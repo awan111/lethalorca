@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LethalOrca — $LORCA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --abyss: #030d16;
+    --deep: #061826;
+    --deep2: #0a2436;
+    --teal: #2dd4bf;
+    --teal-glow: #5eead4;
+    --gold: #f2c94c;
+    --ink: #eef6f6;
+    --muted: #7fa8a8;
+    --line: rgba(94, 234, 212, 0.15);
+    --display: 'Space Grotesk', sans-serif;
+    --body: 'Inter', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--abyss);
+    color: var(--ink);
+    font-family: var(--body);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  a { color: var(--teal-glow); text-decoration: none; }
+
+  /* Ambient background texture */
+  .noise-layer {
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle at 20% 20%, rgba(45,212,191,0.06), transparent 40%),
+                       radial-gradient(circle at 80% 60%, rgba(242,201,76,0.04), transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 6%;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    background: rgba(3,13,22,0.6);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-glow); box-shadow: 0 0 12px var(--teal-glow); }
+  nav .links { display: flex; gap: 28px; font-size: 14px; color: var(--muted); }
+  nav .links a:hover { color: var(--teal-glow); }
+
+  section { position: relative; z-index: 1; padding: 140px 6% 100px; max-width: 1180px; margin: 0 auto; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 100px;
+    position: relative;
+  }
+  .depth-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--teal);
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+  h1.hero-title {
+    font-family: var(--display);
+    font-size: clamp(48px, 8vw, 104px);
+    font-weight: 700;
+    line-height: 0.98;
+    letter-spacing: -2px;
+    background: linear-gradient(180deg, #ffffff 0%, var(--teal-glow) 120%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero-sub {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 560px;
+    margin-top: 24px;
+  }
+  .hero-cta { display: flex; gap: 16px; margin-top: 40px; flex-wrap: wrap; }
+  .btn {
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 14px 28px;
+    border-radius: 100px;
+    border: 1px solid var(--line);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+  .btn-primary { background: var(--teal-glow); color: var(--abyss); border: none; }
+  .btn-primary:hover { background: var(--teal); transform: translateY(-2px); }
+  .btn-ghost { color: var(--ink); }
+  .btn-ghost:hover { border-color: var(--teal-glow); color: var(--teal-glow); }
+
+  /* Orca trail svg */
+  #orca-trail { position: absolute; right: -5%; top: 20%; width: 55%; max-width: 640px; opacity: 0.9; }
+
+  /* Section headers with depth markers */
+  .depth-marker {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .depth-marker .depth-val { font-family: var(--mono); font-size: 13px; color: var(--teal); letter-spacing: 1px; }
+  .depth-marker .depth-name { font-family: var(--mono); font-size: 13px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; }
+  h2.section-title {
+    font-family: var(--display);
+    font-size: clamp(30px, 4vw, 46px);
+    font-weight: 600;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+  }
+  .section-lede { color: var(--muted); max-width: 620px; font-size: 16px; margin-bottom: 48px; }
+
+  hr.divider { border: none; border-top: 1px solid var(--line); margin: 0 6%; }
+
+  /* About */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+  .about-grid p { color: var(--muted); margin-bottom: 16px; font-size: 15px; }
+  .founder-card {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 28px;
+    background: linear-gradient(180deg, var(--deep2), var(--deep));
+  }
+  .founder-card .label { font-family: var(--mono); font-size: 11px; color: var(--teal); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  .founder-card h3 { font-family: var(--display); font-size: 22px; margin-bottom: 12px; }
+  .founder-card p { font-size: 14px; color: var(--muted); }
+
+  /* Transparency / ledger */
+  .ledger {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--deep);
+  }
+  .ledger-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .ledger-row:last-child { border-bottom: none; }
+  .ledger-key { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-family: var(--mono); }
+  .ledger-val { font-family: var(--mono); font-size: 15px; color: var(--ink); }
+  .ledger-val.editable { color: var(--gold); }
+  .verify-note {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  /* Roadmap timeline */
+  .timeline { position: relative; padding-left: 32px; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 6px; top: 8px; bottom: 8px;
+    width: 1px;
+    background: linear-gradient(180deg, var(--teal-glow), transparent);
+  }
+  .tl-item { position: relative; padding-bottom: 44px; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -32px; top: 4px;
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: var(--abyss);
+    border: 2px solid var(--teal-glow);
+  }
+  .tl-item.active::before { background: var(--teal-glow); box-shadow: 0 0 10px var(--teal-glow); }
+  .tl-phase { font-family: var(--mono); font-size: 12px; color: var(--teal); letter-spacing: 1px; margin-bottom: 6px; }
+  .tl-title { font-family: var(--display); font-size: 21px; margin-bottom: 6px; }
+  .tl-desc { color: var(--muted); font-size: 14.5px; max-width: 540px; }
+
+  /* Community */
+  .community-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .comm-card {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 24px;
+    background: var(--deep);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+  .comm-card:hover { border-color: var(--teal-glow); transform: translateY(-3px); }
+  .comm-card .plat { font-family: var(--mono); font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+  .comm-card .handle { font-family: var(--display); font-size: 18px; }
+
+  /* Risk disclaimer */
+  footer {
+    padding: 60px 6% 50px;
+    border-top: 1px solid var(--line);
+    position: relative;
+    z-index: 1;
+  }
+  .disclaimer {
+    font-size: 12.5px;
+    color: var(--muted);
+    max-width: 780px;
+    line-height: 1.7;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.02);
+  }
+  .disclaimer strong { color: var(--ink); }
+  .foot-bottom { margin-top: 24px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
+  @media (max-width: 860px) {
+    .about-grid { grid-template-columns: 1fr; }
+    #orca-trail { display: none; }
+    nav .links { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-layer"></div>
+
+<nav>
+  <div class="brand"><span class="dot"></span>LETHALORCA</div>
+  <div class="links">
+    <a href="#about">About</a>
+    <a href="#transparency">Transparency</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#community">Community</a>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="depth-tag">0m — Surface</div>
+  <h1 class="hero-title">Built in<br>open water.</h1>
+  <p class="hero-sub">$LORCA is a community-first token on pump.fun, paired with LethalOrca Fishing — a play-and-earn arcade game launching next quarter. Every detail below is verifiable. Do your own research before investing.</p>
+  <div class="hero-cta">
+    <a class="btn btn-primary" href="#transparency">View Token Details</a>
+    <a class="btn btn-ghost" href="https://x.com/lethalorcatdo" target="_blank" rel="noopener">Follow on X ↗</a>
+  </div>
+
+  <svg id="orca-trail" viewBox="0 0 500 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path id="trail-path" d="M -20 220 Q 100 180 180 200 Q 260 220 320 140 Q 380 70 480 60" stroke="url(#trailGrad)" stroke-width="2" stroke-dasharray="4 8" opacity="0.5"/>
+    <defs>
+      <linearGradient id="trailGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#5eead4" stop-opacity="0.8"/>
+      </linearGradient>
+    </defs>
+    <g id="orca-icon" transform="translate(420,60) scale(1.1)">
+      <path d="M -60 10 Q -40 -30 0 -32 Q 45 -34 62 -5 Q 55 12 25 20 Q -10 26 -40 20 Q -55 17 -60 10 Z" fill="#0d1f2b" stroke="#2dd4bf" stroke-width="1"/>
+      <path d="M -38 10 Q -15 20 15 18 Q 35 16 45 4 Q 28 17 0 16 Q -25 15 -38 10 Z" fill="#eef6f6"/>
+      <circle cx="-42" cy="-3" r="2.6" fill="#eef6f6"/>
+      <path d="M 58 -6 L 78 -20 L 72 2 L 82 18 L 58 6 Z" fill="#0d1f2b" stroke="#2dd4bf" stroke-width="1"/>
+    </g>
+  </svg>
+</section>
+
+<hr class="divider">
+
+<section id="about">
+  <div class="depth-marker"><span class="depth-val">–200m</span><span class="depth-name">Mesopelagic / About</span></div>
+  <h2 class="section-title">Who's building this</h2>
+  <p class="section-lede">A real person, building in public, with a plan longer than one launch.</p>
+  <div class="about-grid">
+    <div>
+      <p>LethalOrca started as a simple idea: pair a genuinely fun, free-to-play arcade game with a community token — instead of a token with nothing behind it.</p>
+      <p>The first product is a lightweight fishing-arcade game, already playable in prototype form, with wallet and reward features planned as the community grows. Progress is shared openly on X rather than promised all at once.</p>
+      <p>This is an early-stage, high-risk project. There are no guarantees of value or returns — see the disclaimer at the bottom of this page before making any decisions.</p>
+    </div>
+    <div class="founder-card">
+      <div class="label">Founder</div>
+      <h3>Independent Developer</h3>
+      <p>25+ years of professional background in sales, customer service, and front-office operations, now building LethalOrca as an independent, self-funded project. Actively posting build updates and roadmap progress on X.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="transparency">
+  <div class="depth-marker"><span class="depth-val">–1000m</span><span class="depth-name">Bathypelagic / Transparency</span></div>
+  <h2 class="section-title">Verify it yourself</h2>
+  <p class="section-lede">Don't take our word for it — every figure below can be checked on-chain or on pump.fun directly.</p>
+  <div class="ledger">
+    <div class="ledger-row"><span class="ledger-key">Token</span><span class="ledger-val">LethalOrca ($LORCA)</span></div>
+    <div class="ledger-row"><span class="ledger-key">Chain</span><span class="ledger-val">Solana</span></div>
+    <div class="ledger-row"><span class="ledger-key">Launched via</span><span class="ledger-val"><a href="https://pump.fun" target="_blank" rel="noopener">pump.fun ↗</a></span></div>
+    <div class="ledger-row"><span class="ledger-key">Contract address</span><span class="ledger-val editable">[ paste your contract address here ]</span></div>
+    <div class="ledger-row"><span class="ledger-key">Total supply</span><span class="ledger-val editable">[ paste total supply here ]</span></div>
+    <div class="ledger-row"><span class="ledger-key">Team allocation</span><span class="ledger-val editable">[ state your team's token % honestly here ]</span></div>
+  </div>
+  <div class="verify-note">
+    ⚓ Always cross-check the contract address against the official pump.fun page before trading — never trust a link from an unverified source.
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="roadmap">
+  <div class="depth-marker"><span class="depth-val">–4000m</span><span class="depth-name">Abyssal / Roadmap</span></div>
+  <h2 class="section-title">Where this goes next</h2>
+  <p class="section-lede">A phased plan — each stage ships before the next one is promised.</p>
+  <div class="timeline">
+    <div class="tl-item active">
+      <div class="tl-phase">PHASE 01 — NEXT QUARTER</div>
+      <div class="tl-title">Game Launch</div>
+      <div class="tl-desc">LethalOrca Fishing releases publicly on Android, with in-game point tracking and a growing player base.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-phase">PHASE 02</div>
+      <div class="tl-title">Wallet Integration</div>
+      <div class="tl-desc">Secure wallet connection added, letting players link accounts in preparation for on-chain rewards.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-phase">PHASE 03</div>
+      <div class="tl-title">Airdrop for Early Players</div>
+      <div class="tl-desc">A transparent, rules-published airdrop rewarding early community members and active players — criteria announced in advance, not after the fact.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-phase">PHASE 04</div>
+      <div class="tl-title">In-Game Token Utility</div>
+      <div class="tl-desc">$LORCA becomes usable inside the game economy — earning, spending, and a player-facing marketplace.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="community">
+  <div class="depth-marker"><span class="depth-val">–6000m</span><span class="depth-name">Hadal / Community</span></div>
+  <h2 class="section-title">Join the crew</h2>
+  <p class="section-lede">Follow along, ask questions, and watch the build happen in real time.</p>
+  <div class="community-grid">
+    <a class="comm-card" href="https://x.com/lethalorcatdo" target="_blank" rel="noopener">
+      <div class="plat">X / Twitter</div>
+      <div class="handle">@lethalorcatdo ↗</div>
+    </a>
+    <div class="comm-card">
+      <div class="plat">Telegram</div>
+      <div class="handle">[ add your Telegram link ]</div>
+    </div>
+    <div class="comm-card">
+      <div class="plat">pump.fun</div>
+      <div class="handle">[ add your token page link ]</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="disclaimer">
+    <strong>Risk disclosure:</strong> $LORCA is an experimental, early-stage cryptocurrency token. It carries high risk, including the possible loss of your full investment. Nothing on this page is financial advice, and no one associated with this project can guarantee its price, liquidity, or future value. Cryptocurrency markets are volatile and largely unregulated — always do your own research, verify all contract addresses independently, and only invest what you can afford to lose.
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 LethalOrca. Built independently.</span>
+    <span>Not affiliated with pump.fun.</span>
+  </div>
+</footer>
+
+</body>
+</html>
