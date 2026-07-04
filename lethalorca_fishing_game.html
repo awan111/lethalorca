@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LethalOrca Fishing - Token Catcher</title>
+    <title>LethalOrca Fishing - Token Catcher (Wallet Mockup)</title>
     <style>
         body {
             margin: 0;
@@ -33,8 +33,8 @@
             background: rgba(0, 0, 0, 0.6);
             padding: 10px 20px;
             border-radius: 20px;
-            border: 2px solid #00ffff;
-            box-shadow: 0 0 15px #00ffff;
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 15px #ffd700;
         }
         .fish {
             position: absolute;
@@ -53,12 +53,12 @@
             background: rgba(0, 5, 20, 0.95);
             padding: 40px;
             border-radius: 20px;
-            border: 3px solid #00ffff;
-            box-shadow: 0 0 30px #00ffff;
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 30px #ffd700;
             z-index: 20;
         }
         button {
-            background: linear-gradient(45deg, #00ffff, #0088cc);
+            background: linear-gradient(45deg, #ffd700, #ffa500);
             color: black;
             border: none;
             padding: 12px 30px;
@@ -67,10 +67,10 @@
             border-radius: 25px;
             cursor: pointer;
             margin-top: 20px;
-            box-shadow: 0 5px 15px rgba(0,255,255,0.4);
+            box-shadow: 0 5px 15px rgba(255,215,0,0.4);
         }
         button:hover {
-            background: linear-gradient(45deg, #0088cc, #00ffff);
+            background: linear-gradient(45deg, #ffa500, #ffd700);
         }
         .floating-text {
             position: absolute;
@@ -96,7 +96,7 @@
 
     <div id="game-over-screen">
         <h2>Time's Up!</h2>
-        <p style="font-size: 20px;">You earned <span id="final-score" style="color:#00ffff; font-weight:bold;">0</span> LORCA tokens this round!</p>
+        <p style="font-size: 20px;">You earned <span id="final-score" style="color:#ffd700; font-weight:bold;">0</span> LORCA tokens this round!</p>
         <button onclick="restartGame()">Play Again</button>
     </div>
 </div>
@@ -108,11 +108,45 @@
     let spawnInterval;
     const gameContainer = document.getElementById('game-container');
 
-    // Naya feature logic (Golden Orca aur Jellyfish)
+    // 🔊 Synthetic Pop Sound Generator (No file needed)
+    function playPopSound(type) {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'sine';
+            
+            // Alag fish k liye alag sound pitch
+            if (type === 'golden') {
+                oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.15); // High pitch for reward
+            } else if (type === 'jellyfish') {
+                oscillator.frequency.setValueAtTime(250, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2); // Low buzz for danger
+            } else {
+                oscillator.frequency.setValueAtTime(400, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1); // Normal pop
+            }
+
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.15);
+        } catch (e) {
+            console.log("Audio context blocked or not supported.");
+        }
+    }
+
+    // Fish configuration
     const fishTypes = [
-        { type: 'normal', points: 1, speed: 3, color: '#00ffff', label: '🐟' },
-        { type: 'golden', points: 5, speed: 5, color: '#ffd700', label: '🐋' }, 
-        { type: 'jellyfish', points: -5, speed: 2, color: '#ff4444', label: '👾' } 
+        { type: 'normal', points: 1, speed: 4, color: '#00ffff', label: '🐟' },
+        { type: 'golden', points: 5, speed: 6, color: '#ffd700', label: '🐋' }, 
+        { type: 'jellyfish', points: -5, speed: 3, color: '#ff4444', label: '👾' } 
     ];
 
     function startGame() {
@@ -122,6 +156,10 @@
         document.getElementById('time-display').innerText = timeLeft;
         document.getElementById('game-over-screen').style.display = 'none';
 
+        // Clear existing intervals if any
+        clearInterval(gameInterval);
+        clearInterval(spawnInterval);
+
         gameInterval = setInterval(() => {
             timeLeft--;
             document.getElementById('time-display').innerText = timeLeft;
@@ -130,7 +168,7 @@
             }
         }, 1000);
 
-        spawnInterval = setInterval(spawnFish, 700);
+        spawnInterval = setInterval(spawnFish, 600);
     }
 
     function spawnFish() {
@@ -139,32 +177,34 @@
         const randomRoll = Math.random();
         let fishData = fishTypes[0]; 
 
-        if (randomRoll > 0.82) {
-            fishData = fishTypes[1]; // Golden Orca
-        } else if (randomRoll < 0.18) {
-            fishData = fishTypes[2]; // Jellyfish
+        if (randomRoll > 0.80) {
+            fishData = fishTypes[1]; // 20% Chance Golden Orca
+        } else if (randomRoll < 0.15) {
+            fishData = fishTypes[2]; // 15% Chance Jellyfish
         }
 
         const fish = document.createElement('div');
         fish.className = 'fish';
-        fish.style.fontSize = fishData.type === 'golden' ? '50px' : '35px';
+        fish.style.fontSize = fishData.type === 'golden' ? '52px' : '38px';
         fish.innerText = fishData.label;
         
         const side = Math.random() > 0.5 ? 'left' : 'right';
-        const posY = Math.random() * (window.innerHeight - 100) + 50;
+        const posY = Math.random() * (window.innerHeight - 120) + 60;
         fish.style.top = posY + 'px';
 
         if (side === 'left') {
-            fish.style.left = '-60px';
+            fish.style.left = '-70px';
             gameContainer.appendChild(fish);
             animateFish(fish, side, fishData);
         } else {
-            fish.style.right = '-60px';
+            fish.style.right = '-70px';
             gameContainer.appendChild(fish);
             animateFish(fish, side, fishData);
         }
 
-        fish.addEventListener('mousedown', () => {
+        // Click handler
+        fish.addEventListener('mousedown', (e) => {
+            playPopSound(fishData.type); // Plays custom sound!
             score += fishData.points;
             if(score < 0) score = 0; 
             document.getElementById('score-display').innerText = score + " LORCA";
@@ -175,7 +215,7 @@
     }
 
     function animateFish(fish, side, fishData) {
-        let pos = -60;
+        let pos = -70;
         const speed = fishData.speed;
         
         const move = setInterval(() => {
@@ -192,7 +232,7 @@
                 fish.style.right = pos + 'px';
             }
 
-            if (pos > window.innerWidth + 60) {
+            if (pos > window.innerWidth + 70) {
                 clearInterval(move);
                 fish.remove();
             }
@@ -222,6 +262,7 @@
         startGame();
     }
 
+    // Auto start
     startGame();
 </script>
 
