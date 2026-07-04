@@ -108,11 +108,11 @@
     let spawnInterval;
     const gameContainer = document.getElementById('game-container');
 
-    // Fish types setting
+    // Naya feature logic (Golden Orca aur Jellyfish)
     const fishTypes = [
         { type: 'normal', points: 1, speed: 3, color: '#00ffff', label: '🐟' },
-        { type: 'golden', points: 5, speed: 5, color: '#ffd700', label: '🐋' }, // Rare Orca
-        { type: 'jellyfish', points: -5, speed: 2, color: '#ff4444', label: '👾' } // Obstacle
+        { type: 'golden', points: 5, speed: 5, color: '#ffd700', label: '🐋' }, 
+        { type: 'jellyfish', points: -5, speed: 2, color: '#ff4444', label: '👾' } 
     ];
 
     function startGame() {
@@ -137,12 +137,12 @@
         if (timeLeft <= 0) return;
 
         const randomRoll = Math.random();
-        let fishData = fishTypes[0]; // Normal fish
+        let fishData = fishTypes[0]; 
 
         if (randomRoll > 0.82) {
-            fishData = fishTypes[1]; // 18% chance Golden Orca
+            fishData = fishTypes[1]; // Golden Orca
         } else if (randomRoll < 0.18) {
-            fishData = fishTypes[2]; // 18% chance Jellyfish
+            fishData = fishTypes[2]; // Jellyfish
         }
 
         const fish = document.createElement('div');
@@ -150,7 +150,6 @@
         fish.style.fontSize = fishData.type === 'golden' ? '50px' : '35px';
         fish.innerText = fishData.label;
         
-        // Random Y position
         const side = Math.random() > 0.5 ? 'left' : 'right';
         const posY = Math.random() * (window.innerHeight - 100) + 50;
         fish.style.top = posY + 'px';
@@ -167,7 +166,7 @@
 
         fish.addEventListener('mousedown', () => {
             score += fishData.points;
-            if(score < 0) score = 0; // Negative score prevent karne k liye
+            if(score < 0) score = 0; 
             document.getElementById('score-display').innerText = score + " LORCA";
             
             showFloatingText(fishData.points, fish.offsetLeft, fish.offsetTop, fishData.color);
@@ -223,7 +222,6 @@
         startGame();
     }
 
-    // Start on load
     startGame();
 </script>
 
