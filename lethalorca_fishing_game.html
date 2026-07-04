@@ -113,9 +113,11 @@
   .wallet-option-btn:hover { border-color: #5eead4; }
   .withdraw-btn {
     width: 100%; margin-top: 20px; padding: 14px; border-radius: 10px;
-    background: rgba(127,168,168,0.15); color: #7fa8a8; border: 1px solid rgba(127,168,168,0.3);
-    font-size: 14px; font-weight: 600; cursor: not-allowed;
+    background: linear-gradient(135deg, #2dd4bf, #0d9488); color: #04211d; border: none;
+    font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.15s ease;
   }
+  .withdraw-btn:hover { transform: translateY(-1px); }
+  .withdraw-btn:disabled { background: rgba(127,168,168,0.15); color: #7fa8a8; cursor: not-allowed; transform: none; }
   .phase-note { font-size: 12px; color: #7fa8a8; margin-top: 10px; line-height: 1.5; }
   .disconnect-btn {
     width: 100%; margin-top: 24px; padding: 10px; border-radius: 10px;
@@ -172,8 +174,8 @@
         <div class="wc-label">In-Game Balance</div>
         <div class="wc-value"><span id="wallet-token-count">0</span> LORCA</div>
       </div>
-      <button class="withdraw-btn" disabled>Withdraw to Wallet (Phase 2)</button>
-      <p class="phase-note">Withdrawals are disabled in this preview. Real token transfers will launch in Phase 2, after a secure backend and smart-contract review are in place.</p>
+      <button class="withdraw-btn" id="withdraw-btn" onclick="mockWithdraw()">Withdraw to Wallet (Simulated)</button>
+      <p class="phase-note">This is a simulated withdrawal for preview purposes — no real $LORCA token exists yet, so no real funds move. Real withdrawals launch in Phase 2, after the token, a secure backend, and a smart-contract audit are in place.</p>
       <button class="disconnect-btn" onclick="mockDisconnect()">Disconnect</button>
     </div>
   </div>
@@ -219,6 +221,7 @@ function catchFish(fish, value) {
   tokens += value;
   tokenCountEl.textContent = tokens;
   walletTokenCountEl.textContent = tokens;
+  playCatchSound(value > 1);
 
   const plus = document.createElement('div');
   plus.id = 'floating-plus';
@@ -254,6 +257,7 @@ function startGame() {
 
   spawnInterval = setInterval(spawnFish, 700);
   setInterval(spawnBubble, 600);
+  startMusic();
 
   gameInterval = setInterval(() => {
     timeLeft--;
@@ -264,11 +268,71 @@ function startGame() {
 
 function endGame() {
   running = false;
+  stopMusic();
   clearInterval(gameInterval);
   clearInterval(spawnInterval);
   document.querySelectorAll('.fish').forEach(f => f.remove());
   document.getElementById('final-score-text').textContent = 'You earned ' + tokens + ' LORCA tokens this round!';
   document.getElementById('end-screen').classList.remove('hidden');
+}
+
+/* ---------- SOUND EFFECTS & MUSIC (synthesized, no external files) ---------- */
+let audioCtx = null;
+let musicInterval = null;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioCtx;
+}
+
+// Short "catch" beep — pitch varies slightly for normal vs bonus catch
+function playCatchSound(isBonus) {
+  const ctx = getAudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(isBonus ? 880 : 660, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(isBonus ? 1320 : 990, ctx.currentTime + 0.12);
+  gain.gain.setValueAtTime(0.18, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.2);
+}
+
+// Gentle background "picking" music loop — simple plucked arpeggio, ocean-y feel
+const bgNotes = [261.6, 329.6, 392.0, 329.6, 440.0, 392.0, 329.6, 293.7]; // C E G E A G E D
+let bgStep = 0;
+
+function playPluckNote(freq) {
+  const ctx = getAudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(freq, ctx.currentTime);
+  gain.gain.setValueAtTime(0.05, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.5);
+}
+
+function startMusic() {
+  getAudioCtx(); // unlock audio on user gesture
+  bgStep = 0;
+  if (musicInterval) clearInterval(musicInterval);
+  musicInterval = setInterval(() => {
+    playPluckNote(bgNotes[bgStep % bgNotes.length]);
+    bgStep++;
+  }, 380);
+}
+
+function stopMusic() {
+  if (musicInterval) { clearInterval(musicInterval); musicInterval = null; }
 }
 
 /* ---------- WALLET UI MOCKUP (no real blockchain interaction) ---------- */
@@ -295,6 +359,31 @@ function mockDisconnect() {
   document.getElementById('wallet-disconnected-view').classList.remove('hidden');
   document.getElementById('wallet-btn').classList.remove('connected');
   document.getElementById('wallet-btn-label').textContent = 'Connect Wallet';
+}
+
+function mockWithdraw() {
+  const btn = document.getElementById('withdraw-btn');
+  if (tokens <= 0) {
+    btn.textContent = 'Nothing to withdraw yet';
+    setTimeout(() => { btn.textContent = 'Withdraw to Wallet (Simulated)'; }, 1500);
+    return;
+  }
+  const amount = tokens;
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+
+  setTimeout(() => {
+    btn.textContent = '✓ ' + amount + ' LORCA sent (simulated)';
+    playCatchSound(true);
+    tokens = 0;
+    tokenCountEl.textContent = tokens;
+    walletTokenCountEl.textContent = tokens;
+
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = 'Withdraw to Wallet (Simulated)';
+    }, 2200);
+  }, 1400);
 }
 </script>
 </body>
