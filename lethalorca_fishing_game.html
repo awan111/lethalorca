@@ -1,29 +1,231 @@
-// 1. Fish types aur unke points define karein
-const fishTypes = [
-    { type: 'normal', points: 1, speed: 2, image: 'fish.png' },
-    { type: 'golden', points: 5, speed: 4, image: 'golden_orca.png' }, // Rare & Fast
-    { type: 'jellyfish', points: -5, speed: 1, image: 'jellyfish.png' } // Obstacle
-];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LethalOrca Fishing - Token Catcher</title>
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(circle, #001f3f, #000511);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            text-align: center;
+            user-select: none;
+        }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 10;
+        }
+        .score-box {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 15px #00ffff;
+        }
+        .fish {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .fish:active {
+            transform: scale(0.8);
+        }
+        #game-over-screen {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 5, 20, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #00ffff;
+            box-shadow: 0 0 30px #00ffff;
+            z-index: 20;
+        }
+        button {
+            background: linear-gradient(45deg, #00ffff, #0088cc);
+            color: black;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,255,255,0.4);
+        }
+        button:hover {
+            background: linear-gradient(45deg, #0088cc, #00ffff);
+        }
+        .floating-text {
+            position: absolute;
+            font-weight: bold;
+            font-size: 28px;
+            animation: floatUp 0.8s ease-out forwards;
+            pointer-events: none;
+            z-index: 15;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-50px); }
+        }
+    </style>
+</head>
+<body>
 
-// 2. Random fish generate karne ka function
-function spawnFish() {
-    const randomRoll = Math.random();
-    let selectedFish = fishTypes[0]; // Default normal fish
+<div id="game-container">
+    <div id="ui-layer">
+        <div class="score-box">Score: <span id="score-display">0 LORCA</span></div>
+        <div class="score-box">Time: <span id="time-display">30</span>s</div>
+    </div>
 
-    if (randomRoll > 0.85) {
-        selectedFish = fishTypes[1]; // 15% chance for Golden Orca
-    } else if (randomRoll < 0.15) {
-        selectedFish = fishTypes[2]; // 15% chance for Jellyfish
+    <div id="game-over-screen">
+        <h2>Time's Up!</h2>
+        <p style="font-size: 20px;">You earned <span id="final-score" style="color:#00ffff; font-weight:bold;">0</span> LORCA tokens this round!</p>
+        <button onclick="restartGame()">Play Again</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let timeLeft = 30;
+    let gameInterval;
+    let spawnInterval;
+    const gameContainer = document.getElementById('game-container');
+
+    // Fish types setting
+    const fishTypes = [
+        { type: 'normal', points: 1, speed: 3, color: '#00ffff', label: '🐟' },
+        { type: 'golden', points: 5, speed: 5, color: '#ffd700', label: '🐋' }, // Rare Orca
+        { type: 'jellyfish', points: -5, speed: 2, color: '#ff4444', label: '👾' } // Obstacle
+    ];
+
+    function startGame() {
+        score = 0;
+        timeLeft = 30;
+        document.getElementById('score-display').innerText = "0 LORCA";
+        document.getElementById('time-display').innerText = timeLeft;
+        document.getElementById('game-over-screen').style.display = 'none';
+
+        gameInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('time-display').innerText = timeLeft;
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }, 1000);
+
+        spawnInterval = setInterval(spawnFish, 700);
     }
 
-    createFishElement(selectedFish);
-}
+    function spawnFish() {
+        if (timeLeft <= 0) return;
 
-// 3. Catching Logic (Score calculation)
-function catchFish(fish) {
-    score += fish.points;
-    document.getElementById('score-display').innerText = score + " LORCA";
-    
-    // Floating text effect dikhane ke liye (+1 or -5)
-    showFloatingText(fish.points);
-}
+        const randomRoll = Math.random();
+        let fishData = fishTypes[0]; // Normal fish
+
+        if (randomRoll > 0.82) {
+            fishData = fishTypes[1]; // 18% chance Golden Orca
+        } else if (randomRoll < 0.18) {
+            fishData = fishTypes[2]; // 18% chance Jellyfish
+        }
+
+        const fish = document.createElement('div');
+        fish.className = 'fish';
+        fish.style.fontSize = fishData.type === 'golden' ? '50px' : '35px';
+        fish.innerText = fishData.label;
+        
+        // Random Y position
+        const side = Math.random() > 0.5 ? 'left' : 'right';
+        const posY = Math.random() * (window.innerHeight - 100) + 50;
+        fish.style.top = posY + 'px';
+
+        if (side === 'left') {
+            fish.style.left = '-60px';
+            gameContainer.appendChild(fish);
+            animateFish(fish, side, fishData);
+        } else {
+            fish.style.right = '-60px';
+            gameContainer.appendChild(fish);
+            animateFish(fish, side, fishData);
+        }
+
+        fish.addEventListener('mousedown', () => {
+            score += fishData.points;
+            if(score < 0) score = 0; // Negative score prevent karne k liye
+            document.getElementById('score-display').innerText = score + " LORCA";
+            
+            showFloatingText(fishData.points, fish.offsetLeft, fish.offsetTop, fishData.color);
+            fish.remove();
+        });
+    }
+
+    function animateFish(fish, side, fishData) {
+        let pos = -60;
+        const speed = fishData.speed;
+        
+        const move = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(move);
+                fish.remove();
+                return;
+            }
+            
+            pos += speed;
+            if (side === 'left') {
+                fish.style.left = pos + 'px';
+            } else {
+                fish.style.right = pos + 'px';
+            }
+
+            if (pos > window.innerWidth + 60) {
+                clearInterval(move);
+                fish.remove();
+            }
+        }, 20);
+    }
+
+    function showFloatingText(points, x, y, color) {
+        const text = document.createElement('div');
+        text.className = 'floating-text';
+        text.style.left = x + 'px';
+        text.style.top = y + 'px';
+        text.style.color = color;
+        text.innerText = points > 0 ? `+${points}` : `${points}`;
+        gameContainer.appendChild(text);
+        
+        setTimeout(() => text.remove(), 800);
+    }
+
+    function endGame() {
+        clearInterval(gameInterval);
+        clearInterval(spawnInterval);
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('game-over-screen').style.display = 'block';
+    }
+
+    function restartGame() {
+        startGame();
+    }
+
+    // Start on load
+    startGame();
+</script>
+
+</body>
+</html>
