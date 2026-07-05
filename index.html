@@ -32,7 +32,6 @@
   }
   a { color: var(--teal-glow); text-decoration: none; }
 
-  /* Ambient background texture */
   .noise-layer {
     position: fixed;
     inset: 0;
@@ -69,7 +68,6 @@
 
   section { position: relative; z-index: 1; padding: 140px 6% 100px; max-width: 1180px; margin: 0 auto; }
 
-  /* HERO */
   #hero {
     min-height: 100vh;
     display: flex;
@@ -122,10 +120,8 @@
   .btn-ghost { color: var(--ink); }
   .btn-ghost:hover { border-color: var(--teal-glow); color: var(--teal-glow); }
 
-  /* Orca trail svg */
   #orca-trail { position: absolute; right: -5%; top: 20%; width: 55%; max-width: 640px; opacity: 0.9; }
 
-  /* Section headers with depth markers */
   .depth-marker {
     display: flex;
     align-items: baseline;
@@ -145,7 +141,6 @@
 
   hr.divider { border: none; border-top: 1px solid var(--line); margin: 0 6%; }
 
-  /* About */
   .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
   .about-grid p { color: var(--muted); margin-bottom: 16px; font-size: 15px; }
   .founder-card {
@@ -158,7 +153,6 @@
   .founder-card h3 { font-family: var(--display); font-size: 22px; margin-bottom: 12px; }
   .founder-card p { font-size: 14px; color: var(--muted); }
 
-  /* Transparency / ledger */
   .ledger {
     border: 1px solid var(--line);
     border-radius: 16px;
@@ -187,7 +181,6 @@
     align-items: flex-start;
   }
 
-  /* Roadmap timeline */
   .timeline { position: relative; padding-left: 32px; }
   .timeline::before {
     content: '';
@@ -212,7 +205,6 @@
   .tl-title { font-family: var(--display); font-size: 21px; margin-bottom: 6px; }
   .tl-desc { color: var(--muted); font-size: 14.5px; max-width: 540px; }
 
-  /* Community */
   .community-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
   .comm-card {
     border: 1px solid var(--line);
@@ -225,7 +217,6 @@
   .comm-card .plat { font-family: var(--mono); font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
   .comm-card .handle { font-family: var(--display); font-size: 18px; }
 
-  /* Risk disclaimer */
   footer {
     padding: 60px 6% 50px;
     border-top: 1px solid var(--line);
@@ -270,7 +261,8 @@
   <h1 class="hero-title">Built in<br>open water.</h1>
   <p class="hero-sub">$LORCA is a community-first token on pump.fun, paired with LethalOrca Fishing — a play-and-earn arcade game launching next quarter. Every detail below is verifiable. Do your own research before investing.</p>
   <div class="hero-cta">
-    <a class="btn btn-primary" href="#transparency">View Token Details</a>
+    <a class="btn btn-primary" href="game.html">▶ Play Demo</a>
+    <a class="btn btn-ghost" href="#transparency">View Token Details</a>
     <a class="btn btn-ghost" href="https://x.com/lethalorcatdo" target="_blank" rel="noopener">Follow on X ↗</a>
   </div>
 
@@ -320,13 +312,13 @@
   <div class="ledger">
     <div class="ledger-row"><span class="ledger-key">Token</span><span class="ledger-val">LethalOrca ($LORCA)</span></div>
     <div class="ledger-row"><span class="ledger-key">Chain</span><span class="ledger-val">Solana</span></div>
-    <div class="ledger-row"><span class="ledger-key">Launched via</span><span class="ledger-val"><a href="https://pump.fun" target="_blank" rel="noopener">pump.fun ↗</a></span></div>
-    <div class="ledger-row"><span class="ledger-key">Contract address</span><span class="ledger-val editable">[ paste your contract address here ]</span></div>
-    <div class="ledger-row"><span class="ledger-key">Total supply</span><span class="ledger-val editable">[ paste total supply here ]</span></div>
-    <div class="ledger-row"><span class="ledger-key">Team allocation</span><span class="ledger-val editable">[ state your team's token % honestly here ]</span></div>
+    <div class="ledger-row"><span class="ledger-key">Launch platform</span><span class="ledger-val">pump.fun (upcoming)</span></div>
+    <div class="ledger-row"><span class="ledger-key">Contract address</span><span class="ledger-val editable">Not yet issued — game launches first</span></div>
+    <div class="ledger-row"><span class="ledger-key">Total supply</span><span class="ledger-val editable">To be announced</span></div>
+    <div class="ledger-row"><span class="ledger-key">Team allocation</span><span class="ledger-val editable">To be announced</span></div>
   </div>
   <div class="verify-note">
-    ⚓ Always cross-check the contract address against the official pump.fun page before trading — never trust a link from an unverified source.
+    ⚓ The $LORCA token has not launched yet. The game comes first — token details will be published here, in full, the moment it goes live. Never trust a contract address from anywhere else claiming to be $LORCA until it's confirmed on this page.
   </div>
 </section>
 
@@ -372,13 +364,13 @@
       <div class="handle">@lethalorcatdo ↗</div>
     </a>
     <div class="comm-card">
-      <div class="plat">Telegram</div>
-      <div class="handle">[ add your Telegram link ]</div>
+      <div class="plat">Discord</div>
+      <div class="handle">Under Process</div>
     </div>
-    <div class="comm-card">
+    <a class="comm-card" href="https://pump.fun/profile/lethalorca06029" target="_blank" rel="noopener">
       <div class="plat">pump.fun</div>
-      <div class="handle">[ add your token page link ]</div>
-    </div>
+      <div class="handle">View Profile ↗</div>
+    </a>
   </div>
 </section>
 
