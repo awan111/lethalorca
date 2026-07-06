@@ -206,7 +206,7 @@ function spawnFish() {
   fish.style.left = startX + '%';
   fish.style.top = randomBetween(20, 75) + '%';
 
-  const value = Math.random() < 0.15 ? 5 : 1;
+  const value = Math.random() < 0.15 ? 25000 : 5000;
   if (value === 5) { fish.textContent = '🐋'; fish.style.fontSize = '46px'; }
 
   fish.addEventListener('click', () => catchFish(fish, value));
@@ -221,7 +221,7 @@ function catchFish(fish, value) {
   tokens += value;
   tokenCountEl.textContent = tokens;
   walletTokenCountEl.textContent = tokens;
-  playCatchSound(value > 1);
+  playCatchSound(value > 5000);
 
   const plus = document.createElement('div');
   plus.id = 'floating-plus';
