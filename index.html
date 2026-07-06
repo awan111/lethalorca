@@ -3,442 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LethalOrca — $LORCA</title>
+    <title>LethalOrca Fishing - Token Catcher (Wallet Mockup)</title>
     <style>
-        :root {
-            --bg-deep: #050b14;
-            --bg-dark: #0a1424;
-            --text-light: #e2f1ff;
-            --text-muted: #708aa6;
-            --primary: #52e5cc;
-            --secondary: #f4c454;
-            --accent-red: #ff5252;
-            --mono-font: 'Courier New', Courier, monospace;
-            --sans-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background-color: var(--bg-deep);
-            color: var(--text-light);
-            font-family: var(--sans-font);
-            line-height: 1.6;
-            overflow-x: hidden;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(180deg, #0a4d68 0%, #088395 50%, #05bfdb 100%);
+            height: 100vh;
+            overflow: hidden;
+            touch-action: manipulation;
         }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 24px;
+        #game-container { position: relative; width: 100%; height: 100vh; overflow: hidden; }
+        #hud {
+            position: absolute; top: 0; left: 0; right: 0;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 20px; z-index: 10; background: rgba(0,0,0,0.25); backdrop-filter: blur(4px);
         }
-
-        /* Header / Nav */
-        header {
-            padding: 24px 0;
-            border-bottom: 1px solid rgba(112, 138, 166, 0.1);
-            position: sticky;
-            top: 0;
-            background: rgba(5, 11, 20, 0.85);
-            backdrop-filter: blur(12px);
-            z-index: 100;
+        #token-display { color: #ffd700; font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        #token-display .coin {
+            width: 24px; height: 24px;
+            background: radial-gradient(circle at 35% 35%, #fff7cc, #ffd700 60%, #b8860b);
+            border-radius: 50%; display: inline-block;
         }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        #timer { color: white; font-size: 16px; font-weight: 600; }
+        #wallet-btn {
+            position: absolute; top: 15px; right: 20px; z-index: 15;
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(94,234,212,0.4);
+            color: #eef6f6; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; gap: 6px;
         }
-
-        .logo {
-            font-weight: 800;
-            font-size: 20px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        #wallet-btn:hover { border-color: #5eead4; }
+        #wallet-btn .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #ff5c5c; }
+        #wallet-btn.connected .status-dot { background: #4ade80; }
+        #hud #wallet-btn { position: static; margin-left: 12px; }
+        .fish {
+            position: absolute; cursor: pointer; user-select: none; transition: transform 0.1s;
+            font-size: 40px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
-
-        .logo::before {
-            content: '';
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: var(--primary);
-            border-radius: 50%;
+        .fish:active { transform: scale(0.85); }
+        .bubble { position: absolute; bottom: -20px; border-radius: 50%; background: rgba(255,255,255,0.35); animation: rise linear forwards; }
+        @keyframes rise { to { transform: translateY(-110vh); opacity: 0; } }
+        #start-screen, #end-screen {
+            position: absolute; inset: 0; background: rgba(0,10,20,0.75);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; z-index: 20; text-align: center; padding: 20px;
         }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 24px;
+        #start-screen h1, #end-screen h1 { font-size: 30px; margin-bottom: 10px; color: #ffd700; }
+        #start-screen p, #end-screen p { max-width: 320px; line-height: 1.5; margin-bottom: 20px; opacity: 0.9; }
+        button.primary {
+            background: linear-gradient(135deg, #ffd700, #ff9500); border: none;
+            padding: 14px 32px; border-radius: 30px; font-size: 17px; font-weight: bold;
+            color: #1a1a1a; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-
-        nav a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.2s ease;
+        .hidden { display: none !important; }
+        #floating-plus { position: absolute; color: #ffd700; font-weight: bold; font-size: 20px; pointer-events: none; animation: floatUp 0.8s ease-out forwards; }
+        @keyframes floatUp { to { transform: translateY(-50px); opacity: 0; } }
+        
+        /* Wallet panel */
+        #wallet-panel {
+            position: absolute; top: 0; right: -340px; width: 320px; height: 100%;
+            background: rgba(3,13,22,0.97); border-left: 1px solid rgba(94,234,212,0.25);
+            z-index: 30; padding: 24px 20px; color: #eef6f6; transition: right 0.3s ease;
+            overflow-y: auto; font-family: 'Segoe UI', Arial, sans-serif;
         }
-
-        nav a:hover {
-            color: var(--text-light);
+        #wallet-panel.open { right: 0; }
+        #wallet-panel h2 { font-size: 18px; margin-bottom: 4px; }
+        .mock-tag { display: inline-block; font-size: 10px; letter-spacing: 1px; color: #f2c94c; border: 1px solid rgba(242,201,76,0.4); padding: 2px 8px; border-radius: 20px; margin-bottom: 18px; text-transform: uppercase; }
+        .wp-close { position: absolute; top: 18px; right: 18px; cursor: pointer; font-size: 20px; color: #7fa8a8; background: none; border: none; }
+        .wallet-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(94,234,212,0.15); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+        .wallet-card .wc-label { font-size: 11px; color: #7fa8a8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+        .wallet-card .wc-value { font-family: monospace; font-size: 14px; word-break: break-all; }
+        .wallet-options { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+        .wallet-option-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(94,234,212,0.2); color: #eef6f6; padding: 12px; border-radius: 10px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; text-align: left; }
+        .wallet-option-btn:hover { border-color: #5eead4; }
+        .withdraw-btn { width: 100%; margin-top: 20px; padding: 14px; border-radius: 10px; background: linear-gradient(135deg, #2dd4bf, #0d9488); color: #04211d; border: none; font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.15s ease; }
+        .withdraw-btn:hover { transform: translateY(-1px); }
+        .withdraw-btn:disabled { background: rgba(127,168,168,0.15); color: #7fa8a8; cursor: not-allowed; transform: none; }
+        .phase-note { font-size: 12px; color: #7fa8a8; margin-top: 10px; line-height: 1.5; }
+        .disconnect-btn { width: 100%; margin-top: 24px; padding: 10px; border-radius: 10px; background: none; color: #ff8080; border: 1px solid rgba(255,128,128,0.3); font-size: 13px; cursor: pointer; }
+        
+        .pump-menu-btn {
+            display: block; width: 100%; text-align: center; margin-top: 15px; padding: 12px;
+            border-radius: 10px; background: #e21b7e; color: white; text-decoration: none;
+            font-size: 14px; font-weight: bold; transition: background 0.2s;
         }
-
-        /* Depth Sections General */
-        .depth-section {
-            padding: 100px 0;
-            position: relative;
-            border-bottom: 1px solid rgba(112, 138, 166, 0.1);
-        }
-
-        .depth-marker {
-            position: absolute;
-            top: 32px;
-            left: 24px;
-            font-family: var(--mono-font);
-            font-size: 12px;
-            color: var(--text-muted);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .section-title {
-            font-size: 48px;
-            font-weight: 800;
-            letter-spacing: -1px;
-            margin-bottom: 16px;
-            line-height: 1.1;
-        }
-
-        .section-subtitle {
-            font-size: 18px;
-            color: var(--text-muted);
-            max-width: 680px;
-            margin-bottom: 40px;
-        }
-
-        /* Buttons */
-        .btn-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .cta-button {
-            display: inline-flex;
-            align-items: center;
-            padding: 14px 28px;
-            border-radius: 30px;
-            font-weight: 700;
-            text-decoration: none;
-            font-size: 15px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border: none;
-        }
-
-        .cta-button.primary {
-            background-color: var(--primary);
-            color: var(--bg-deep);
-        }
-
-        .cta-button.primary:hover {
-            background-color: #43cca6;
-            transform: translateY(-2px);
-        }
-
-        .cta-button.secondary {
-            background-color: transparent;
-            color: var(--text-light);
-            border: 1px solid rgba(112, 138, 166, 0.3);
-        }
-
-        .cta-button.secondary:hover {
-            border-color: var(--text-light);
-            background: rgba(255,255,255,0.02);
-        }
-
-        .cta-button.game-btn {
-            background-color: var(--secondary);
-            color: var(--bg-deep);
-        }
-
-        .cta-button:disabled {
-            background-color: #2a3544 !important;
-            color: #566981 !important;
-            cursor: not-allowed;
-            transform: none !important;
-            border: none;
-        }
-
-        /* Transparency Info Block */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 24px;
-            background: var(--bg-dark);
-            padding: 32px;
-            border-radius: 12px;
-            border: 1px solid rgba(112, 138, 166, 0.1);
-            margin-bottom: 32px;
-        }
-
-        .info-item label {
-            display: block;
-            font-family: var(--mono-font);
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 6px;
-            letter-spacing: 1px;
-        }
-
-        .info-item span {
-            font-size: 16px;
-            font-weight: 700;
-            word-break: break-all;
-        }
-
-        .info-item a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        .warning-box {
-            background: rgba(244, 196, 84, 0.05);
-            border-left: 3px solid var(--secondary);
-            padding: 16px;
-            font-size: 14px;
-            color: #e2d1a6;
-            border-radius: 0 8px 8px 0;
-        }
-
-        /* Roadmap Phasing */
-        .roadmap-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 24px;
-        }
-
-        .phase-card {
-            background: rgba(10, 20, 36, 0.5);
-            border: 1px solid rgba(112, 138, 166, 0.1);
-            padding: 24px;
-            border-radius: 8px;
-        }
-
-        .phase-num {
-            font-family: var(--mono-font);
-            font-size: 12px;
-            color: var(--primary);
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .phase-timeline {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-        }
-
-        .phase-card h3 {
-            font-size: 18px;
-            margin-bottom: 8px;
-        }
-
-        .phase-card p {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        /* Community Links */
-        .community-links {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            max-width: 400px;
-        }
-
-        .community-link {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            background: var(--bg-dark);
-            border: 1px solid rgba(112, 138, 166, 0.1);
-            border-radius: 8px;
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 700;
-            transition: all 0.2s ease;
-        }
-
-        .community-link:hover {
-            border-color: var(--primary);
-            transform: translateX(4px);
-        }
-
-        /* Disclaimer Footer */
-        footer {
-            padding: 60px 0;
-            font-size: 13px;
-            color: var(--text-muted);
-            border-top: 1px solid rgba(112, 138, 166, 0.1);
-        }
-
-        footer p {
-            margin-bottom: 16px;
-        }
-
-        @media(max-width: 768px) {
-            .section-title { font-size: 36px; }
-            nav ul { display: none; }
-            .depth-marker { position: relative; top: 0; left: 0; margin-bottom: 24px; display: block; }
-            .depth-section { padding: 60px 0; }
-        }
+        .pump-menu-btn:hover { background: #fd2692; }
     </style>
 </head>
 <body>
-
-    <header>
-        <div class="container nav-container">
-            <div class="logo">LethalOrca</div>
-            <nav>
-                <ul>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#transparency">Transparency</a></li>
-                    <li><a href="#roadmap">Roadmap</a></li>
-                    <li><a href="#community">Community</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <!-- SURFACE -->
-    <section id="surface" class="depth-section">
-        <div class="depth-marker">0m — Surface</div>
-        <div class="container">
-            <h1 class="section-title">Built in open water.</h1>
-            <p class="section-subtitle">$LORCA is a community-first token on pump.fun, paired with LethalOrca Fishing — a play-and-earn arcade game launching next quarter. Every detail below is verifiable. Do your own research before investing.</p>
-            <div class="btn-group">
-                <a href="#transparency" class="cta-button primary">View Token Details</a>
-                <a href="https://x.com/lethalorcatdo" target="_blank" class="cta-button secondary">Follow on X ↗</a>
-              <a href="lethalorca_fishing_game.html" class="cta-button game-btn">🎮 Play Game Live</a>
+    <div id="game-container">
+        <div id="hud">
+            <div style="display:flex; align-items:center;">
+                <div id="token-display"><span class="coin"></span><span id="token-count">0</span> LORCA</div>
+                <button id="wallet-btn" onclick="toggleWalletPanel()">
+                    <span class="status-dot" id="status-dot"></span>
+                    <span id="wallet-btn-label">Connect Wallet</span>
+                </button>
             </div>
+            <div id="timer">Time: 30</div>
         </div>
-    </section>
 
-    <!-- ABOUT -->
-    <section id="about" class="depth-section">
-        <div class="depth-marker">—200m Mesopelagic / About</div>
-        <div class="container">
-            <h2 class="section-title">Who's building this</h2>
-            <p class="section-subtitle">A real person, building in public, with a plan longer than one launch. LethalOrca started as a simple idea: pair a genuinely fun, free-to-play arcade game with a community token — instead of a token with nothing behind it.</p>
-            <div style="margin-top: 32px;">
-                <span style="font-family: var(--mono-font); font-size: 11px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px;">Founder</span>
-                <h3 style="font-size: 22px; margin-bottom: 8px;">Independent Developer</h3>
-                <p style="color: var(--text-muted); max-width: 680px; font-size: 15px;">25+ years of professional background in sales, customer service, and front-office operations, now building LethalOrca as an independent, self-funded project. Actively posting build updates and roadmap progress on X.</p>
-            </div>
+        <div id="start-screen">
+            <h1>🐟 LethalOrca Fishing</h1>
+            <p>Tap the fish before they swim away! Each catch earns you LORCA tokens. You have 30 seconds — good luck!</p>
+            <button class="primary" onclick="startGame()">Start Fishing</button>
+            <a href="https://pump.fun/profile/lethalorca06029" target="_blank" style="color: #ffd700; margin-top: 20px; display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold;">
+                View on pump.fun ↗
+            </a>
         </div>
-    </section>
 
-    <!-- TRANSPARENCY -->
-    <section id="transparency" class="depth-section">
-        <div class="depth-marker">—1000m Bathypelagic / Transparency</div>
-        <div class="container">
-            <h2 class="section-title">Verify it yourself</h2>
-            <p class="section-subtitle">Don't take our word for it — every figure below can be checked on-chain or on pump.fun directly.</p>
+        <div id="end-screen" class="hidden">
+            <h1>Time's Up!</h1>
+            <p id="final-score-text"></p>
+            <button class="primary" onclick="startGame()">Play Again</button>
+        </div>
+
+        <!-- WALLET PANEL -->
+        <div id="wallet-panel">
+            <button class="wp-close" onclick="toggleWalletPanel()">✕</button>
+            <h2>Wallet</h2>
+            <div class="mock-tag">UI Preview — Not Live</div>
             
-            <div class="info-grid">
-                <div class="info-item">
-                    <label>Token</label>
-                    <span>LethalOrca ($LORCA)</span>
-                </div>
-                <div class="info-item">
-                    <label>Chain</label>
-                    <span>Solana</span>
-                </div>
-                <div class="info-item">
-                    <label>Launched Via</label>
-                    <span><a href="https://pump.fun/profile/lethalorca06029" target="_blank">pump.fun ↗</a></span>
-                </div>
-                <div class="info-item">
-                    <label>Contract Address</label>
-                    <span style="color: var(--text-muted); font-size: 14px;">[ Paste your contract address here after launch ]</span>
+            <div id="wallet-disconnected-view">
+                <p style="font-size:13px; color:#7fa8a8; margin-bottom:16px;">Connect a wallet to preview how token balances and withdrawals will look.</p>
+                <div class="wallet-options">
+                    <button class="wallet-option-btn" onclick="mockConnect('Phantom')">👻 Connect Phantom (mock)</button>
+                    <button class="wallet-option-btn" onclick="mockConnect('Solflare')">🔥 Connect Solflare (mock)</button>
                 </div>
             </div>
 
-            <div class="warning-box">
-                ⚓ Always cross-check the contract address against the official pump.fun page before trading — never trust a link from an unverified source.
+            <div id="wallet-connected-view" class="hidden">
+                <div class="wallet-card">
+                    <div class="wc-label">Connected Address (mock)</div>
+                    <div class="wc-value" id="mock-address">—</div>
+                </div>
+                <div class="wallet-card">
+                    <div class="wc-label">In-Game Balance</div>
+                    <div class="wc-value"><span id="wallet-token-count">0</span> LORCA</div>
+                </div>
+                <button class="withdraw-btn" id="withdraw-btn" onclick="mockWithdraw()">Withdraw to Wallet (Simulated)</button>
+                <p class="phase-note">Real withdrawals launch in Phase 2, after the token and backend are live.</p>
+                <button class="disconnect-btn" onclick="mockDisconnect()">Disconnect</button>
             </div>
-        </div>
-    </section>
-
-    <!-- ROADMAP -->
-    <section id="roadmap" class="depth-section">
-        <div class="depth-marker">—4000m Abyssal / Roadmap</div>
-        <div class="container">
-            <h2 class="section-title">Where this goes next</h2>
-            <p class="section-subtitle">A phased plan — each stage ships before the next one is promised.</p>
             
-            <div class="roadmap-grid">
-                <div class="phase-card">
-                    <div class="phase-num">Phase 01</div>
-                    <div class="phase-timeline">Next Quarter</div>
-                    <h3>Game Launch</h3>
-                    <p>LethalOrca Fishing releases publicly on Android, with in-game point tracking and a growing player base.</p>
-                </div>
-                <div class="phase-card">
-                    <div class="phase-num">Phase 02</div>
-                    <div class="phase-timeline">TBD</div>
-                    <h3>Wallet Integration</h3>
-                    <p>Secure wallet connection added, letting players link accounts in preparation for on-chain rewards.</p>
-                </div>
-                <div class="phase-card">
-                    <div class="phase-num">Phase 03</div>
-                    <div class="phase-timeline">TBD</div>
-                    <h3>Airdrop for Early Players</h3>
-                    <p>A transparent, rules-published airdrop rewarding early community members and active players.</p>
-                </div>
-                <div class="phase-card">
-                    <div class="phase-num">Phase 04</div>
-                    <div class="phase-timeline">TBD</div>
-                    <h3>In-Game Token Utility</h3>
-                    <p>$LORCA becomes usable inside the game economy — earning, spending, and a player-facing marketplace.</p>
-                </div>
-            </div>
+            <a href="https://pump.fun/profile/lethalorca06029" target="_blank" class="pump-menu-btn">
+                PUMP.FUN PROFILE ↗
+            </a>
         </div>
-    </section>
+    </div>
 
-    <!-- COMMUNITY -->
-    <section id="community" class="depth-section">
-        <div class="depth-marker">—6000m Hadal / Community</div>
-        <div class="container">
-            <h2 class="section-title">Join the crew</h2>
-            <p class="section-subtitle">Follow along, ask questions, and watch the build happen in real time.</p>
-            
-            <div class="community-links">
-                <a href="https://x.com/lethalorcatdo" target="_blank" class="community-link">X / TWITTER @lethalorcatdo ↗</a>
-                <a href="https://discord.gg/WGxWc9UzVQ" target="_blank" class="community-link">DISCORD Join Lethal Orca ↗</a>
-                <a href="https://pump.fun/profile/lethalorca06029" target="_blank" class="community-link">PUMP.FUN View Profile ↗</a>
-            </div>
-        </div>
-    </section>
+    <script>
+        let tokens = 0; let timeLeft = 30; let gameInterval, spawnInterval; let running = false; let walletConnected = false;
+        const container = document.getElementById('game-container'); const tokenCountEl = document.getElementById('token-count');
+        const walletTokenCountEl = document.getElementById('wallet-token-count'); const timerEl = document.getElementById('timer');
+        const fishEmojis = ['🐟','🐠','🐡'];
 
-    <footer>
-        <div class="container">
-            <p><strong>Risk disclosure:</strong> $LORCA is an experimental, early-stage cryptocurrency token. It carries high risk, including the possible loss of your full investment. Nothing on this page is financial advice, and no one associated with this project can guarantee its price, liquidity, or future value. Cryptocurrency markets are volatile and largely unregulated — always do your own research, verify all contract addresses independently, and only invest what you can afford to lose.</p>
-            <p>&copy; 2026 LethalOrca. Built independently. Not affiliated with pump.fun.</p>
-        </div>
-    </footer>
+        function randomBetween(a, b) { return Math.random() * (b - a) + a; }
+        function spawnFish() {
+            if (!running) return;
+            const fish = document.createElement('div'); fish.className = 'fish';
+            fish.textContent = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
+            const startX = randomBetween(5, 85); fish.style.left = startX + '%'; fish.style.top = randomBetween(20, 75) + '%';
+            const value = Math.random() < 0.15 ? 25000 : 5000;
+            if (value === 25000) { fish.textContent = '🐋'; fish.style.fontSize = '46px'; }
+            fish.addEventListener('click', () => catchFish(fish, value));
+            fish.addEventListener('touchstart', (e) => { e.preventDefault(); catchFish(fish, value); });
+            container.appendChild(fish);
+            setTimeout(() => { if (fish.parentNode) fish.remove(); }, 2200);
+        }
+        function catchFish(fish, value) {
+            if (!running) return; tokens += value; tokenCountEl.textContent = tokens; walletTokenCountEl.textContent = tokens; playCatchSound(value > 5000);
+            const plus = document.createElement('div'); plus.id = 'floating-plus'; plus.textContent = '+' + value; plus.style.left = fish.style.left; plus.style.top = fish.style.top;
+            container.appendChild(plus); setTimeout(() => plus.remove(), 800); fish.remove();
+        }
+        function spawnBubble() {
+            const bubble = document.createElement('div'); bubble.className = 'bubble'; const size = randomBetween(8, 20);
+            bubble.style.width = size + 'px'; bubble.style.height = size + 'px'; bubble.style.left = randomBetween(0, 100) + '%'; bubble.style.animationDuration = randomBetween(4, 8) + 's';
+            container.appendChild(bubble); setTimeout(() => bubble.remove(), 8000);
+        }
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden'); document.getElementById('end-screen').classList.add('hidden');
+            tokens = 0; timeLeft = 30; tokenCountEl.textContent = tokens; walletTokenCountEl.textContent = tokens; timerEl.textContent = 'Time: ' + timeLeft;
+            document.querySelectorAll('.fish').forEach(f => f.remove()); running = true; spawnInterval = setInterval(spawnFish, 700); setInterval(spawnBubble, 600); startMusic();
+            gameInterval = setInterval(() => { timeLeft--; timerEl.textContent = 'Time: ' + timeLeft; if (timeLeft <= 0) endGame(); }, 1000);
+        }
+        function endGame() {
+            running = false; stopMusic(); clearInterval(gameInterval); clearInterval(spawnInterval); document.querySelectorAll('.fish').forEach(f => f.remove());
+            document.getElementById('final-score-text').textContent = 'You earned ' + tokens + ' LORCA tokens this round!'; document.getElementById('end-screen').classList.remove('hidden');
+        }
+        
+        let audioCtx = null; let musicInterval = null;
+        function getAudioCtx() { if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } return audioCtx; }
+        function playCatchSound(isBonus) {
+            const ctx = getAudioCtx(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.type = 'sine';
+            osc.frequency.setValueAtTime(isBonus ? 880 : 660, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(isBonus ? 1320 : 990, ctx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.18, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+            osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.2);
+        }
+        const bgNotes = [261.6, 329.6, 392.0, 329.6, 440.0, 392.0, 329.6, 293.7]; let bgStep = 0;
+        function playPluckNote(freq) {
+            const ctx = getAudioCtx(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime); gain.gain.setValueAtTime(0.05, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+            osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.5);
+        }
+        function startMusic() { getAudioCtx(); bgStep = 0; if (musicInterval) clearInterval(musicInterval); musicInterval = setInterval(() => { playPluckNote(bgNotes[bgStep % bgNotes.length]); bgStep++; }, 380); }
+        function stopMusic() { if (musicInterval) { clearInterval(musicInterval); musicInterval = null; } }
 
+        function toggleWalletPanel() { document.getElementById('wallet-panel').classList.toggle('open'); }
+        function mockConnect(providerName) {
+            walletConnected = true; document.getElementById('wallet-disconnected-view').classList.add('hidden'); document.getElementById('wallet-connected-view').classList.remove('hidden');
+            const fakeAddress = providerName.slice(0,3).toUpperCase() + 'x7f2...' + Math.floor(Math.random()*9000+1000);
+            document.getElementById('mock-address').textContent = fakeAddress; document.getElementById('wallet-token-count').textContent = tokens;
+            document.getElementById('wallet-btn').classList.add('connected'); document.getElementById('wallet-btn-label').textContent = 'Wallet Connected';
+        }
+        function mockDisconnect() {
+            walletConnected = false; document.getElementById('wallet-connected-view').classList.add('hidden'); document.getElementById('wallet-disconnected-view').classList.remove('hidden');
+            document.getElementById('wallet-btn').classList.remove('connected'); document.getElementById('wallet-btn-label').textContent = 'Connect Wallet';
+        }
+        function mockWithdraw() {
+            const btn = document.getElementById('withdraw-btn'); if (tokens <= 0) { btn.textContent = 'Nothing to withdraw yet'; setTimeout(() => { btn.textContent = 'Withdraw to Wallet (Simulated)'; }, 1500); return; }
+            const amount = tokens; btn.disabled = true; btn.textContent = 'Processing...';
+            setTimeout(() => { btn.textContent = '✓ ' + amount + ' LORCA sent (simulated)'; playCatchSound(true); tokens = 0; tokenCountEl.textContent = tokens; walletTokenCountEl.textContent = tokens; setTimeout(() => { btn.disabled = false; btn.textContent = 'Withdraw to Wallet (Simulated)'; }, 2200); }, 1400);
+        }
+    </script>
 </body>
 </html>
