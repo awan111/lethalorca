@@ -10,74 +10,182 @@
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #0f172a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b1329;
             color: white;
             text-align: center;
-            padding: 20px;
+            margin: 0;
+            padding: 10px;
+            overflow: hidden;
+        }
+        header {
+            margin-bottom: 10px;
         }
         .btn {
             background-color: #10b981;
             color: white;
             border: none;
-            padding: 12px 24px;
-            font-size: 16px;
+            padding: 10px 20px;
+            font-size: 15px;
             cursor: pointer;
             border-radius: 8px;
-            margin-top: 20px;
+            font-weight: bold;
+            transition: 0.3s;
         }
         .btn:hover {
             background-color: #059669;
         }
         #wallet-address {
-            margin-top: 15px;
             color: #38bdf8;
             font-family: monospace;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        #score-board {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fbbf24;
+            margin: 5px 0;
+        }
+        /* Game Canvas Style */
+        canvas {
+            background: linear-gradient(180deg, #1e3a8a 0%, #0f172a 100%);
+            border: 3px solid #38bdf8;
+            border-radius: 12px;
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            cursor: crosshair;
+            box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
 <body>
 
-    <h1>🐋 Lethal Orca Fishing Arcade</h1>
-    <p>Welcome to the Play, Earn & Liquidate Hub!</p>
+    <header>
+        <h2>🐋 Lethal Orca Fishing Arcade</h2>
+        <button id="connect-btn" class="btn">Connect Phantom Wallet</button>
+        <p id="wallet-address">Wallet: Not Connected</p>
+        <div id="score-board">Score: <span id="score">0</span> $LORCA</div>
+    </header>
 
-    <!-- Wallet Connect Button -->
-    <button id="connect-btn" class="btn">Connect Phantom Wallet</button>
-    <p id="wallet-address"></p>
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
 
     <script>
         // Initialize Telegram Web App
         const tg = window.Telegram.WebApp;
-        tg.expand(); // App ko poori screen par open karne ke liye
+        tg.expand();
 
         const connectBtn = document.getElementById('connect-btn');
         const walletAddressTxt = document.getElementById('wallet-address');
+        const scoreTxt = document.getElementById('score');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-        // Function to connect Phantom Wallet
+        let score = 0;
+        let walletConnected = false;
+        let fishes = [];
+
+        // Wallet Connection Logic
         async function connectWallet() {
             const isPhantomAvailable = window.solana && window.solana.isPhantom;
-
             if (isPhantomAvailable) {
                 try {
-                    // Connect to Phantom
                     const resp = await window.solana.connect();
                     const walletAddress = resp.publicKey.toString();
-                    
-                    walletAddressTxt.innerText = "Connected: " + walletAddress.substring(0, 6) + "..." + walletAddress.substring(walletAddress.length - 4);
-                    connectBtn.innerText = "Wallet Connected ✅";
-                    
-                    // Telegram par confirmation message show karna
-                    tg.MainButton.setText("Wallet Connected! Ready to Play").show();
+                    walletAddressTxt.innerText = "Wallet: " + walletAddress.substring(0, 6) + "..." + walletAddress.substring(walletAddress.length - 4);
+                    connectBtn.style.display = 'none';
+                    walletConnected = true;
+                    tg.MainButton.setText("Wallet Connected! Tap Fishes to Earn").show();
                 } catch (err) {
-                    console.error("Connection rejected", err);
-                    alert("Wallet connection rejected!");
+                    console.error(err);
+                    alert("Connection rejected!");
                 }
             } else {
-                alert("Phantom Wallet not found! Please open this inside a browser with Phantom extension or Phantom mobile app.");
+                alert("Phantom Wallet nahi mila! Isay Phantom Browser ya extension wale browser me kholein.");
+            }
+        }
+        connectBtn.addEventListener('click', connectWallet);
+
+        // Fish Class
+        class Fish {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 50;
+                this.radius = 15 + Math.random() * 15;
+                this.speed = 1 + Math.random() * 2.5;
+                // Random colors for different fish types
+                const colors = ['#34d399', '#f43f5e', '#38bdf8', '#a855f7', '#fbbf24'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.emoji = "🐟";
+            }
+            update() {
+                this.y -= this.speed; // Fish upar ki taraf swim karegi
+                // Agar screen se baahir nikal jaye to reset ho jaye নিচে
+                if (this.y < -30) {
+                    this.y = canvas.height + 20;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.font = `${this.radius * 1.5}px Arial`;
+                ctx.fillText(this.emoji, this.x - this.radius, this.y);
             }
         }
 
-        connectBtn.addEventListener('click', connectWallet);
+        // Generate Fishes
+        function initFishes() {
+            for (let i = 0; i < 6; i++) {
+                fishes.push(new Fish());
+            }
+        }
+
+        // Game Loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background bubbles effects decoration
+            ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.font = "12px Arial";
+            ctx.fillText("🫧", 50, 200);
+            ctx.fillText("🫧", 300, 100);
+            ctx.fillText("🫧", 180, 400);
+
+            // Update & Draw Fishes
+            fishes.forEach(fish => {
+                fish.update();
+                fish.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // Catch Fish Interaction (Click/Tap)
+        canvas.addEventListener('click', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+
+            fishes.forEach((fish) => {
+                // Distance formula to check if clicked on fish
+                const dist = Math.hypot(clickX - fish.x, clickY - fish.y);
+                if (dist < fish.radius + 15) {
+                    // Fish Caught!
+                    score += 10;
+                    scoreTxt.innerText = score;
+                    
+                    // Reset fish to bottom
+                    fish.y = canvas.height + 50;
+                    fish.x = Math.random() * canvas.width;
+                    fish.speed = 1 + Math.random() * 3;
+                }
+            });
+        });
+
+        // Start Game
+        initFishes();
+        animate();
     </script>
 </body>
 </html>
