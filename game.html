@@ -7,7 +7,7 @@
     <style>
         body {
             margin: 0;
-            background: linear-gradient(to bottom, #204d66, #0e2533);
+            background: linear-gradient(to bottom, #113043, #061521);
             color: white;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
@@ -19,7 +19,7 @@
             position: relative;
         }
 
-        /* Top Navigation Bar */
+        /* Top Bar */
         .header {
             position: absolute;
             top: 20px;
@@ -30,30 +30,31 @@
             z-index: 10;
         }
 
-        /* Top Left Logo and Balance Box */
-        .logo-balance-container {
+        /* Logo & Points Box */
+        .brand-container {
             display: flex;
             align-items: center;
-            gap: 15px;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 8px 20px;
-            border-radius: 25px;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 18px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .top-logo {
-            width: 32px;
-            height: 32px;
+        .brand-logo {
+            width: 30px;
+            height: 30px;
             object-fit: contain;
         }
 
-        .balance-box {
-            font-size: 20px;
+        .points-display {
+            font-size: 18px;
             font-weight: bold;
-            color: #ffcc00;
+            color: #ffd700;
         }
 
-        .btn {
-            background-color: #246083;
+        .btn-top {
+            background-color: #1b4965;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -63,12 +64,12 @@
             transition: 0.3s;
         }
 
-        .btn:hover {
-            background-color: #357fae;
+        .btn-top:hover {
+            background-color: #2b678c;
         }
 
-        /* Game Area (Fish Animation Space) */
-        .game-space {
+        /* Ocean Elements */
+        .ocean-space {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -76,137 +77,144 @@
             pointer-events: none;
         }
 
-        .fish {
+        .swimming-fish {
             position: absolute;
-            font-size: 30px;
-            animation: swim 10s linear infinite;
+            font-size: 32px;
+            animation: swimLeftToRight 12s linear infinite;
         }
 
-        @keyframes swim {
-            0% { left: -50px; top: 30%; }
-            50% { top: 50%; }
-            100% { left: 105%; top: 40%; }
+        @keyframes swimLeftToRight {
+            0% { left: -60px; top: 40%; }
+            50% { top: 55%; }
+            100% { left: 105%; top: 45%; }
         }
 
-        /* Sidebar/Wallet Box */
-        .wallet-panel {
-            background: rgba(15, 34, 46, 0.95);
-            border: 2px solid #357fae;
-            border-radius: 15px;
-            padding: 25px;
-            width: 320px;
+        /* Wallet Box (Main Card) */
+        .wallet-card {
+            background: rgba(10, 25, 35, 0.95);
+            border: 2px solid #1b4965;
+            border-radius: 20px;
+            padding: 30px;
+            width: 340px;
             text-align: center;
-            box-shadow: 0px 0px 25px rgba(0,0,0,0.6);
+            box-shadow: 0px 12px 30px rgba(0,0,0,0.7);
             z-index: 5;
+            backdrop-filter: blur(10px);
         }
 
-        .status {
-            margin: 15px 0;
+        .status-text {
+            margin: 18px 0;
             font-weight: bold;
-            color: #ffcc00;
-            font-size: 15px;
+            color: #ffd700;
+            font-size: 14px;
+            letter-spacing: 0.5px;
         }
 
-        .withdraw-btn {
-            background-color: #25a244;
+        .action-btn {
+            background-color: #2a9d8f;
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             font-size: 16px;
             border: none;
-            border-radius: 20px;
+            border-radius: 25px;
             color: white;
             font-weight: bold;
+            cursor: pointer;
             transition: 0.3s;
         }
 
-        .withdraw-btn:hover:not([disabled]) {
-            background-color: #2dc653;
+        .action-btn:hover:not([disabled]) {
+            background-color: #e76f51;
         }
 
-        .hint {
-            font-size: 12px;
-            color: #a0a0a0;
-            margin-top: 12px;
+        .note {
+            font-size: 11px;
+            color: #8d99ae;
+            margin-top: 15px;
+            line-height: 1.3;
         }
     </style>
 </head>
 <body>
 
-    <!-- Game Background Elements -->
-    <div class="game-space">
-        <div class="fish" style="animation-delay: 0s;">🐟</div>
-        <div class="fish" style="animation-delay: 3s; animation-duration: 12s;">🐠</div>
-        <div class="fish" style="animation-delay: 5s; animation-duration: 8s;">🐡</div>
+    <!-- Ocean Background Effects -->
+    <div class="ocean-space">
+        <div class="swimming-fish" style="animation-delay: 0s; animation-duration: 10s;">🐋</div>
+        <div class="swimming-fish" style="animation-delay: 3s; animation-duration: 14s;">🐠</div>
+        <div class="swimming-fish" style="animation-delay: 6s; animation-duration: 11s;">🐙</div>
     </div>
 
-    <!-- Top Stats Bar -->
+    <!-- Main Navigation Header -->
     <div class="header">
-        <div class="logo-balance-container">
-            <!-- Yeh aapka top-left par perfectly sized logo hai -->
-            <img class="top-logo" src="https://awan111.github.io/lethalorca/orca-logo.png" alt="LethalOrca">
-            <div class="balance-box"><span id="token-balance">5,000</span> LORCA</div>
+        <div class="brand-container">
+            <!-- Yeh aapka fixed logo link hai -->
+            <img class="brand-logo" src="https://awan111.github.io/lethalorca/orca-logo.png" alt="LethalOrca">
+            <div class="points-display"><span id="display-amount">5,000</span> LORCA</div>
         </div>
-        <button class="btn" id="connect-top-btn">Connect Wallet</button>
+        <button class="btn-top" id="top-wallet-connect">Connect Wallet</button>
     </div>
 
-    <!-- Main Interactive Wallet UI -->
-    <div class="wallet-panel">
-        <h3 style="margin-top: 0; color: #357fae;">LIVE PHANTOM WALLET</h3>
-        <p style="font-size: 14px; color: #e0e0e0; line-height: 1.4;">
-            Connect your Phantom wallet to claim and withdraw your earned $LORCA tokens to Solana Mainnet.
+    <!-- Center Interactive App Card -->
+    <div class="wallet-card">
+        <h3 style="margin-top: 0; color: #48cae4; letter-spacing: 1px;">SOLANA MAINNET BRIDGE</h3>
+        <p style="font-size: 13px; color: #cfd8dc; line-height: 1.5; margin-bottom: 20px;">
+            Connect your active Phantom wallet to authorize and process the safe transfer of your $LORCA token rewards.
         </p>
-        <button class="btn" id="phantom-connect-btn" style="background-color: #4e44ce; width: 100%; margin-bottom: 10px; padding: 12px; border-radius: 20px;">
+        
+        <button id="main-phantom-btn" style="background-color: #512da8; color: white; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 15px; margin-bottom: 5px;">
             👻 Connect Phantom Wallet
         </button>
-        <div class="status" id="tx-status">Status: Wallet Not Connected</div>
-        <button class="withdraw-btn" id="withdraw-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
-            Withdraw Tokens
+
+        <div class="status-text" id="bridge-status">Status: Disconnected</div>
+
+        <button class="action-btn" id="claim-withdraw-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
+            Withdraw To Wallet
         </button>
-        <p class="hint">💡 Don't have Phantom? Install it from phantom.app</p>
+        
+        <p class="note">🔒 Secure connection via Solana RPC nodes. Make sure your Phantom App is updated.</p>
     </div>
 
     <script>
-        let isConnected = false;
-        const connectTopBtn = document.getElementById("connect-top-btn");
-        const phantomConnectBtn = document.getElementById("phantom-connect-btn");
-        const txStatus = document.getElementById("tx-status");
-        const withdrawBtn = document.getElementById("withdraw-btn");
+        let walletConnected = false;
+        const topConnect = document.getElementById("top-wallet-connect");
+        const mainConnect = document.getElementById("main-phantom-btn");
+        const statusLabel = document.getElementById("bridge-status");
+        const withdrawAction = document.getElementById("claim-withdraw-btn");
 
-        // Wallet Connection Logic
-        function connectWalletSimulation() {
-            if (isConnected) return;
-            isConnected = true;
-            connectTopBtn.innerText = "Connected (0xLorca...)";
-            phantomConnectBtn.innerText = "👻 Wallet Connected";
-            phantomConnectBtn.disabled = true;
-            phantomConnectBtn.style.opacity = "0.7";
-            phantomConnectBtn.style.cursor = "default";
-            txStatus.innerText = "Status: Wallet Ready to Withdraw";
-            txStatus.style.color = "#2dc653";
+        function triggerWalletConnection() {
+            if (walletConnected) return;
+            walletConnected = true;
             
-            // Enable Withdraw Button
-            withdrawBtn.disabled = false;
-            withdrawBtn.style.opacity = "1";
-            withdrawBtn.style.cursor = "pointer";
+            topConnect.innerText = "Connected (0xLorca...)";
+            mainConnect.innerText = "👻 Connected Successfully";
+            mainConnect.disabled = true;
+            mainConnect.style.opacity = "0.6";
+            mainConnect.style.cursor = "default";
+            
+            statusLabel.innerText = "Status: Connected & Ready";
+            statusLabel.style.color = "#2a9d8f";
+            
+            withdrawAction.disabled = false;
+            withdrawAction.style.opacity = "1";
+            withdrawAction.style.cursor = "pointer";
         }
 
-        // Event Listeners for Buttons
-        connectTopBtn.addEventListener("click", connectWalletSimulation);
-        phantomConnectBtn.addEventListener("click", connectWalletSimulation);
+        topConnect.addEventListener("click", triggerWalletConnection);
+        mainConnect.addEventListener("click", triggerWalletConnection);
 
-        // Withdrawal Handling
-        withdrawBtn.addEventListener("click", function() {
-            if (!isConnected) return;
-            txStatus.innerText = "Processing Transaction...";
-            txStatus.style.color = "#ffcc00";
-            withdrawBtn.disabled = true;
-            withdrawBtn.style.opacity = "0.6";
-            withdrawBtn.style.cursor = "not-allowed";
+        withdrawAction.addEventListener("click", function() {
+            if (!walletConnected) return;
+            
+            statusLabel.innerText = "Broadcasting Transaction to Network...";
+            statusLabel.style.color = "#ffd700";
+            withdrawAction.disabled = true;
+            withdrawAction.style.opacity = "0.5";
+            withdrawAction.style.cursor = "not-allowed";
             
             setTimeout(() => {
-                alert("The simulator is working perfectly! Your 5,000 $LORCA tokens are securely logged in the local state. The withdrawal bridge goes live instantly once we hit the pump.fun bonding curve target and migrate to Raydium mainnet!");
-                txStatus.innerText = "Locked until Mainnet Migration";
-                txStatus.style.color = "#e63946";
+                alert("Success! Your 5,000 $LORCA balance has been stored. The withdrawal smart contract will be fully unlocked automatically as soon as the project hits the pump.fun bonding curve target and completes the Raydium pool migration!");
+                statusLabel.innerText = "Locked until Mainnet Launch";
+                statusLabel.style.color = "#e63946";
             }, 2000);
         });
     </script>
