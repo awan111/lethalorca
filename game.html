@@ -30,27 +30,34 @@
             z-index: 10;
         }
 
-        /* Logo & Points Box */
+        /* Bulletproof Logo & Points Box */
         .brand-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
             background: rgba(0, 0, 0, 0.5);
-            padding: 8px 18px;
+            padding: 8px 20px;
             border-radius: 30px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .brand-logo {
-            width: 30px;
-            height: 30px;
-            object-fit: contain;
+        /* Modern Text/Emoji Logo Style */
+        .brand-logo-text {
+            font-size: 20px;
+            font-weight: 800;
+            color: #48cae4;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 1px;
         }
 
         .points-display {
             font-size: 18px;
             font-weight: bold;
             color: #ffd700;
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+            padding-left: 12px;
         }
 
         .btn-top {
@@ -147,8 +154,8 @@
     <!-- Main Navigation Header -->
     <div class="header">
         <div class="brand-container">
-            <!-- Yeh aapka fixed logo link hai -->
-            <img class="brand-logo" src="https://awan111.github.io/lethalorca/orca-logo.png" alt="LethalOrca">
+            <!-- Image hata kar bulletproof Emoji logo laga diya hai -->
+            <div class="brand-logo-text">🐋 LORCA</div>
             <div class="points-display"><span id="display-amount">5,000</span> LORCA</div>
         </div>
         <button class="btn-top" id="top-wallet-connect">Connect Wallet</button>
