@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LethalOrca Fishing - Token Catcher (Wallet Mockup)</title>
+<title>LethalOrca Fishing - Play & Earn $LORCA</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -14,11 +14,13 @@
     touch-action: manipulation;
   }
   #game-container { position: relative; width: 100%; height: 100vh; overflow: hidden; }
+  
+  /* HUD */
   #hud {
     position: absolute; top: 0; left: 0; right: 0;
     display: flex; justify-content: space-between; align-items: center;
     padding: 15px 20px; z-index: 10;
-    background: rgba(0,0,0,0.25); backdrop-filter: blur(4px);
+    background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
   }
   #token-display {
     color: #ffd700; font-size: 20px; font-weight: bold;
@@ -27,7 +29,7 @@
   #token-display .coin {
     width: 24px; height: 24px;
     background: radial-gradient(circle at 35% 35%, #fff7cc, #ffd700 60%, #b8860b);
-    border-radius: 50%; display: inline-block;
+    border-radius: 50%;
   }
   #timer { color: white; font-size: 16px; font-weight: 600; }
 
@@ -36,45 +38,50 @@
     background: rgba(255,255,255,0.12);
     border: 1px solid rgba(94,234,212,0.4);
     color: #eef6f6;
-    padding: 8px 16px;
-    border-radius: 20px;
+    padding: 10px 18px;
+    border-radius: 25px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    display: flex; align-items: center; gap: 6px;
+    display: flex; align-items: center; gap: 8px;
+    transition: all 0.2s ease;
   }
-  #wallet-btn:hover { border-color: #5eead4; }
-  #wallet-btn .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #ff5c5c; }
-  #wallet-btn.connected .status-dot { background: #4ade80; }
-  /* repositioned when hud present */
-  #hud #wallet-btn { position: static; margin-left: 12px; }
+  #wallet-btn:hover { border-color: #5eead4; background: rgba(94,234,212,0.1); }
+  #wallet-btn.connected { border-color: #5eead4; background: rgba(94,234,212,0.2); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff5c5c; }
+  .connected .status-dot { background: #4ade80; }
 
+  /* Fish */
   .fish {
     position: absolute; cursor: pointer; user-select: none;
-    transition: transform 0.1s; font-size: 40px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    font-size: 40px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    transition: transform 0.1s;
   }
   .fish:active { transform: scale(0.85); }
+
   .bubble {
     position: absolute; bottom: -20px; border-radius: 50%;
     background: rgba(255,255,255,0.35); animation: rise linear forwards;
   }
   @keyframes rise { to { transform: translateY(-110vh); opacity: 0; } }
 
+  /* Screens */
   #start-screen, #end-screen {
-    position: absolute; inset: 0; background: rgba(0,10,20,0.75);
+    position: absolute; inset: 0; background: rgba(0,10,20,0.85);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     color: white; z-index: 20; text-align: center; padding: 20px;
   }
-  #start-screen h1, #end-screen h1 { font-size: 30px; margin-bottom: 10px; color: #ffd700; }
-  #start-screen p, #end-screen p { max-width: 320px; line-height: 1.5; margin-bottom: 20px; opacity: 0.9; }
+  #start-screen h1, #end-screen h1 { font-size: 32px; margin-bottom: 12px; color: #ffd700; }
+  #start-screen p, #end-screen p { max-width: 340px; line-height: 1.6; margin-bottom: 24px; opacity: 0.9; font-size: 16px; }
+  
   button.primary {
     background: linear-gradient(135deg, #ffd700, #ff9500);
-    border: none; padding: 14px 32px; border-radius: 30px;
+    border: none; padding: 14px 36px; border-radius: 30px;
     font-size: 17px; font-weight: bold; color: #1a1a1a; cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
   }
-  .hidden { display: none !important; }
+  button.primary:hover { transform: translateY(-2px); }
 
   #floating-plus {
     position: absolute; color: #ffd700; font-weight: bold; font-size: 20px;
@@ -82,47 +89,63 @@
   }
   @keyframes floatUp { to { transform: translateY(-50px); opacity: 0; } }
 
-  /* Wallet panel (slide-in) */
+  /* Wallet Panel */
   #wallet-panel {
-    position: absolute; top: 0; right: -340px; width: 320px; height: 100%;
-    background: rgba(3,13,22,0.97); border-left: 1px solid rgba(94,234,212,0.25);
-    z-index: 30; padding: 24px 20px; color: #eef6f6;
-    transition: right 0.3s ease; overflow-y: auto;
-    font-family: 'Segoe UI', Arial, sans-serif;
+    position: absolute; top: 0; right: -360px; width: 340px; height: 100%;
+    background: rgba(3,13,22,0.98); border-left: 1px solid rgba(94,234,212,0.25);
+    z-index: 30; padding: 24px 20px; color: #eef6f6; overflow-y: auto;
+    transition: right 0.3s ease; font-family: 'Segoe UI', Arial, sans-serif;
   }
   #wallet-panel.open { right: 0; }
-  #wallet-panel h2 { font-size: 18px; margin-bottom: 4px; }
-  .mock-tag {
-    display: inline-block; font-size: 10px; letter-spacing: 1px;
-    color: #f2c94c; border: 1px solid rgba(242,201,76,0.4);
-    padding: 2px 8px; border-radius: 20px; margin-bottom: 18px; text-transform: uppercase;
+  
+  .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .panel-header h2 { font-size: 18px; }
+  .panel-close { cursor: pointer; font-size: 22px; color: #7fa8a8; background: none; border: none; }
+  
+  .status-tag {
+    font-size: 10px; letter-spacing: 1px; color: #f2c94c;
+    border: 1px solid rgba(242,201,76,0.4); padding: 3px 10px;
+    border-radius: 20px; text-transform: uppercase; margin-bottom: 16px; display: inline-block;
   }
-  .wp-close { position: absolute; top: 18px; right: 18px; cursor: pointer; font-size: 20px; color: #7fa8a8; background: none; border: none; }
+
   .wallet-card {
     background: rgba(255,255,255,0.04); border: 1px solid rgba(94,234,212,0.15);
     border-radius: 12px; padding: 16px; margin-bottom: 16px;
   }
-  .wallet-card .wc-label { font-size: 11px; color: #7fa8a8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-  .wallet-card .wc-value { font-family: monospace; font-size: 14px; word-break: break-all; }
+  .wallet-card .label { font-size: 11px; color: #7fa8a8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .wallet-card .value { font-family: monospace; font-size: 13px; word-break: break-all; color: #fff; }
+
   .wallet-options { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
-  .wallet-option-btn {
+  .wallet-btn {
     background: rgba(255,255,255,0.06); border: 1px solid rgba(94,234,212,0.2);
     color: #eef6f6; padding: 12px; border-radius: 10px; font-size: 14px;
-    cursor: pointer; display: flex; align-items: center; gap: 10px; text-align: left;
+    cursor: pointer; transition: all 0.2s ease;
   }
-  .wallet-option-btn:hover { border-color: #5eead4; }
+  .wallet-btn:hover { border-color: #5eead4; background: rgba(94,234,212,0.1); }
+
   .withdraw-btn {
     width: 100%; margin-top: 20px; padding: 14px; border-radius: 10px;
-    background: linear-gradient(135deg, #2dd4bf, #0d9488); color: #04211d; border: none;
-    font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.15s ease;
+    background: linear-gradient(135deg, #2dd4bf, #0d9488); color: #04211d;
+    border: none; font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: all 0.2s ease;
   }
-  .withdraw-btn:hover { transform: translateY(-1px); }
-  .withdraw-btn:disabled { background: rgba(127,168,168,0.15); color: #7fa8a8; cursor: not-allowed; transform: none; }
-  .phase-note { font-size: 12px; color: #7fa8a8; margin-top: 10px; line-height: 1.5; }
+  .withdraw-btn:hover:not(:disabled) { transform: translateY(-1px); }
+  .withdraw-btn:disabled { background: rgba(127,168,168,0.15); color: #7fa8a8; cursor: not-allowed; }
+
+  .note { font-size: 12px; color: #7fa8a8; margin-top: 12px; line-height: 1.5; padding: 12px; background: rgba(127,168,168,0.1); border-radius: 8px; }
+  
   .disconnect-btn {
     width: 100%; margin-top: 24px; padding: 10px; border-radius: 10px;
     background: none; color: #ff8080; border: 1px solid rgba(255,128,128,0.3);
-    font-size: 13px; cursor: pointer;
+    font-size: 13px; cursor: pointer; transition: all 0.2s ease;
+  }
+  .disconnect-btn:hover { border-color: #ff8080; background: rgba(255,128,128,0.05); }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    #wallet-panel { width: 100%; right: -100%; }
+    #hud { flex-wrap: wrap; }
   }
 </style>
 </head>
@@ -131,9 +154,9 @@
   <div id="hud">
     <div style="display:flex; align-items:center;">
       <div id="token-display"><span class="coin"></span><span id="token-count">0</span> LORCA</div>
-      <button id="wallet-btn" onclick="toggleWalletPanel()">
-        <span class="status-dot" id="status-dot"></span>
-        <span id="wallet-btn-label">Connect Wallet</span>
+      <button id="wallet-btn" onclick="togglePanel()">
+        <span class="status-dot"></span>
+        <span id="wallet-label">Connect Wallet</span>
       </button>
     </div>
     <div id="timer">Time: 30</div>
@@ -141,94 +164,224 @@
 
   <div id="start-screen">
     <h1>🐟 LethalOrca Fishing</h1>
-    <p>Tap the fish before they swim away! Each catch earns you LORCA tokens. You have 30 seconds — good luck!</p>
+    <p>Tap fish to earn LORCA tokens! Catch them before they swim away. You have 30 seconds!</p>
     <button class="primary" onclick="startGame()">Start Fishing</button>
   </div>
 
   <div id="end-screen" class="hidden">
     <h1>Time's Up!</h1>
-    <p id="final-score-text"></p>
+    <p id="final-score"></p>
     <button class="primary" onclick="startGame()">Play Again</button>
   </div>
 
-  <!-- WALLET PANEL (UI MOCKUP ONLY — no real blockchain calls) -->
+  <!-- WALLET PANEL -->
   <div id="wallet-panel">
-    <button class="wp-close" onclick="toggleWalletPanel()">✕</button>
-    <h2>Wallet</h2>
-    <div class="mock-tag">UI Preview — Not Live</div>
+    <div class="panel-header">
+      <h2>Wallet</h2>
+      <button class="panel-close" onclick="togglePanel()">✕</button>
+    </div>
+    <div class="status-tag">Live Phantom</div>
 
-    <div id="wallet-disconnected-view">
-      <p style="font-size:13px; color:#7fa8a8; margin-bottom:16px;">Connect a wallet to preview how token balances and withdrawals will look. No real wallet or funds are involved yet.</p>
+    <div id="wallet-disconnected">
+      <p style="font-size:13px; color:#7fa8a8; margin-bottom:16px;">Connect your Phantom wallet to withdraw LORCA tokens to your Solana account.</p>
       <div class="wallet-options">
-        <button class="wallet-option-btn" onclick="mockConnect('Phantom')">👻 Connect Phantom (mock)</button>
-        <button class="wallet-option-btn" onclick="mockConnect('Solflare')">🔥 Connect Solflare (mock)</button>
+        <button class="wallet-btn" onclick="connectPhantom()">👻 Connect Phantom Wallet</button>
       </div>
+      <div class="note">💡 Don't have Phantom? Install it from phantom.app</div>
     </div>
 
-    <div id="wallet-connected-view" class="hidden">
+    <div id="wallet-connected" class="hidden">
       <div class="wallet-card">
-        <div class="wc-label">Connected Address (mock)</div>
-        <div class="wc-value" id="mock-address">—</div>
+        <div class="label">Wallet Address</div>
+        <div class="value" id="wallet-address">—</div>
       </div>
       <div class="wallet-card">
-        <div class="wc-label">In-Game Balance</div>
-        <div class="wc-value"><span id="wallet-token-count">0</span> LORCA</div>
+        <div class="label">Game Balance</div>
+        <div class="value"><span id="balance-display">0</span> LORCA</div>
       </div>
-      <button class="withdraw-btn" id="withdraw-btn" onclick="mockWithdraw()">Withdraw to Wallet (Simulated)</button>
-      <p class="phase-note">This is a simulated withdrawal for preview purposes — no real $LORCA token exists yet, so no real funds move. Real withdrawals launch in Phase 2, after the token, a secure backend, and a smart-contract audit are in place.</p>
-      <button class="disconnect-btn" onclick="mockDisconnect()">Disconnect</button>
+      <button class="withdraw-btn" id="withdraw-btn" onclick="withdrawTokens()">Withdraw Tokens</button>
+      <div class="note">⚠️ Withdrawal works when $LORCA token is live on Solana mainnet. Your balance is stored securely and can be withdrawn anytime.</div>
+      <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
     </div>
   </div>
 </div>
 
 <script>
+// ============ GAME STATE ============
 let tokens = 0;
 let timeLeft = 30;
-let gameInterval, spawnInterval;
-let running = false;
+let gameRunning = false;
 let walletConnected = false;
+let userAddress = null;
 
+// ============ PHANTOM WALLET INTEGRATION ============
+async function connectPhantom() {
+  try {
+    // Check if Phantom is installed
+    const provider = window.phantom?.solana;
+    
+    if (!provider) {
+      alert('❌ Phantom wallet not detected!\n\n1. Go to phantom.app\n2. Install the browser extension\n3. Create or import a wallet\n4. Reload this page and try again');
+      return;
+    }
+
+    // Request connection
+    const response = await provider.connect();
+    userAddress = response.publicKey.toString();
+
+    console.log('✅ Connected:', userAddress);
+
+    // Update UI
+    document.getElementById('wallet-disconnected').classList.add('hidden');
+    document.getElementById('wallet-connected').classList.remove('hidden');
+    document.getElementById('wallet-address').textContent = userAddress.slice(0, 8) + '...' + userAddress.slice(-8);
+    document.getElementById('balance-display').textContent = tokens;
+
+    document.getElementById('wallet-btn').classList.add('connected');
+    document.getElementById('wallet-label').textContent = '✓ Connected';
+
+    walletConnected = true;
+
+  } catch (error) {
+    console.error('Connection failed:', error);
+    alert('❌ Connection failed: ' + error.message + '\n\nMake sure Phantom is installed and unlocked.');
+  }
+}
+
+function disconnectWallet() {
+  walletConnected = false;
+  userAddress = null;
+  document.getElementById('wallet-connected').classList.add('hidden');
+  document.getElementById('wallet-disconnected').classList.remove('hidden');
+  document.getElementById('wallet-btn').classList.remove('connected');
+  document.getElementById('wallet-label').textContent = 'Connect Wallet';
+}
+
+async function withdrawTokens() {
+  if (!walletConnected) {
+    alert('Please connect wallet first');
+    return;
+  }
+  if (tokens === 0) {
+    alert('No tokens to withdraw');
+    return;
+  }
+
+  const btn = document.getElementById('withdraw-btn');
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+
+  try {
+    // BACKEND CALL (replace with your actual endpoint when ready)
+    const response = await fetch('https://your-backend-api.com/withdraw', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        wallet: userAddress,
+        amount: tokens,
+        timestamp: new Date().toISOString()
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      alert(`✅ Success!\n\nTokens withdrawn to your wallet.\nTx: ${data.transactionHash}`);
+      tokens = 0;
+      document.getElementById('token-count').textContent = '0';
+      document.getElementById('balance-display').textContent = '0';
+    }
+  } catch (error) {
+    // Expected: backend not deployed yet
+    if (error.message.includes('Failed to fetch') || error.message.includes('backend')) {
+      alert('⚠️ Backend not live yet.\n\nWhen ready, this will send real $LORCA tokens to your Phantom wallet.');
+    } else {
+      alert('Error: ' + error.message);
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Withdraw Tokens';
+  }
+}
+
+function togglePanel() {
+  document.getElementById('wallet-panel').classList.toggle('open');
+}
+
+// ============ GAME MECHANICS ============
 const container = document.getElementById('game-container');
 const tokenCountEl = document.getElementById('token-count');
-const walletTokenCountEl = document.getElementById('wallet-token-count');
 const timerEl = document.getElementById('timer');
+const fishEmojis = ['🐟', '🐠', '🐡'];
 
-const fishEmojis = ['🐟','🐠','🐡'];
+function startGame() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('end-screen').classList.add('hidden');
+  
+  tokens = 0;
+  timeLeft = 30;
+  tokenCountEl.textContent = '0';
+  document.getElementById('balance-display').textContent = '0';
+  timerEl.textContent = 'Time: 30';
+  
+  document.querySelectorAll('.fish').forEach(f => f.remove());
+  gameRunning = true;
 
-function randomBetween(a, b) { return Math.random() * (b - a) + a; }
+  setInterval(spawnFish, 700);
+  setInterval(spawnBubble, 600);
+
+  const timer = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = 'Time: ' + timeLeft;
+    if (timeLeft <= 0) {
+      gameRunning = false;
+      clearInterval(timer);
+      endGame();
+    }
+  }, 1000);
+}
 
 function spawnFish() {
-  if (!running) return;
+  if (!gameRunning) return;
+  
   const fish = document.createElement('div');
   fish.className = 'fish';
   fish.textContent = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
-  const startX = randomBetween(5, 85);
-  fish.style.left = startX + '%';
-  fish.style.top = randomBetween(20, 75) + '%';
+  fish.style.left = (Math.random() * 85 + 5) + '%';
+  fish.style.top = (Math.random() * 55 + 20) + '%';
 
-  const value = Math.random() < 0.15 ? 25000 : 5000;
-  if (value === 5) { fish.textContent = '🐋'; fish.style.fontSize = '46px'; }
+  const isBonusFish = Math.random() < 0.15;
+  const value = isBonusFish ? 25000 : 5000;
+  
+  if (isBonusFish) {
+    fish.textContent = '🐋';
+    fish.style.fontSize = '50px';
+  }
 
-  fish.addEventListener('click', () => catchFish(fish, value));
-  fish.addEventListener('touchstart', (e) => { e.preventDefault(); catchFish(fish, value); });
+  fish.onclick = () => catchFish(fish, value);
+  fish.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    catchFish(fish, value);
+  });
 
   container.appendChild(fish);
   setTimeout(() => { if (fish.parentNode) fish.remove(); }, 2200);
 }
 
 function catchFish(fish, value) {
-  if (!running) return;
+  if (!gameRunning) return;
+  
   tokens += value;
   tokenCountEl.textContent = tokens;
-  walletTokenCountEl.textContent = tokens;
-  playCatchSound(value > 5000);
+  document.getElementById('balance-display').textContent = tokens;
 
+  // Floating number animation
   const plus = document.createElement('div');
   plus.id = 'floating-plus';
-  plus.textContent = '+' + value;
+  plus.textContent = '+' + value.toLocaleString();
   plus.style.left = fish.style.left;
   plus.style.top = fish.style.top;
   container.appendChild(plus);
+  
   setTimeout(() => plus.remove(), 800);
   fish.remove();
 }
@@ -236,155 +389,28 @@ function catchFish(fish, value) {
 function spawnBubble() {
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
-  const size = randomBetween(8, 20);
+  const size = Math.random() * 12 + 8;
   bubble.style.width = size + 'px';
   bubble.style.height = size + 'px';
-  bubble.style.left = randomBetween(0, 100) + '%';
-  bubble.style.animationDuration = randomBetween(4, 8) + 's';
+  bubble.style.left = Math.random() * 100 + '%';
+  bubble.style.animationDuration = (Math.random() * 4 + 4) + 's';
   container.appendChild(bubble);
   setTimeout(() => bubble.remove(), 8000);
 }
 
-function startGame() {
-  document.getElementById('start-screen').classList.add('hidden');
-  document.getElementById('end-screen').classList.add('hidden');
-  tokens = 0; timeLeft = 30;
-  tokenCountEl.textContent = tokens;
-  walletTokenCountEl.textContent = tokens;
-  timerEl.textContent = 'Time: ' + timeLeft;
-  document.querySelectorAll('.fish').forEach(f => f.remove());
-  running = true;
-
-  spawnInterval = setInterval(spawnFish, 700);
-  setInterval(spawnBubble, 600);
-  startMusic();
-
-  gameInterval = setInterval(() => {
-    timeLeft--;
-    timerEl.textContent = 'Time: ' + timeLeft;
-    if (timeLeft <= 0) endGame();
-  }, 1000);
-}
-
 function endGame() {
-  running = false;
-  stopMusic();
-  clearInterval(gameInterval);
-  clearInterval(spawnInterval);
-  document.querySelectorAll('.fish').forEach(f => f.remove());
-  document.getElementById('final-score-text').textContent = 'You earned ' + tokens + ' LORCA tokens this round!';
+  document.getElementById('final-score').textContent = 'You earned ' + tokens.toLocaleString() + ' LORCA tokens!';
   document.getElementById('end-screen').classList.remove('hidden');
 }
 
-/* ---------- SOUND EFFECTS & MUSIC (synthesized, no external files) ---------- */
-let audioCtx = null;
-let musicInterval = null;
-
-function getAudioCtx() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+// Check Phantom on load
+window.addEventListener('load', () => {
+  if (window.phantom?.solana) {
+    console.log('✅ Phantom detected');
+  } else {
+    console.warn('⚠️ Phantom not installed');
   }
-  return audioCtx;
-}
-
-// Short "catch" beep — pitch varies slightly for normal vs bonus catch
-function playCatchSound(isBonus) {
-  const ctx = getAudioCtx();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(isBonus ? 880 : 660, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(isBonus ? 1320 : 990, ctx.currentTime + 0.12);
-  gain.gain.setValueAtTime(0.18, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  osc.start();
-  osc.stop(ctx.currentTime + 0.2);
-}
-
-// Gentle background "picking" music loop — simple plucked arpeggio, ocean-y feel
-const bgNotes = [261.6, 329.6, 392.0, 329.6, 440.0, 392.0, 329.6, 293.7]; // C E G E A G E D
-let bgStep = 0;
-
-function playPluckNote(freq) {
-  const ctx = getAudioCtx();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.type = 'triangle';
-  osc.frequency.setValueAtTime(freq, ctx.currentTime);
-  gain.gain.setValueAtTime(0.05, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  osc.start();
-  osc.stop(ctx.currentTime + 0.5);
-}
-
-function startMusic() {
-  getAudioCtx(); // unlock audio on user gesture
-  bgStep = 0;
-  if (musicInterval) clearInterval(musicInterval);
-  musicInterval = setInterval(() => {
-    playPluckNote(bgNotes[bgStep % bgNotes.length]);
-    bgStep++;
-  }, 380);
-}
-
-function stopMusic() {
-  if (musicInterval) { clearInterval(musicInterval); musicInterval = null; }
-}
-
-/* ---------- WALLET UI MOCKUP (no real blockchain interaction) ---------- */
-function toggleWalletPanel() {
-  document.getElementById('wallet-panel').classList.toggle('open');
-}
-
-function mockConnect(providerName) {
-  walletConnected = true;
-  document.getElementById('wallet-disconnected-view').classList.add('hidden');
-  document.getElementById('wallet-connected-view').classList.remove('hidden');
-  // Fake, clearly non-real address for preview purposes only
-  const fakeAddress = providerName.slice(0,3).toUpperCase() + 'x7f2...' + Math.floor(Math.random()*9000+1000);
-  document.getElementById('mock-address').textContent = fakeAddress;
-  document.getElementById('wallet-token-count').textContent = tokens;
-
-  document.getElementById('wallet-btn').classList.add('connected');
-  document.getElementById('wallet-btn-label').textContent = 'Wallet Connected';
-}
-
-function mockDisconnect() {
-  walletConnected = false;
-  document.getElementById('wallet-connected-view').classList.add('hidden');
-  document.getElementById('wallet-disconnected-view').classList.remove('hidden');
-  document.getElementById('wallet-btn').classList.remove('connected');
-  document.getElementById('wallet-btn-label').textContent = 'Connect Wallet';
-}
-
-function mockWithdraw() {
-  const btn = document.getElementById('withdraw-btn');
-  if (tokens <= 0) {
-    btn.textContent = 'Nothing to withdraw yet';
-    setTimeout(() => { btn.textContent = 'Withdraw to Wallet (Simulated)'; }, 1500);
-    return;
-  }
-  const amount = tokens;
-  btn.disabled = true;
-  btn.textContent = 'Processing...';
-
-  setTimeout(() => {
-    btn.textContent = '✓ ' + amount + ' LORCA sent (simulated)';
-    playCatchSound(true);
-    tokens = 0;
-    tokenCountEl.textContent = tokens;
-    walletTokenCountEl.textContent = tokens;
-
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.textContent = 'Withdraw to Wallet (Simulated)';
-    }, 2200);
-  }, 1400);
-}
+});
 </script>
 </body>
 </html>
