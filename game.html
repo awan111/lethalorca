@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -14,36 +14,63 @@
             color: white;
             text-align: center;
             margin: 0;
-            padding: 10px;
+            padding: 0;
             overflow: hidden;
             user-select: none;
+            touch-action: none;
         }
-        header { margin-bottom: 10px; }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        header {
+            width: 100%;
+            padding: 10px 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 10;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        h2 {
+            margin: 5px 0;
+            font-size: 20px;
+            color: #38bdf8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
         #score-board {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             color: #fbbf24;
-            margin: 5px 0;
+            margin: 2px 0;
         }
         canvas {
-            background: linear-gradient(180deg, #1e3a8a 0%, #0f172a 100%);
-            border: 3px solid #38bdf8;
-            border-radius: 12px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #1e3a8a 0%, #0b1329 100%);
             display: block;
-            margin: 0 auto;
-            max-width: 100%;
-            box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.5);
+            z-index: 1;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h2>🐋 Lethal Orca Fishing Arcade</h2>
-        <div id="score-board">Score: <span id="score">0</span> $LORCA</div>
-    </header>
+    <div id="game-container">
+        <header>
+            <h2>🐋 Lethal Orca Arcade</h2>
+            <div id="score-board">Score: <span id="score">0</span> $LORCA</div>
+        </header>
 
-    <canvas id="gameCanvas" width="400" height="500"></canvas>
+        <canvas id="gameCanvas"></canvas>
+    </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -52,80 +79,140 @@
 
         let score = 0;
         let fishes = [];
+        let bubbles = [];
 
+        // Screen size ke mutabiq canvas resize karna (Full Screen Fix)
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Vector Fish Graphic Design (No Emojis, No Boxes Error)
         class Fish {
             constructor() {
+                this.reset();
+                this.y = canvas.height + Math.random() * canvas.height; // Pehli dafa random spread
+            }
+            reset() {
                 this.x = Math.random() * (canvas.width - 60) + 30;
-                this.y = canvas.height + Math.random() * 150;
-                this.radius = 25;
-                this.speed = 2 + Math.random() * 2.5;
-                this.emoji = "🐟";
+                this.y = canvas.height + Math.random() * 100;
+                this.length = 35 + Math.random() * 15;
+                this.height = this.length * 0.6;
+                this.speed = 2 + Math.random() * 3;
+                
+                // Neon Colors for Arcade Feel
+                const colors = ['#38bdf8', '#f43f5e', '#10b981', '#fbbf24', '#a855f7'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
             }
             update() {
                 this.y -= this.speed;
                 if (this.y < -50) {
-                    this.y = canvas.height + Math.random() * 100;
-                    this.x = Math.random() * (canvas.width - 60) + 30;
+                    this.reset();
                 }
             }
             draw() {
                 ctx.save();
-                ctx.font = "38px Arial";
-                ctx.textBaseline = "middle";
-                ctx.textAlign = "center";
-                ctx.fillText(this.emoji, this.x, this.y);
+                ctx.translate(this.x, this.y);
+                
+                // Fish Tail (Dum)
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(-this.length/2, -this.height/3);
+                ctx.lineTo(-this.length/2, this.height/3);
+                ctx.closePath();
+                ctx.fill();
+
+                // Fish Body
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.length/2, this.height/2, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Fish Eye (Ankh)
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(this.length/4, -this.height/6, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#000000';
+                ctx.beginPath();
+                ctx.arc(this.length/4, -this.height/6, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+
                 ctx.restore();
             }
         }
 
-        function initFishes() {
-            fishes = [];
-            for (let i = 0; i < 6; i++) {
-                fishes.push(new Fish());
+        // Bubbles Animation
+        class Bubble {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.radius = 2 + Math.random() * 4;
+                this.speed = 0.5 + Math.random() * 1;
             }
+            update() {
+                this.y -= this.speed;
+                if (this.y < -10) {
+                    this.y = canvas.height + 10;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        }
+
+        function initGame() {
+            fishes = [];
+            bubbles = [];
+            for (let i = 0; i < 6; i++) fishes.push(new Fish());
+            for (let i = 0; i < 20; i++) bubbles.push(new Bubble());
         }
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Bubbles background effect
-            ctx.font = "20px Arial";
-            ctx.fillText("🫧", 60, 140);
-            ctx.fillText("🫧", 340, 220);
-            ctx.fillText("🫧", 130, 390);
+            // Draw & Update Bubbles
+            bubbles.forEach(b => { b.update(); b.draw(); });
 
+            // Draw & Update Fishes
             fishes.forEach(fish => {
                 fish.update();
                 fish.draw();
             });
+
             requestAnimationFrame(animate);
         }
 
         function handleCatch(clickX, clickY) {
             fishes.forEach((fish) => {
+                // Hitbox detection
                 const dist = Math.hypot(clickX - fish.x, clickY - fish.y);
-                if (dist < 40) {
+                if (dist < fish.length) {
                     score += 10;
                     scoreTxt.innerText = score;
-                    fish.y = canvas.height + Math.random() * 50;
-                    fish.x = Math.random() * (canvas.width - 60) + 30;
+                    fish.reset();
                 }
             });
         }
 
         canvas.addEventListener('click', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            handleCatch(e.clientX - rect.left, e.clientY - rect.top);
+            handleCatch(e.clientX, e.clientY);
         });
 
         canvas.addEventListener('touchstart', (e) => {
-            const rect = canvas.getBoundingClientRect();
             const touch = e.touches[0];
-            handleCatch(touch.clientX - rect.left, touch.clientY - rect.top);
+            handleCatch(touch.clientX, touch.clientY);
             e.preventDefault();
         }, { passive: false });
 
-        initFishes();
+        initGame();
         animate();
     </script>
 </body>
