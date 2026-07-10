@@ -6,8 +6,6 @@
     <title>Lethal Orca Fishing Game</title>
     <!-- Telegram Web Apps Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Stable Solana Web3 Production Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/solana-web3.js/1.31.0/index.iife.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -75,9 +73,7 @@
     <script>
         // Initialize Telegram Web App
         const tg = window.Telegram.WebApp;
-        if (tg) {
-            tg.expand();
-        }
+        if (tg) tg.expand();
 
         const connectBtn = document.getElementById('connect-btn');
         const walletAddressTxt = document.getElementById('wallet-address');
@@ -86,33 +82,26 @@
         const ctx = canvas.getContext('2d');
 
         let score = 0;
-        let walletConnected = false;
         let fishes = [];
 
-        // Wallet Connection Logic
+        // Simple Phantom Wallet Connection
         async function connectWallet() {
-            const isPhantomAvailable = window.solana && window.solana.isPhantom;
-            if (isPhantomAvailable) {
+            if (window.solana && window.solana.isPhantom) {
                 try {
                     const resp = await window.solana.connect();
                     const walletAddress = resp.publicKey.toString();
                     walletAddressTxt.innerText = "Wallet: " + walletAddress.substring(0, 6) + "..." + walletAddress.substring(walletAddress.length - 4);
                     connectBtn.style.display = 'none';
-                    walletConnected = true;
-                    if(tg && tg.MainButton) {
-                        tg.MainButton.setText("Wallet Connected! Tap Fishes to Earn").show();
-                    }
                 } catch (err) {
                     console.error(err);
-                    alert("Wallet connection rejected!");
                 }
             } else {
-                alert("Phantom Wallet nahi mila! Isay Phantom Mobile App ke andar Browser me open karein.");
+                alert("Phantom Wallet nahi mila! Isay Phantom app ke browser me chalayein.");
             }
         }
         connectBtn.addEventListener('click', connectWallet);
 
-        // Fish Class
+        // Fish Object Setup
         class Fish {
             constructor() {
                 this.x = Math.random() * (canvas.width - 40) + 20;
@@ -123,41 +112,35 @@
             }
             update() {
                 this.y -= this.speed;
-                // Loop back to bottom if fish goes off-screen
                 if (this.y < -40) {
                     this.y = canvas.height + Math.random() * 50;
                     this.x = Math.random() * (canvas.width - 40) + 20;
                 }
             }
             draw() {
-                ctx.save();
                 ctx.font = "30px Arial";
                 ctx.textBaseline = "middle";
                 ctx.textAlign = "center";
                 ctx.fillText(this.emoji, this.x, this.y);
-                ctx.restore();
             }
         }
 
-        // Initialize 5 Fishes
+        // Spawn Fishes
         function initFishes() {
-            fishes = [];
             for (let i = 0; i < 5; i++) {
                 fishes.push(new Fish());
             }
         }
 
-        // Main Game Loop Animation
+        // Animation Loop
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Background Water Details (Bubbles)
+            // Bubbles background
             ctx.font = "16px Arial";
             ctx.fillText("🫧", 60, 180);
             ctx.fillText("🫧", 320, 120);
-            ctx.fillText("🫧", 200, 380);
 
-            // Update & Render Fishes
             fishes.forEach(fish => {
                 fish.update();
                 fish.draw();
@@ -166,42 +149,31 @@
             requestAnimationFrame(animate);
         }
 
-        // Catch Fish (Tap/Click Event)
+        // Tap/Click to catch
         function handleCatch(clickX, clickY) {
             fishes.forEach((fish) => {
                 const dist = Math.hypot(clickX - fish.x, clickY - fish.y);
-                // Hitbox check
                 if (dist < 30) {
                     score += 10;
                     scoreTxt.innerText = score;
-                    
-                    // Respawn fish at the bottom instantly
                     fish.y = canvas.height + Math.random() * 30;
                     fish.x = Math.random() * (canvas.width - 40) + 20;
-                    fish.speed = 1.5 + Math.random() * 2.5;
                 }
             });
         }
 
-        // Mouse Click
-        canvas.addEventListener('click', (event) => {
+        canvas.addEventListener('click', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const clickX = event.clientX - rect.left;
-            const clickY = event.clientY - rect.top;
-            handleCatch(clickX, clickY);
+            handleCatch(e.clientX - rect.left, e.clientY - rect.top);
         });
 
-        // Mobile/Telegram Touch Tap
-        canvas.addEventListener('touchstart', (event) => {
+        canvas.addEventListener('touchstart', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const touch = event.touches[0];
-            const clickX = touch.clientX - rect.left;
-            const clickY = touch.clientY - rect.top;
-            handleCatch(clickX, clickY);
-            event.preventDefault(); // Prevents double firing with click
+            const touch = e.touches[0];
+            handleCatch(touch.clientX - rect.left, touch.clientY - rect.top);
+            e.preventDefault();
         }, { passive: false });
 
-        // Start everything
         initFishes();
         animate();
     </script>
