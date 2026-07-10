@@ -18,7 +18,7 @@
             overflow: hidden;
             position: relative;
         }
-        
+
         /* Top Navigation Bar */
         .header {
             position: absolute;
@@ -29,14 +29,29 @@
             align-items: center;
             z-index: 10;
         }
+
+        /* Top Left Logo and Balance Box */
+        .logo-balance-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 20px;
+            border-radius: 25px;
+        }
+
+        .top-logo {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
         .balance-box {
             font-size: 20px;
             font-weight: bold;
             color: #ffcc00;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 8px 15px;
-            border-radius: 20px;
         }
+
         .btn {
             background-color: #246083;
             color: white;
@@ -47,9 +62,12 @@
             font-weight: bold;
             transition: 0.3s;
         }
-        .btn:hover { background-color: #357fae; }
 
-        /* Game Area (Corrected Fish Swimming Direction) */
+        .btn:hover {
+            background-color: #357fae;
+        }
+
+        /* Game Area (Fish Animation Space) */
         .game-space {
             position: absolute;
             width: 100%;
@@ -57,26 +75,17 @@
             z-index: 1;
             pointer-events: none;
         }
+
         .fish {
             position: absolute;
             font-size: 30px;
-            animation: swim-right 10s linear infinite;
-        }
-        /* Defualt is swimming left to right. Reverse needs to look other way. */
-        .fish.reverse {
-            animation-name: swim-left;
+            animation: swim 10s linear infinite;
         }
 
-        /* Animation from LEFT to RIGHT */
-        @keyframes swim-right {
-            0% { left: -50px; transform: scaleX(1); } /* Face right */
-            100% { left: 105%; transform: scaleX(1); }
-        }
-
-        /* Animation from RIGHT to LEFT */
-        @keyframes swim-left {
-            0% { right: -50px; transform: scaleX(-1); } /* Face left */
-            100% { right: 105%; transform: scaleX(-1); }
+        @keyframes swim {
+            0% { left: -50px; top: 30%; }
+            50% { top: 50%; }
+            100% { left: 105%; top: 40%; }
         }
 
         /* Sidebar/Wallet Box */
@@ -90,12 +99,14 @@
             box-shadow: 0px 0px 25px rgba(0,0,0,0.6);
             z-index: 5;
         }
+
         .status {
             margin: 15px 0;
             font-weight: bold;
             color: #ffcc00;
             font-size: 15px;
         }
+
         .withdraw-btn {
             background-color: #25a244;
             width: 100%;
@@ -107,7 +118,11 @@
             font-weight: bold;
             transition: 0.3s;
         }
-        .withdraw-btn:hover:not([disabled]) { background-color: #2dc653; }
+
+        .withdraw-btn:hover:not([disabled]) {
+            background-color: #2dc653;
+        }
+
         .hint {
             font-size: 12px;
             color: #a0a0a0;
@@ -117,17 +132,20 @@
 </head>
 <body>
 
-    <!-- Game Background Elements (With corrected direction classes) -->
+    <!-- Game Background Elements -->
     <div class="game-space">
-        <div class="fish" style="animation-delay: 0s; top: 20%;">🐟</div>
-        <div class="fish reverse" style="animation-delay: 2s; animation-duration: 12s; top: 40%;">🐠</div>
-        <div class="fish" style="animation-delay: 5s; animation-duration: 8s; top: 60%;">🐡</div>
-        <div class="fish reverse" style="animation-delay: 7s; top: 80%;">🐟</div>
+        <div class="fish" style="animation-delay: 0s;">🐟</div>
+        <div class="fish" style="animation-delay: 3s; animation-duration: 12s;">🐠</div>
+        <div class="fish" style="animation-delay: 5s; animation-duration: 8s;">🐡</div>
     </div>
 
-    <!-- Top Stats -->
+    <!-- Top Stats Bar -->
     <div class="header">
-        <div class="balance-box">🎣 <span id="token-balance">5,000</span> LORCA</div>
+        <div class="logo-balance-container">
+            <!-- Yeh aapka top-left par perfectly sized logo hai -->
+            <img class="top-logo" src="https://awan111.github.io/lethalorca/orca-logo.png" alt="LethalOrca">
+            <div class="balance-box"><span id="token-balance">5,000</span> LORCA</div>
+        </div>
         <button class="btn" id="connect-top-btn">Connect Wallet</button>
     </div>
 
@@ -137,17 +155,13 @@
         <p style="font-size: 14px; color: #e0e0e0; line-height: 1.4;">
             Connect your Phantom wallet to claim and withdraw your earned $LORCA tokens to Solana Mainnet.
         </p>
-        
         <button class="btn" id="phantom-connect-btn" style="background-color: #4e44ce; width: 100%; margin-bottom: 10px; padding: 12px; border-radius: 20px;">
             👻 Connect Phantom Wallet
         </button>
-
         <div class="status" id="tx-status">Status: Wallet Not Connected</div>
-
         <button class="withdraw-btn" id="withdraw-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
             Withdraw Tokens
         </button>
-
         <p class="hint">💡 Don't have Phantom? Install it from phantom.app</p>
     </div>
 
@@ -161,14 +175,12 @@
         // Wallet Connection Logic
         function connectWalletSimulation() {
             if (isConnected) return;
-            
             isConnected = true;
             connectTopBtn.innerText = "Connected (0xLorca...)";
             phantomConnectBtn.innerText = "👻 Wallet Connected";
             phantomConnectBtn.disabled = true;
             phantomConnectBtn.style.opacity = "0.7";
             phantomConnectBtn.style.cursor = "default";
-            
             txStatus.innerText = "Status: Wallet Ready to Withdraw";
             txStatus.style.color = "#2dc653";
             
@@ -182,24 +194,21 @@
         connectTopBtn.addEventListener("click", connectWalletSimulation);
         phantomConnectBtn.addEventListener("click", connectWalletSimulation);
 
-        // Withdrawal Handling (2-second Delay Loop)
+        // Withdrawal Handling
         withdrawBtn.addEventListener("click", function() {
             if (!isConnected) return;
-
             txStatus.innerText = "Processing Transaction...";
             txStatus.style.color = "#ffcc00";
             withdrawBtn.disabled = true;
             withdrawBtn.style.opacity = "0.6";
             withdrawBtn.style.cursor = "not-allowed";
-
+            
             setTimeout(() => {
                 alert("The simulator is working perfectly! Your 5,000 $LORCA tokens are securely logged in the local state. The withdrawal bridge goes live instantly once we hit the pump.fun bonding curve target and migrate to Raydium mainnet!");
-                
                 txStatus.innerText = "Locked until Mainnet Migration";
                 txStatus.style.color = "#e63946";
             }, 2000);
         });
     </script>
-
 </body>
 </html>
