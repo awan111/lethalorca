@@ -21,20 +21,41 @@
     display: flex; justify-content: space-between; align-items: center;
     padding: 15px 20px; z-index: 10;
     background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  #hud > div:first-child {
+    display: flex; align-items: center; gap: 15px;
+    order: 1;
   }
   #token-display {
     color: #ffd700; font-size: 20px; font-weight: bold;
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: center; gap: 6px;
+    white-space: nowrap;
   }
   #token-display .coin {
-    width: 24px; height: 24px;
-    background: radial-gradient(circle at 35% 35%, #fff7cc, #ffd700 60%, #b8860b);
+    width: 18px; height: 18px;
+    background: transparent;
     border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
-  #timer { color: white; font-size: 16px; font-weight: 600; }
+  #token-display .coin img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: contain;
+  }
+  #timer { 
+    color: white; font-size: 16px; font-weight: 600;
+    order: 2;
+    margin-left: auto;
+    white-space: nowrap;
+  }
 
   #wallet-btn {
-    position: absolute; top: 15px; right: 20px; z-index: 15;
     background: rgba(255,255,255,0.12);
     border: 1px solid rgba(94,234,212,0.4);
     color: #eef6f6;
@@ -45,6 +66,8 @@
     cursor: pointer;
     display: flex; align-items: center; gap: 8px;
     transition: all 0.2s ease;
+    white-space: nowrap;
+    order: 3;
   }
   #wallet-btn:hover { border-color: #5eead4; background: rgba(94,234,212,0.1); }
   #wallet-btn.connected { border-color: #5eead4; background: rgba(94,234,212,0.2); }
@@ -145,7 +168,13 @@
 
   @media (max-width: 600px) {
     #wallet-panel { width: 100%; right: -100%; }
-    #hud { flex-wrap: wrap; }
+    #hud { 
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+    #hud > div:first-child { order: 1; }
+    #timer { order: 2; margin-left: 0; margin-top: 8px; }
+    #wallet-btn { order: 3; margin-top: 8px; margin-left: auto; }
   }
 </style>
 </head>
@@ -153,13 +182,13 @@
 <div id="game-container">
   <div id="hud">
     <div style="display:flex; align-items:center;">
-      <div id="token-display"><span class="coin"></span><span id="token-count">0</span> LORCA</div>
-      <button id="wallet-btn" onclick="togglePanel()">
-        <span class="status-dot"></span>
-        <span id="wallet-label">Connect Wallet</span>
-      </button>
+      <div id="token-display"><span class="coin"><img src="lorca_logo.png" alt="LORCA"></span><span id="token-count">0</span> LORCA</div>
     </div>
     <div id="timer">Time: 30</div>
+    <button id="wallet-btn" onclick="togglePanel()">
+      <span class="status-dot"></span>
+      <span id="wallet-label">Connect Wallet</span>
+    </button>
   </div>
 
   <div id="start-screen">
