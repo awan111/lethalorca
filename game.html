@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Browser ko cash karne se rokne ke liye headers -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Lethal Orca Fishing Game</title>
-    <!-- Telegram Web Apps Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             background-color: #0b1329;
             color: white;
             text-align: center;
@@ -17,9 +20,7 @@
             overflow: hidden;
             user-select: none;
         }
-        header {
-            margin-bottom: 10px;
-        }
+        header { margin-bottom: 10px; }
         .btn {
             background-color: #10b981;
             color: white;
@@ -29,19 +30,9 @@
             cursor: pointer;
             border-radius: 8px;
             font-weight: bold;
-            transition: 0.3s;
-        }
-        .btn:hover {
-            background-color: #059669;
-        }
-        #wallet-address {
-            color: #38bdf8;
-            font-family: monospace;
-            font-size: 14px;
-            margin: 5px 0;
         }
         #score-board {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
             color: #fbbf24;
             margin: 5px 0;
@@ -53,7 +44,6 @@
             display: block;
             margin: 0 auto;
             max-width: 100%;
-            cursor: crosshair;
             box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.5);
         }
     </style>
@@ -62,101 +52,76 @@
 
     <header>
         <h2>🐋 Lethal Orca Fishing Arcade</h2>
-        <button id="connect-btn" class="btn">Connect Phantom Wallet</button>
-        <p id="wallet-address">Wallet: Not Connected</p>
+        <button id="connect-btn" class="btn">Connect Wallet</button>
         <div id="score-board">Score: <span id="score">0</span> $LORCA</div>
     </header>
 
-    <!-- Game Canvas -->
     <canvas id="gameCanvas" width="400" height="500"></canvas>
 
     <script>
-        // Initialize Telegram Web App
         const tg = window.Telegram.WebApp;
         if (tg) tg.expand();
 
-        const connectBtn = document.getElementById('connect-btn');
-        const walletAddressTxt = document.getElementById('wallet-address');
-        const scoreTxt = document.getElementById('score');
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const scoreTxt = document.getElementById('score');
 
         let score = 0;
         let fishes = [];
 
-        // Simple Phantom Wallet Connection
-        async function connectWallet() {
-            if (window.solana && window.solana.isPhantom) {
-                try {
-                    const resp = await window.solana.connect();
-                    const walletAddress = resp.publicKey.toString();
-                    walletAddressTxt.innerText = "Wallet: " + walletAddress.substring(0, 6) + "..." + walletAddress.substring(walletAddress.length - 4);
-                    connectBtn.style.display = 'none';
-                } catch (err) {
-                    console.error(err);
-                }
-            } else {
-                alert("Phantom Wallet nahi mila! Isay Phantom app ke browser me chalayein.");
-            }
-        }
-        connectBtn.addEventListener('click', connectWallet);
-
-        // Fish Object Setup
         class Fish {
             constructor() {
                 this.x = Math.random() * (canvas.width - 40) + 20;
-                this.y = canvas.height + Math.random() * 100;
-                this.radius = 20;
-                this.speed = 1.5 + Math.random() * 2;
+                this.y = canvas.height + Math.random() * 150;
+                this.radius = 25;
+                this.speed = 2 + Math.random() * 2;
                 this.emoji = "🐟";
             }
             update() {
                 this.y -= this.speed;
-                if (this.y < -40) {
-                    this.y = canvas.height + Math.random() * 50;
+                if (this.y < -50) {
+                    this.y = canvas.height + Math.random() * 100;
                     this.x = Math.random() * (canvas.width - 40) + 20;
                 }
             }
             draw() {
-                ctx.font = "30px Arial";
+                ctx.font = "35px Arial";
                 ctx.textBaseline = "middle";
                 ctx.textAlign = "center";
                 ctx.fillText(this.emoji, this.x, this.y);
             }
         }
 
-        // Spawn Fishes
         function initFishes() {
-            for (let i = 0; i < 5; i++) {
+            fishes = [];
+            for (let i = 0; i < 6; i++) {
                 fishes.push(new Fish());
             }
         }
 
-        // Animation Loop
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Bubbles background
-            ctx.font = "16px Arial";
-            ctx.fillText("🫧", 60, 180);
-            ctx.fillText("🫧", 320, 120);
+            // Bubbles background animation loop effect
+            ctx.font = "18px Arial";
+            ctx.fillText("🫧", 70, 150);
+            ctx.fillText("🫧", 330, 250);
+            ctx.fillText("🫧", 150, 400);
 
             fishes.forEach(fish => {
                 fish.update();
                 fish.draw();
             });
-
             requestAnimationFrame(animate);
         }
 
-        // Tap/Click to catch
         function handleCatch(clickX, clickY) {
             fishes.forEach((fish) => {
                 const dist = Math.hypot(clickX - fish.x, clickY - fish.y);
-                if (dist < 30) {
+                if (dist < 35) {
                     score += 10;
                     scoreTxt.innerText = score;
-                    fish.y = canvas.height + Math.random() * 30;
+                    fish.y = canvas.height + Math.random() * 50;
                     fish.x = Math.random() * (canvas.width - 40) + 20;
                 }
             });
