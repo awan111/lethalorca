@@ -3,227 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LethalOrca Fishing - Play & Earn $LORCA</title>
+    <title>Lethal Orca Fishing Game</title>
+    <!-- Telegram Web Apps Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Solana Web3 SDK -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
     <style>
         body {
-            margin: 0;
-            background: linear-gradient(to bottom, #113043, #061521);
+            font-family: Arial, sans-serif;
+            background-color: #0f172a;
             color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Top Bar */
-        .header {
-            position: absolute;
-            top: 20px;
-            width: 90%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-        }
-
-        /* Bulletproof Logo & Points Box */
-        .brand-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 8px 20px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Modern Text/Emoji Logo Style */
-        .brand-logo-text {
-            font-size: 20px;
-            font-weight: 800;
-            color: #48cae4;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            letter-spacing: 1px;
-        }
-
-        .points-display {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ffd700;
-            border-left: 2px solid rgba(255, 255, 255, 0.2);
-            padding-left: 12px;
-        }
-
-        .btn-top {
-            background-color: #1b4965;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .btn-top:hover {
-            background-color: #2b678c;
-        }
-
-        /* Ocean Elements */
-        .ocean-space {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .swimming-fish {
-            position: absolute;
-            font-size: 32px;
-            animation: swimLeftToRight 12s linear infinite;
-        }
-
-        @keyframes swimLeftToRight {
-            0% { left: -60px; top: 40%; }
-            50% { top: 55%; }
-            100% { left: 105%; top: 45%; }
-        }
-
-        /* Wallet Box (Main Card) */
-        .wallet-card {
-            background: rgba(10, 25, 35, 0.95);
-            border: 2px solid #1b4965;
-            border-radius: 20px;
-            padding: 30px;
-            width: 340px;
             text-align: center;
-            box-shadow: 0px 12px 30px rgba(0,0,0,0.7);
-            z-index: 5;
-            backdrop-filter: blur(10px);
+            padding: 20px;
         }
-
-        .status-text {
-            margin: 18px 0;
-            font-weight: bold;
-            color: #ffd700;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-        }
-
-        .action-btn {
-            background-color: #2a9d8f;
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            border: none;
-            border-radius: 25px;
+        .btn {
+            background-color: #10b981;
             color: white;
-            font-weight: bold;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
             cursor: pointer;
-            transition: 0.3s;
+            border-radius: 8px;
+            margin-top: 20px;
         }
-
-        .action-btn:hover:not([disabled]) {
-            background-color: #e76f51;
+        .btn:hover {
+            background-color: #059669;
         }
-
-        .note {
-            font-size: 11px;
-            color: #8d99ae;
+        #wallet-address {
             margin-top: 15px;
-            line-height: 1.3;
+            color: #38bdf8;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
 
-    <!-- Ocean Background Effects -->
-    <div class="ocean-space">
-        <div class="swimming-fish" style="animation-delay: 0s; animation-duration: 10s;">🐋</div>
-        <div class="swimming-fish" style="animation-delay: 3s; animation-duration: 14s;">🐠</div>
-        <div class="swimming-fish" style="animation-delay: 6s; animation-duration: 11s;">🐙</div>
-    </div>
+    <h1>🐋 Lethal Orca Fishing Arcade</h1>
+    <p>Welcome to the Play, Earn & Liquidate Hub!</p>
 
-    <!-- Main Navigation Header -->
-    <div class="header">
-        <div class="brand-container">
-            <!-- Image hata kar bulletproof Emoji logo laga diya hai -->
-            <div class="brand-logo-text">🐋 LORCA</div>
-            <div class="points-display"><span id="display-amount">5,000</span> LORCA</div>
-        </div>
-        <button class="btn-top" id="top-wallet-connect">Connect Wallet</button>
-    </div>
-
-    <!-- Center Interactive App Card -->
-    <div class="wallet-card">
-        <h3 style="margin-top: 0; color: #48cae4; letter-spacing: 1px;">SOLANA MAINNET BRIDGE</h3>
-        <p style="font-size: 13px; color: #cfd8dc; line-height: 1.5; margin-bottom: 20px;">
-            Connect your active Phantom wallet to authorize and process the safe transfer of your $LORCA token rewards.
-        </p>
-        
-        <button id="main-phantom-btn" style="background-color: #512da8; color: white; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 15px; margin-bottom: 5px;">
-            👻 Connect Phantom Wallet
-        </button>
-
-        <div class="status-text" id="bridge-status">Status: Disconnected</div>
-
-        <button class="action-btn" id="claim-withdraw-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
-            Withdraw To Wallet
-        </button>
-        
-        <p class="note">🔒 Secure connection via Solana RPC nodes. Make sure your Phantom App is updated.</p>
-    </div>
+    <!-- Wallet Connect Button -->
+    <button id="connect-btn" class="btn">Connect Phantom Wallet</button>
+    <p id="wallet-address"></p>
 
     <script>
-        let walletConnected = false;
-        const topConnect = document.getElementById("top-wallet-connect");
-        const mainConnect = document.getElementById("main-phantom-btn");
-        const statusLabel = document.getElementById("bridge-status");
-        const withdrawAction = document.getElementById("claim-withdraw-btn");
+        // Initialize Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // App ko poori screen par open karne ke liye
 
-        function triggerWalletConnection() {
-            if (walletConnected) return;
-            walletConnected = true;
-            
-            topConnect.innerText = "Connected (0xLorca...)";
-            mainConnect.innerText = "👻 Connected Successfully";
-            mainConnect.disabled = true;
-            mainConnect.style.opacity = "0.6";
-            mainConnect.style.cursor = "default";
-            
-            statusLabel.innerText = "Status: Connected & Ready";
-            statusLabel.style.color = "#2a9d8f";
-            
-            withdrawAction.disabled = false;
-            withdrawAction.style.opacity = "1";
-            withdrawAction.style.cursor = "pointer";
+        const connectBtn = document.getElementById('connect-btn');
+        const walletAddressTxt = document.getElementById('wallet-address');
+
+        // Function to connect Phantom Wallet
+        async function connectWallet() {
+            const isPhantomAvailable = window.solana && window.solana.isPhantom;
+
+            if (isPhantomAvailable) {
+                try {
+                    // Connect to Phantom
+                    const resp = await window.solana.connect();
+                    const walletAddress = resp.publicKey.toString();
+                    
+                    walletAddressTxt.innerText = "Connected: " + walletAddress.substring(0, 6) + "..." + walletAddress.substring(walletAddress.length - 4);
+                    connectBtn.innerText = "Wallet Connected ✅";
+                    
+                    // Telegram par confirmation message show karna
+                    tg.MainButton.setText("Wallet Connected! Ready to Play").show();
+                } catch (err) {
+                    console.error("Connection rejected", err);
+                    alert("Wallet connection rejected!");
+                }
+            } else {
+                alert("Phantom Wallet not found! Please open this inside a browser with Phantom extension or Phantom mobile app.");
+            }
         }
 
-        topConnect.addEventListener("click", triggerWalletConnection);
-        mainConnect.addEventListener("click", triggerWalletConnection);
-
-        withdrawAction.addEventListener("click", function() {
-            if (!walletConnected) return;
-            
-            statusLabel.innerText = "Broadcasting Transaction to Network...";
-            statusLabel.style.color = "#ffd700";
-            withdrawAction.disabled = true;
-            withdrawAction.style.opacity = "0.5";
-            withdrawAction.style.cursor = "not-allowed";
-            
-            setTimeout(() => {
-                alert("Success! Your 5,000 $LORCA balance has been stored. The withdrawal smart contract will be fully unlocked automatically as soon as the project hits the pump.fun bonding curve target and completes the Raydium pool migration!");
-                statusLabel.innerText = "Locked until Mainnet Launch";
-                statusLabel.style.color = "#e63946";
-            }, 2000);
-        });
+        connectBtn.addEventListener('click', connectWallet);
     </script>
 </body>
 </html>
