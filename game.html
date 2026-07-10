@@ -16,7 +16,10 @@
             justify-content: center;
             height: 100vh;
             overflow: hidden;
+            position: relative;
         }
+        
+        /* Top Navigation Bar */
         .header {
             position: absolute;
             top: 20px;
@@ -24,6 +27,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            z-index: 10;
+        }
+        .balance-box {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffcc00;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 15px;
+            border-radius: 20px;
         }
         .btn {
             background-color: #246083;
@@ -36,53 +48,91 @@
             transition: 0.3s;
         }
         .btn:hover { background-color: #357fae; }
+
+        /* Game Area (Fish Animation Space) */
+        .game-space {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .fish {
+            position: absolute;
+            font-size: 30px;
+            animation: swim 10s linear infinite;
+        }
+        @keyframes swim {
+            0% { left: -50px; top: 30%; }
+            50% { top: 50%; }
+            100% { left: 105%; top: 40%; }
+        }
+
+        /* Sidebar/Wallet Box */
         .wallet-panel {
             background: rgba(15, 34, 46, 0.95);
             border: 2px solid #357fae;
             border-radius: 15px;
-            padding: 20px;
-            width: 300px;
+            padding: 25px;
+            width: 320px;
             text-align: center;
-            box-shadow: 0px 0px 20px rgba(0,0,0,0.5);
+            box-shadow: 0px 0px 25px rgba(0,0,0,0.6);
+            z-index: 5;
         }
         .status {
             margin: 15px 0;
             font-weight: bold;
             color: #ffcc00;
+            font-size: 15px;
         }
         .withdraw-btn {
             background-color: #25a244;
             width: 100%;
             padding: 12px;
             font-size: 16px;
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            transition: 0.3s;
         }
-        .withdraw-btn:hover { background-color: #2dc653; }
+        .withdraw-btn:hover:not([disabled]) { background-color: #2dc653; }
         .hint {
             font-size: 12px;
             color: #a0a0a0;
-            margin-top: 10px;
+            margin-top: 12px;
         }
     </style>
 </head>
 <body>
 
+    <!-- Game Background Elements -->
+    <div class="game-space">
+        <div class="fish" style="animation-delay: 0s;">🐟</div>
+        <div class="fish" style="animation-delay: 3s; animation-duration: 12s;">🐠</div>
+        <div class="fish" style="animation-delay: 5s; animation-duration: 8s;">🐡</div>
+    </div>
+
+    <!-- Top Stats -->
     <div class="header">
-        <h2>Tokens: <span id="token-balance">30,000</span> $LORCA</h2>
+        <div class="balance-box">🎣 <span id="token-balance">5,000</span> LORCA</div>
         <button class="btn" id="connect-top-btn">Connect Wallet</button>
     </div>
 
-    <!-- Wallet Sidebar / Panel -->
+    <!-- Main Interactive Wallet UI -->
     <div class="wallet-panel">
-        <h3>LIVE PHANTOM</h3>
-        <p>Connect your Phantom wallet to withdraw LORCA tokens to your Solana account.</p>
+        <h3 style="margin-top: 0; color: #357fae;">LIVE PHANTOM WALLET</h3>
+        <p style="font-size: 14px; color: #e0e0e0; line-height: 1.4;">
+            Connect your Phantom wallet to claim and withdraw your earned $LORCA tokens to Solana Mainnet.
+        </p>
         
-        <button class="btn" id="phantom-connect-btn" style="background-color: #4e44ce; width: 100%; margin-bottom: 10px;">
+        <button class="btn" id="phantom-connect-btn" style="background-color: #4e44ce; width: 100%; margin-bottom: 10px; padding: 12px; border-radius: 20px;">
             👻 Connect Phantom Wallet
         </button>
 
-        <div class="status" id="tx-status">Wallet: Not Connected</div>
+        <div class="status" id="tx-status">Status: Wallet Not Connected</div>
 
-        <button class="btn withdraw-btn" id="withdraw-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
+        <button class="withdraw-btn" id="withdraw-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
             Withdraw Tokens
         </button>
 
@@ -96,36 +146,42 @@
         const txStatus = document.getElementById("tx-status");
         const withdrawBtn = document.getElementById("withdraw-btn");
 
-        // Function to handle connection visual state
-        function handleConnect() {
+        // Wallet Connection Logic
+        function connectWalletSimulation() {
+            if (isConnected) return;
+            
             isConnected = true;
-            connectTopBtn.innerText = "0xLorca...Connected";
-            phantomConnectBtn.innerText = "👻 Connected";
+            connectTopBtn.innerText = "Connected (0xLorca...)";
+            phantomConnectBtn.innerText = "👻 Wallet Connected";
             phantomConnectBtn.disabled = true;
             phantomConnectBtn.style.opacity = "0.7";
+            phantomConnectBtn.style.cursor = "default";
             
-            txStatus.innerText = "Wallet Ready to Withdraw";
+            txStatus.innerText = "Status: Wallet Ready to Withdraw";
             txStatus.style.color = "#2dc653";
             
-            // Enable withdrawal button
+            // Enable Withdraw Button
             withdrawBtn.disabled = false;
             withdrawBtn.style.opacity = "1";
             withdrawBtn.style.cursor = "pointer";
         }
 
-        // Connect button listeners
-        connectTopBtn.addEventListener("click", handleConnect);
-        phantomConnectBtn.addEventListener("click", handleConnect);
+        // Event Listeners for Buttons
+        connectTopBtn.addEventListener("click", connectWalletSimulation);
+        phantomConnectBtn.addEventListener("click", connectWalletSimulation);
 
-        // Withdrawal Logic with 2 seconds processing simulator
+        // Withdrawal Handling (2-second Delay Loop)
         withdrawBtn.addEventListener("click", function() {
-            txStatus.innerText = "Processing...";
+            if (!isConnected) return;
+
+            txStatus.innerText = "Processing Transaction...";
             txStatus.style.color = "#ffcc00";
             withdrawBtn.disabled = true;
             withdrawBtn.style.opacity = "0.6";
+            withdrawBtn.style.cursor = "not-allowed";
 
             setTimeout(() => {
-                alert("The simulator is working perfectly! Your 30,000 $LORCA tokens are securely logged. The withdrawal bridge goes live instantly once we hit the pump.fun bonding curve target and migrate to Raydium mainnet!");
+                alert("The simulator is working perfectly! Your 5,000 $LORCA tokens are securely logged in the local state. The withdrawal bridge goes live instantly once we hit the pump.fun bonding curve target and migrate to Raydium mainnet!");
                 
                 txStatus.innerText = "Locked until Mainnet Migration";
                 txStatus.style.color = "#e63946";
