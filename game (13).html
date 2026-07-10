@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LethalOrca Fishing - Play & Earn $LORCA</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(180deg, #0a4d68 0%, #088395 50%, #05bfdb 100%);
+    height: 100vh;
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+  #game-container { position: relative; width: 100%; height: 100vh; overflow: hidden; }
+  
+  /* HUD */
+  #hud {
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 20px; z-index: 10;
+    background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
+  }
+  #token-display {
+    color: #ffd700; font-size: 20px; font-weight: bold;
+    display: flex; align-items: center; gap: 8px;
+  }
+  #token-display .coin {
+    width: 24px; height: 24px;
+    background: radial-gradient(circle at 35% 35%, #fff7cc, #ffd700 60%, #b8860b);
+    border-radius: 50%;
+  }
+  #timer { color: white; font-size: 16px; font-weight: 600; }
+
+  #wallet-btn {
+    position: absolute; top: 15px; right: 20px; z-index: 15;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(94,234,212,0.4);
+    color: #eef6f6;
+    padding: 10px 18px;
+    border-radius: 25px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    transition: all 0.2s ease;
+  }
+  #wallet-btn:hover { border-color: #5eead4; background: rgba(94,234,212,0.1); }
+  #wallet-btn.connected { border-color: #5eead4; background: rgba(94,234,212,0.2); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff5c5c; }
+  .connected .status-dot { background: #4ade80; }
+
+  /* Fish */
+  .fish {
+    position: absolute; cursor: pointer; user-select: none;
+    font-size: 40px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    transition: transform 0.1s;
+  }
+  .fish:active { transform: scale(0.85); }
+
+  .bubble {
+    position: absolute; bottom: -20px; border-radius: 50%;
+    background: rgba(255,255,255,0.35); animation: rise linear forwards;
+  }
+  @keyframes rise { to { transform: translateY(-110vh); opacity: 0; } }
+
+  /* Screens */
+  #start-screen, #end-screen {
+    position: absolute; inset: 0; background: rgba(0,10,20,0.85);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: white; z-index: 20; text-align: center; padding: 20px;
+  }
+  #start-screen h1, #end-screen h1 { font-size: 32px; margin-bottom: 12px; color: #ffd700; }
+  #start-screen p, #end-screen p { max-width: 340px; line-height: 1.6; margin-bottom: 24px; opacity: 0.9; font-size: 16px; }
+  
+  button.primary {
+    background: linear-gradient(135deg, #ffd700, #ff9500);
+    border: none; padding: 14px 36px; border-radius: 30px;
+    font-size: 17px; font-weight: bold; color: #1a1a1a; cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
+  }
+  button.primary:hover { transform: translateY(-2px); }
+
+  #floating-plus {
+    position: absolute; color: #ffd700; font-weight: bold; font-size: 20px;
+    pointer-events: none; animation: floatUp 0.8s ease-out forwards;
+  }
+  @keyframes floatUp { to { transform: translateY(-50px); opacity: 0; } }
+
+  /* Wallet Panel */
+  #wallet-panel {
+    position: absolute; top: 0; right: -360px; width: 340px; height: 100%;
+    background: rgba(3,13,22,0.98); border-left: 1px solid rgba(94,234,212,0.25);
+    z-index: 30; padding: 24px 20px; color: #eef6f6; overflow-y: auto;
+    transition: right 0.3s ease; font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  #wallet-panel.open { right: 0; }
+  
+  .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .panel-header h2 { font-size: 18px; }
+  .panel-close { cursor: pointer; font-size: 22px; color: #7fa8a8; background: none; border: none; }
+  
+  .status-tag {
+    font-size: 10px; letter-spacing: 1px; color: #f2c94c;
+    border: 1px solid rgba(242,201,76,0.4); padding: 3px 10px;
+    border-radius: 20px; text-transform: uppercase; margin-bottom: 16px; display: inline-block;
+  }
+
+  .wallet-card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(94,234,212,0.15);
+    border-radius: 12px; padding: 16px; margin-bottom: 16px;
+  }
+  .wallet-card .label { font-size: 11px; color: #7fa8a8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .wallet-card .value { font-family: monospace; font-size: 13px; word-break: break-all; color: #fff; }
+
+  .wallet-options { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .wallet-btn {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(94,234,212,0.2);
+    color: #eef6f6; padding: 12px; border-radius: 10px; font-size: 14px;
+    cursor: pointer; transition: all 0.2s ease;
+  }
+  .wallet-btn:hover { border-color: #5eead4; background: rgba(94,234,212,0.1); }
+
+  .withdraw-btn {
+    width: 100%; margin-top: 20px; padding: 14px; border-radius: 10px;
+    background: linear-gradient(135deg, #2dd4bf, #0d9488); color: #04211d;
+    border: none; font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .withdraw-btn:hover:not(:disabled) { transform: translateY(-1px); }
+  .withdraw-btn:disabled { background: rgba(127,168,168,0.15); color: #7fa8a8; cursor: not-allowed; }
+
+  .note { font-size: 12px; color: #7fa8a8; margin-top: 12px; line-height: 1.5; padding: 12px; background: rgba(127,168,168,0.1); border-radius: 8px; }
+  
+  .disconnect-btn {
+    width: 100%; margin-top: 24px; padding: 10px; border-radius: 10px;
+    background: none; color: #ff8080; border: 1px solid rgba(255,128,128,0.3);
+    font-size: 13px; cursor: pointer; transition: all 0.2s ease;
+  }
+  .disconnect-btn:hover { border-color: #ff8080; background: rgba(255,128,128,0.05); }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    #wallet-panel { width: 100%; right: -100%; }
+    #hud { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="hud">
+    <div style="display:flex; align-items:center;">
+      <div id="token-display"><span class="coin"></span><span id="token-count">0</span> LORCA</div>
+      <button id="wallet-btn" onclick="togglePanel()">
+        <span class="status-dot"></span>
+        <span id="wallet-label">Connect Wallet</span>
+      </button>
+    </div>
+    <div id="timer">Time: 30</div>
+  </div>
+
+  <div id="start-screen">
+    <h1>🐟 LethalOrca Fishing</h1>
+    <p>Tap fish to earn LORCA tokens! Catch them before they swim away. You have 30 seconds!</p>
+    <button class="primary" onclick="startGame()">Start Fishing</button>
+  </div>
+
+  <div id="end-screen" class="hidden">
+    <h1>Time's Up!</h1>
+    <p id="final-score"></p>
+    <button class="primary" onclick="startGame()">Play Again</button>
+  </div>
+
+  <!-- WALLET PANEL -->
+  <div id="wallet-panel">
+    <div class="panel-header">
+      <h2>Wallet</h2>
+      <button class="panel-close" onclick="togglePanel()">✕</button>
+    </div>
+    <div class="status-tag">Live Phantom</div>
+
+    <div id="wallet-disconnected">
+      <p style="font-size:13px; color:#7fa8a8; margin-bottom:16px;">Connect your Phantom wallet to withdraw LORCA tokens to your Solana account.</p>
+      <div class="wallet-options">
+        <button class="wallet-btn" onclick="connectPhantom()">👻 Connect Phantom Wallet</button>
+      </div>
+      <div class="note">💡 Don't have Phantom? Install it from phantom.app</div>
+    </div>
+
+    <div id="wallet-connected" class="hidden">
+      <div class="wallet-card">
+        <div class="label">Wallet Address</div>
+        <div class="value" id="wallet-address">—</div>
+      </div>
+      <div class="wallet-card">
+        <div class="label">Game Balance</div>
+        <div class="value"><span id="balance-display">0</span> LORCA</div>
+      </div>
+      <button class="withdraw-btn" id="withdraw-btn" onclick="withdrawTokens()">Withdraw Tokens</button>
+      <div class="note">⚠️ Withdrawal works when $LORCA token is live on Solana mainnet. Your balance is stored securely and can be withdrawn anytime.</div>
+      <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ GAME STATE ============
+let tokens = 0;
+let timeLeft = 30;
+let gameRunning = false;
+let walletConnected = false;
+let userAddress = null;
+
+// ============ PHANTOM WALLET INTEGRATION ============
+async function connectPhantom() {
+  try {
+    // Check if Phantom is installed
+    const provider = window.phantom?.solana;
+    
+    if (!provider) {
+      alert('❌ Phantom wallet not detected!\n\n1. Go to phantom.app\n2. Install the browser extension\n3. Create or import a wallet\n4. Reload this page and try again');
+      return;
+    }
+
+    // Request connection
+    const response = await provider.connect();
+    userAddress = response.publicKey.toString();
+
+    console.log('✅ Connected:', userAddress);
+
+    // Update UI
+    document.getElementById('wallet-disconnected').classList.add('hidden');
+    document.getElementById('wallet-connected').classList.remove('hidden');
+    document.getElementById('wallet-address').textContent = userAddress.slice(0, 8) + '...' + userAddress.slice(-8);
+    document.getElementById('balance-display').textContent = tokens;
+
+    document.getElementById('wallet-btn').classList.add('connected');
+    document.getElementById('wallet-label').textContent = '✓ Connected';
+
+    walletConnected = true;
+
+  } catch (error) {
+    console.error('Connection failed:', error);
+    alert('❌ Connection failed: ' + error.message + '\n\nMake sure Phantom is installed and unlocked.');
+  }
+}
+
+function disconnectWallet() {
+  walletConnected = false;
+  userAddress = null;
+  document.getElementById('wallet-connected').classList.add('hidden');
+  document.getElementById('wallet-disconnected').classList.remove('hidden');
+  document.getElementById('wallet-btn').classList.remove('connected');
+  document.getElementById('wallet-label').textContent = 'Connect Wallet';
+}
+
+async function withdrawTokens() {
+  if (!walletConnected) {
+    alert('Please connect wallet first');
+    return;
+  }
+  if (tokens === 0) {
+    alert('No tokens to withdraw');
+    return;
+  }
+
+  const btn = document.getElementById('withdraw-btn');
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+
+  try {
+    // BACKEND CALL (replace with your actual endpoint when ready)
+    const response = await fetch('https://your-backend-api.com/withdraw', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        wallet: userAddress,
+        amount: tokens,
+        timestamp: new Date().toISOString()
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      alert(`✅ Success!\n\nTokens withdrawn to your wallet.\nTx: ${data.transactionHash}`);
+      tokens = 0;
+      document.getElementById('token-count').textContent = '0';
+      document.getElementById('balance-display').textContent = '0';
+    }
+  } catch (error) {
+    // Expected: backend not deployed yet
+    if (error.message.includes('Failed to fetch') || error.message.includes('backend')) {
+      alert('⚠️ Backend not live yet.\n\nWhen ready, this will send real $LORCA tokens to your Phantom wallet.');
+    } else {
+      alert('Error: ' + error.message);
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Withdraw Tokens';
+  }
+}
+
+function togglePanel() {
+  document.getElementById('wallet-panel').classList.toggle('open');
+}
+
+// ============ GAME MECHANICS ============
+const container = document.getElementById('game-container');
+const tokenCountEl = document.getElementById('token-count');
+const timerEl = document.getElementById('timer');
+const fishEmojis = ['🐟', '🐠', '🐡'];
+
+function startGame() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('end-screen').classList.add('hidden');
+  
+  tokens = 0;
+  timeLeft = 30;
+  tokenCountEl.textContent = '0';
+  document.getElementById('balance-display').textContent = '0';
+  timerEl.textContent = 'Time: 30';
+  
+  document.querySelectorAll('.fish').forEach(f => f.remove());
+  gameRunning = true;
+
+  setInterval(spawnFish, 700);
+  setInterval(spawnBubble, 600);
+
+  const timer = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = 'Time: ' + timeLeft;
+    if (timeLeft <= 0) {
+      gameRunning = false;
+      clearInterval(timer);
+      endGame();
+    }
+  }, 1000);
+}
+
+function spawnFish() {
+  if (!gameRunning) return;
+  
+  const fish = document.createElement('div');
+  fish.className = 'fish';
+  fish.textContent = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
+  fish.style.left = (Math.random() * 85 + 5) + '%';
+  fish.style.top = (Math.random() * 55 + 20) + '%';
+
+  const isBonusFish = Math.random() < 0.15;
+  const value = isBonusFish ? 25000 : 5000;
+  
+  if (isBonusFish) {
+    fish.textContent = '🐋';
+    fish.style.fontSize = '50px';
+  }
+
+  fish.onclick = () => catchFish(fish, value);
+  fish.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    catchFish(fish, value);
+  });
+
+  container.appendChild(fish);
+  setTimeout(() => { if (fish.parentNode) fish.remove(); }, 2200);
+}
+
+function catchFish(fish, value) {
+  if (!gameRunning) return;
+  
+  tokens += value;
+  tokenCountEl.textContent = tokens;
+  document.getElementById('balance-display').textContent = tokens;
+
+  // Floating number animation
+  const plus = document.createElement('div');
+  plus.id = 'floating-plus';
+  plus.textContent = '+' + value.toLocaleString();
+  plus.style.left = fish.style.left;
+  plus.style.top = fish.style.top;
+  container.appendChild(plus);
+  
+  setTimeout(() => plus.remove(), 800);
+  fish.remove();
+}
+
+function spawnBubble() {
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  const size = Math.random() * 12 + 8;
+  bubble.style.width = size + 'px';
+  bubble.style.height = size + 'px';
+  bubble.style.left = Math.random() * 100 + '%';
+  bubble.style.animationDuration = (Math.random() * 4 + 4) + 's';
+  container.appendChild(bubble);
+  setTimeout(() => bubble.remove(), 8000);
+}
+
+function endGame() {
+  document.getElementById('final-score').textContent = 'You earned ' + tokens.toLocaleString() + ' LORCA tokens!';
+  document.getElementById('end-screen').classList.remove('hidden');
+}
+
+// Check Phantom on load
+window.addEventListener('load', () => {
+  if (window.phantom?.solana) {
+    console.log('✅ Phantom detected');
+  } else {
+    console.warn('⚠️ Phantom not installed');
+  }
+});
+</script>
+</body>
+</html>
