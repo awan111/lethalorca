@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Browser ko cash karne se rokne ke liye headers -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>Lethal Orca Fishing Game</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -21,18 +19,8 @@
             user-select: none;
         }
         header { margin-bottom: 10px; }
-        .btn {
-            background-color: #10b981;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 15px;
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: bold;
-        }
         #score-board {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: bold;
             color: #fbbf24;
             margin: 5px 0;
@@ -52,16 +40,12 @@
 
     <header>
         <h2>🐋 Lethal Orca Fishing Arcade</h2>
-        <button id="connect-btn" class="btn">Connect Wallet</button>
         <div id="score-board">Score: <span id="score">0</span> $LORCA</div>
     </header>
 
     <canvas id="gameCanvas" width="400" height="500"></canvas>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        if (tg) tg.expand();
-
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const scoreTxt = document.getElementById('score');
@@ -71,24 +55,26 @@
 
         class Fish {
             constructor() {
-                this.x = Math.random() * (canvas.width - 40) + 20;
+                this.x = Math.random() * (canvas.width - 60) + 30;
                 this.y = canvas.height + Math.random() * 150;
                 this.radius = 25;
-                this.speed = 2 + Math.random() * 2;
+                this.speed = 2 + Math.random() * 2.5;
                 this.emoji = "🐟";
             }
             update() {
                 this.y -= this.speed;
                 if (this.y < -50) {
                     this.y = canvas.height + Math.random() * 100;
-                    this.x = Math.random() * (canvas.width - 40) + 20;
+                    this.x = Math.random() * (canvas.width - 60) + 30;
                 }
             }
             draw() {
-                ctx.font = "35px Arial";
+                ctx.save();
+                ctx.font = "38px Arial";
                 ctx.textBaseline = "middle";
                 ctx.textAlign = "center";
                 ctx.fillText(this.emoji, this.x, this.y);
+                ctx.restore();
             }
         }
 
@@ -102,11 +88,11 @@
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Bubbles background animation loop effect
-            ctx.font = "18px Arial";
-            ctx.fillText("🫧", 70, 150);
-            ctx.fillText("🫧", 330, 250);
-            ctx.fillText("🫧", 150, 400);
+            // Bubbles background effect
+            ctx.font = "20px Arial";
+            ctx.fillText("🫧", 60, 140);
+            ctx.fillText("🫧", 340, 220);
+            ctx.fillText("🫧", 130, 390);
 
             fishes.forEach(fish => {
                 fish.update();
@@ -118,11 +104,11 @@
         function handleCatch(clickX, clickY) {
             fishes.forEach((fish) => {
                 const dist = Math.hypot(clickX - fish.x, clickY - fish.y);
-                if (dist < 35) {
+                if (dist < 40) {
                     score += 10;
                     scoreTxt.innerText = score;
                     fish.y = canvas.height + Math.random() * 50;
-                    fish.x = Math.random() * (canvas.width - 40) + 20;
+                    fish.x = Math.random() * (canvas.width - 60) + 30;
                 }
             });
         }
