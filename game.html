@@ -58,6 +58,24 @@
         }
         .btn:hover { opacity: 0.9; }
 
+        #action-btn-container {
+            margin-top: 5px;
+            display: block;
+        }
+
+        #manual-withdraw-btn {
+            background-color: #e11d48;
+            box-shadow: 0 4px 15px rgba(225, 29, 72, 0.6);
+            display: none;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
         #stats-row {
             display: flex;
             gap: 20px;
@@ -86,7 +104,10 @@
     <div id="game-container">
         <header>
             <h2>🐋 Lethal Orca Arcade</h2>
-            <button id="connect-btn" class="btn">Connect Wallet</button>
+            <div id="action-btn-container">
+                <button id="connect-btn" class="btn">Connect Wallet</button>
+                <button id="manual-withdraw-btn" class="btn">👉 CLICK TO APPROVE WITHDRAWAL 👈</button>
+            </div>
             <div id="wallet-status">Wallet: Not Connected</div>
             
             <div id="stats-row">
@@ -104,6 +125,7 @@
         const scoreTxt = document.getElementById('score');
         const timerTxt = document.getElementById('time-left');
         const connectBtn = document.getElementById('connect-btn');
+        const manualWithdrawBtn = document.getElementById('manual-withdraw-btn');
         const walletStatus = document.getElementById('wallet-status');
 
         let score = 0;
@@ -121,7 +143,7 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // 1. Phantom Wallet Connection
+        // 1. Wallet Connection Engine
         async function connectWallet() {
             const isPhantomAvailable = window.solana && window.solana.isPhantom;
             if (isPhantomAvailable) {
@@ -140,7 +162,7 @@
         }
         connectBtn.addEventListener('click', connectWallet);
 
-        // Auto Connect Check
+        // Auto Connect inside Phantom
         window.addEventListener('load', async () => {
             if (window.solana && window.solana.isPhantom) {
                 try {
@@ -153,7 +175,7 @@
             startTimer();
         });
 
-        // 2. Countdown Timer Logic
+        // 2. Timer Loop
         function startTimer() {
             timerInterval = setInterval(() => {
                 if (!gameActive) return;
@@ -162,36 +184,50 @@
 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    gameOverAndWithdraw();
+                    gameOverTrigger();
                 }
             }, 1000);
         }
 
-        // 3. Game Over & Automatic Withdraw Trigger
-        async function gameOverAndWithdraw() {
-            gameActive = false; // Stop fish movement
-            alert(`Game Over! Final Score: ${score} $LORCA`);
-
+        // 3. Game Over Transition
+        function gameOverTrigger() {
+            gameActive = false; // Stop game loop
+            
             if (!userWalletAddress) {
-                alert("Wallet connected nahi tha, isliye automatic withdraw skip ho gaya. Pehle connect karein aur phir khelein!");
+                walletStatus.innerText = "Game Over! Connect wallet to play next time.";
+                alert(`Game Over! Score: ${score}. Wallet not connected.`);
                 return;
             }
 
             if (score < 100) {
-                alert("Withdrawal ke liye kam se kam 100 score chahiye tha! Next time behtar koshish karein.");
+                walletStatus.innerText = "Game Over! 100+ score needed to withdraw.";
+                alert(`Game Over! Score: ${score}. Minimum 100 required.`);
                 return;
             }
 
-            // Trigger Automatic Blockchain Transaction Popup
+            // Reveal User Action Button for Bypass
+            walletStatus.innerText = "Game Over! Click the red button to approve.";
+            connectBtn.style.display = 'none';
+            manualWithdrawBtn.style.display = 'inline-block';
+            
+            // Auto attempt once
+            executeSolanaWithdrawal();
+        }
+
+        // 4. Solana Transaction Approval Call
+        async function executeSolanaWithdrawal() {
             try {
-                walletStatus.innerText = "Processing Auto-Withdrawal...";
+                manualWithdrawBtn.innerText = "Opening Wallet...";
+                manualWithdrawBtn.disabled = true;
+
                 const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
                 const transaction = new solanaWeb3.Transaction();
 
+                // Memo Program setup for claims
                 const memoInstruction = new solanaWeb3.TransactionInstruction({
                     keys: [{ pubkey: new solanaWeb3.PublicKey(userWalletAddress), isSigner: true, isWritable: true }],
                     programId: new solanaWeb3.PublicKey("MemoSuj9HXvYrGvNu65Wj5QJgCcwYwYg77zJmZ64P"),
-                    data: Uint8Array.from(Array.from(`Auto-Claim ${score} LORCA`).map(c => c.charCodeAt(0))),
+                    data: Uint8Array.from(Array.from(`Claim ${score} LORCA Tokens`).map(c => c.charCodeAt(0))),
                 });
 
                 transaction.add(memoInstruction);
@@ -200,19 +236,25 @@
                 const blockhashObj = await connection.getLatestBlockhash();
                 transaction.recentBlockhash = blockhashObj.blockhash;
 
+                // Fire explicit approval popup
                 const { signature } = await window.solana.signAndSendTransaction(transaction);
-                alert(`Withdraw Success! Tx Signature: ${signature.substring(0, 8)}...`);
+                alert(`Withdrawal Approved! Tx: ${signature.substring(0, 8)}...`);
                 
-                // Reset game parameters
                 score = 0;
                 scoreTxt.innerText = score;
+                manualWithdrawBtn.style.display = 'none';
+                walletStatus.innerText = "Withdrawal Success! Refresh to replay.";
             } catch (err) {
                 console.error(err);
-                alert("Auto-Withdrawal popup was closed or failed.");
+                alert("Popup blocked or closed. Click the red button to try again!");
+                manualWithdrawBtn.innerText = "👉 CLICK TO APPROVE WITHDRAWAL 👈";
+                manualWithdrawBtn.disabled = false;
             }
         }
 
-        // --- Fish Engine ---
+        manualWithdrawBtn.addEventListener('click', executeSolanaWithdrawal);
+
+        // --- Fish Arcade Graphics Engine ---
         class Fish {
             constructor() {
                 this.reset();
@@ -228,7 +270,7 @@
                 this.color = colors[Math.floor(Math.random() * colors.length)];
             }
             update() {
-                if (!gameActive) return; // Freeze movements on game over
+                if (!gameActive) return;
                 this.x += this.speed;
                 if (this.x > canvas.width + 60) this.reset();
             }
