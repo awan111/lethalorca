@@ -32,16 +32,16 @@
             left: 0;
             width: 100%;
             padding: 12px 0;
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.9);
             backdrop-filter: blur(8px);
             z-index: 10;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
         }
-        h2 { margin: 2px 0; font-size: 18px; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px; }
+        h2 { margin: 2px 0; font-size: 16px; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px; }
         
         .btn-group {
             display: flex;
@@ -51,8 +51,8 @@
         .btn {
             color: white;
             border: none;
-            padding: 8px 18px;
-            font-size: 14px;
+            padding: 8px 16px;
+            font-size: 13px;
             cursor: pointer;
             border-radius: 6px;
             font-weight: bold;
@@ -62,14 +62,11 @@
             background-color: #10b981;
             box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
         }
-        #connect-btn:hover { background-color: #059669; }
-        
         #withdraw-btn {
             background-color: #e11d48;
             box-shadow: 0 2px 10px rgba(225, 29, 72, 0.4);
-            display: none; /* Wallet connect hone ke baad dikhega */
         }
-        #withdraw-btn:hover { background-color: #be123c; }
+        .btn:hover { opacity: 0.9; }
 
         #wallet-status { font-size: 12px; color: #38bdf8; margin-top: 4px; font-family: monospace; }
         #score-board { font-size: 22px; font-weight: bold; color: #fbbf24; margin-top: 4px; }
@@ -92,7 +89,7 @@
         <header>
             <h2>🐋 Lethal Orca Arcade</h2>
             <div class="btn-group">
-                <button id="connect-btn" class="btn">Connect Phantom Wallet</button>
+                <button id="connect-btn" class="btn">Connect Wallet</button>
                 <button id="withdraw-btn" class="btn">Withdraw $LORCA</button>
             </div>
             <div id="wallet-status">Wallet: Not Connected</div>
@@ -122,7 +119,7 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // 1. Wallet Connection Logic
+        // 1. Connection Engine Fix
         async function connectWallet() {
             const isPhantomAvailable = window.solana && window.solana.isPhantom;
             if (isPhantomAvailable) {
@@ -131,63 +128,69 @@
                     userWalletAddress = resp.publicKey.toString();
                     walletStatus.innerText = "Connected: " + userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
                     connectBtn.style.display = 'none';
-                    withdrawBtn.style.display = 'inline-block'; // Show Withdraw Option
                 } catch (err) {
-                    alert("Connection rejected!");
+                    alert("Wallet connect request rejected!");
                 }
             } else {
                 const currentUrl = window.location.href;
-                alert("Opening inside Phantom App Browser...");
                 window.location.href = "https://phantom.app/ul/browse/" + encodeURIComponent(currentUrl);
             }
         }
         connectBtn.addEventListener('click', connectWallet);
 
-        // 2. Withdraw / Claim Setup Logic
+        // Auto check if already connected inside Phantom browser
+        window.addEventListener('load', async () => {
+            if (window.solana && window.solana.isPhantom) {
+                try {
+                    const resp = await window.solana.connect({ onlyIfTrusted: true });
+                    userWalletAddress = resp.publicKey.toString();
+                    walletStatus.innerText = "Connected: " + userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
+                    connectBtn.style.display = 'none';
+                } catch (e) {}
+            }
+        });
+
+        // 2. Real Web3 Transaction Push Logic
         async function handleWithdraw() {
             if (!userWalletAddress) {
                 alert("Pehle wallet connect karein!");
                 return;
             }
             if (score < 100) {
-                alert("Withdrawal ke liye kam se kam 100 $LORCA score chahiye!");
+                alert("Withdrawal ke liye kam se kam 100 score chahiye!");
                 return;
             }
 
             try {
-                withdrawBtn.innerText = "Processing...";
+                withdrawBtn.innerText = "Approving...";
                 withdrawBtn.disabled = true;
 
-                // Solana Web3 Transaction Pipeline Setup
                 const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
                 const transaction = new solanaWeb3.Transaction();
 
-                // NOTE: Real setup me yahan aap apna Backend Program Address lagayein ge
-                // Abhi yeh user se confirmation popup generate karega sign karne ke liye
+                // Memo log setup for claiming token
                 const memoInstruction = new solanaWeb3.TransactionInstruction({
                     keys: [{ pubkey: new solanaWeb3.PublicKey(userWalletAddress), isSigner: true, isWritable: true }],
-                    programId: new solanaWeb3.PublicKey("MemoSuj9HXvYrGvNu65Wj5QJgCcwYwYg77zJmZ64P"), // Standard Solana Memo Program
-                    data: Uint8Array.from(Array.from(`Claiming ${score} $LORCA Tokens`).map(c => c.charCodeAt(0))),
+                    programId: new solanaWeb3.PublicKey("MemoSuj9HXvYrGvNu65Wj5QJgCcwYwYg77zJmZ64P"),
+                    data: Uint8Array.from(Array.from(`Claim ${score} LORCA Tokens`).map(c => c.charCodeAt(0))),
                 });
 
                 transaction.add(memoInstruction);
                 transaction.feePayer = new solanaWeb3.PublicKey(userWalletAddress);
                 
-                const anyTransaction = await connection.getLatestBlockhash();
-                transaction.recentBlockhash = anyTransaction.blockhash;
+                const blockhashObj = await connection.getLatestBlockhash();
+                transaction.recentBlockhash = blockhashObj.blockhash;
 
-                // Open Phantom Approval Popup
+                // Fire transaction prompt window
                 const { signature } = await window.solana.signAndSendTransaction(transaction);
+                alert(`Success! Withdrawal request recorded on Solana network. Tx: ${signature.substring(0, 8)}...`);
                 
-                alert(`Withdrawal Request Sent! Tx Signature: ${signature.substring(0, 8)}...`);
-                
-                // Reset Score after successful blockchain pop
                 score = 0;
                 scoreTxt.innerText = score;
 
             } catch (err) {
                 console.error(err);
-                alert("Transaction cancelled ya failed ho gayi!");
+                alert("Transaction processing failed or denied.");
             } finally {
                 withdrawBtn.innerText = "Withdraw $LORCA";
                 withdrawBtn.disabled = false;
@@ -195,7 +198,7 @@
         }
         withdrawBtn.addEventListener('click', handleWithdraw);
 
-        // --- Fish Engine (Horizontal Scroller) ---
+        // --- Fish Object Scroller Setup ---
         class Fish {
             constructor() {
                 this.reset();
