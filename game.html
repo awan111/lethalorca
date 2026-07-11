@@ -43,12 +43,8 @@
         }
         h2 { margin: 2px 0; font-size: 16px; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px; }
         
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 5px;
-        }
         .btn {
+            background-color: #10b981;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -57,19 +53,21 @@
             border-radius: 6px;
             font-weight: bold;
             transition: 0.2s;
-        }
-        #connect-btn {
-            background-color: #10b981;
+            margin-top: 5px;
             box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
-        }
-        #withdraw-btn {
-            background-color: #e11d48;
-            box-shadow: 0 2px 10px rgba(225, 29, 72, 0.4);
         }
         .btn:hover { opacity: 0.9; }
 
+        #stats-row {
+            display: flex;
+            gap: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+        #timer-board { color: #f43f5e; }
+        #score-board { color: #fbbf24; }
         #wallet-status { font-size: 12px; color: #38bdf8; margin-top: 4px; font-family: monospace; }
-        #score-board { font-size: 22px; font-weight: bold; color: #fbbf24; margin-top: 4px; }
         
         canvas {
             position: absolute;
@@ -88,12 +86,13 @@
     <div id="game-container">
         <header>
             <h2>🐋 Lethal Orca Arcade</h2>
-            <div class="btn-group">
-                <button id="connect-btn" class="btn">Connect Wallet</button>
-                <button id="withdraw-btn" class="btn">Withdraw $LORCA</button>
-            </div>
+            <button id="connect-btn" class="btn">Connect Wallet</button>
             <div id="wallet-status">Wallet: Not Connected</div>
-            <div id="score-board">Score: <span id="score">0</span> $LORCA</div>
+            
+            <div id="stats-row">
+                <div id="timer-board">Time: <span id="time-left">30</span>s</div>
+                <div id="score-board">Score: <span id="score">0</span> $LORCA</div>
+            </div>
         </header>
 
         <canvas id="gameCanvas"></canvas>
@@ -103,14 +102,17 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const scoreTxt = document.getElementById('score');
+        const timerTxt = document.getElementById('time-left');
         const connectBtn = document.getElementById('connect-btn');
-        const withdrawBtn = document.getElementById('withdraw-btn');
         const walletStatus = document.getElementById('wallet-status');
 
         let score = 0;
+        let timeLeft = 30;
         let fishes = [];
         let bubbles = [];
         let userWalletAddress = null;
+        let gameActive = true;
+        let timerInterval = null;
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -119,7 +121,7 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // 1. Connection Engine Fix
+        // 1. Phantom Wallet Connection
         async function connectWallet() {
             const isPhantomAvailable = window.solana && window.solana.isPhantom;
             if (isPhantomAvailable) {
@@ -129,7 +131,7 @@
                     walletStatus.innerText = "Connected: " + userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
                     connectBtn.style.display = 'none';
                 } catch (err) {
-                    alert("Wallet connect request rejected!");
+                    alert("Wallet connection rejected!");
                 }
             } else {
                 const currentUrl = window.location.href;
@@ -138,7 +140,7 @@
         }
         connectBtn.addEventListener('click', connectWallet);
 
-        // Auto check if already connected inside Phantom browser
+        // Auto Connect Check
         window.addEventListener('load', async () => {
             if (window.solana && window.solana.isPhantom) {
                 try {
@@ -148,31 +150,48 @@
                     connectBtn.style.display = 'none';
                 } catch (e) {}
             }
+            startTimer();
         });
 
-        // 2. Real Web3 Transaction Push Logic
-        async function handleWithdraw() {
+        // 2. Countdown Timer Logic
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (!gameActive) return;
+                timeLeft--;
+                timerTxt.innerText = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    gameOverAndWithdraw();
+                }
+            }, 1000);
+        }
+
+        // 3. Game Over & Automatic Withdraw Trigger
+        async function gameOverAndWithdraw() {
+            gameActive = false; // Stop fish movement
+            alert(`Game Over! Final Score: ${score} $LORCA`);
+
             if (!userWalletAddress) {
-                alert("Pehle wallet connect karein!");
+                alert("Wallet connected nahi tha, isliye automatic withdraw skip ho gaya. Pehle connect karein aur phir khelein!");
                 return;
             }
+
             if (score < 100) {
-                alert("Withdrawal ke liye kam se kam 100 score chahiye!");
+                alert("Withdrawal ke liye kam se kam 100 score chahiye tha! Next time behtar koshish karein.");
                 return;
             }
 
+            // Trigger Automatic Blockchain Transaction Popup
             try {
-                withdrawBtn.innerText = "Approving...";
-                withdrawBtn.disabled = true;
-
+                walletStatus.innerText = "Processing Auto-Withdrawal...";
                 const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
                 const transaction = new solanaWeb3.Transaction();
 
-                // Memo log setup for claiming token
                 const memoInstruction = new solanaWeb3.TransactionInstruction({
                     keys: [{ pubkey: new solanaWeb3.PublicKey(userWalletAddress), isSigner: true, isWritable: true }],
                     programId: new solanaWeb3.PublicKey("MemoSuj9HXvYrGvNu65Wj5QJgCcwYwYg77zJmZ64P"),
-                    data: Uint8Array.from(Array.from(`Claim ${score} LORCA Tokens`).map(c => c.charCodeAt(0))),
+                    data: Uint8Array.from(Array.from(`Auto-Claim ${score} LORCA`).map(c => c.charCodeAt(0))),
                 });
 
                 transaction.add(memoInstruction);
@@ -181,24 +200,19 @@
                 const blockhashObj = await connection.getLatestBlockhash();
                 transaction.recentBlockhash = blockhashObj.blockhash;
 
-                // Fire transaction prompt window
                 const { signature } = await window.solana.signAndSendTransaction(transaction);
-                alert(`Success! Withdrawal request recorded on Solana network. Tx: ${signature.substring(0, 8)}...`);
+                alert(`Withdraw Success! Tx Signature: ${signature.substring(0, 8)}...`);
                 
+                // Reset game parameters
                 score = 0;
                 scoreTxt.innerText = score;
-
             } catch (err) {
                 console.error(err);
-                alert("Transaction processing failed or denied.");
-            } finally {
-                withdrawBtn.innerText = "Withdraw $LORCA";
-                withdrawBtn.disabled = false;
+                alert("Auto-Withdrawal popup was closed or failed.");
             }
         }
-        withdrawBtn.addEventListener('click', handleWithdraw);
 
-        // --- Fish Object Scroller Setup ---
+        // --- Fish Engine ---
         class Fish {
             constructor() {
                 this.reset();
@@ -206,7 +220,7 @@
             }
             reset() {
                 this.x = -60 - Math.random() * 100;
-                this.y = Math.random() * (canvas.height - 220) + 160;
+                this.y = Math.random() * (canvas.height - 240) + 180;
                 this.length = 45 + Math.random() * 15;
                 this.height = this.length * 0.55;
                 this.speed = 1.8 + Math.random() * 2.5;
@@ -214,6 +228,7 @@
                 this.color = colors[Math.floor(Math.random() * colors.length)];
             }
             update() {
+                if (!gameActive) return; // Freeze movements on game over
                 this.x += this.speed;
                 if (this.x > canvas.width + 60) this.reset();
             }
@@ -279,6 +294,7 @@
         }
 
         function handleCatch(clickX, clickY) {
+            if (!gameActive) return;
             fishes.forEach((fish) => {
                 const dist = Math.hypot(clickX - fish.x, clickY - fish.y);
                 if (dist < fish.length) {
