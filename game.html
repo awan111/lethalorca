@@ -6,7 +6,9 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>Lethal Orca Fishing Game</title>
+    <title>Lethal Orca Arcade</title>
+    <!-- Solana Web3 SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/solana-web3.js/1.31.0/index.iife.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -23,39 +25,46 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
         }
         header {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 10px 0;
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(5px);
+            padding: 12px 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
             z-index: 10;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        h2 {
-            margin: 5px 0;
-            font-size: 20px;
-            color: #38bdf8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        #score-board {
-            font-size: 22px;
+        h2 { margin: 2px 0; font-size: 18px; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px; }
+        .btn {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 6px;
             font-weight: bold;
-            color: #fbbf24;
-            margin: 2px 0;
+            margin-top: 5px;
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+            transition: 0.2s;
         }
+        .btn:hover { background-color: #059669; }
+        #wallet-status { font-size: 12px; color: #38bdf8; margin-top: 4px; font-family: monospace; }
+        #score-board { font-size: 22px; font-weight: bold; color: #fbbf24; margin-top: 4px; }
         canvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, #1e3a8a 0%, #0b1329 100%);
+            background: linear-gradient(180deg, #1e3a8a 0%, #070b19 100%);
             display: block;
             z-index: 1;
         }
@@ -66,6 +75,8 @@
     <div id="game-container">
         <header>
             <h2>🐋 Lethal Orca Arcade</h2>
+            <button id="connect-btn" class="btn">Connect Phantom Wallet</button>
+            <div id="wallet-status">Wallet: Not Connected</div>
             <div id="score-board">Score: <span id="score">0</span> $LORCA</div>
         </header>
 
@@ -76,12 +87,14 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const scoreTxt = document.getElementById('score');
+        const connectBtn = document.getElementById('connect-btn');
+        const walletStatus = document.getElementById('wallet-status');
 
         let score = 0;
         let fishes = [];
         let bubbles = [];
+        let userWalletAddress = null;
 
-        // Screen size ke mutabiq canvas resize karna (Full Screen Fix)
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -89,34 +102,54 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Vector Fish Graphic Design (No Emojis, No Boxes Error)
+        // Wallet Connection Logic
+        async function connectWallet() {
+            const isPhantomAvailable = window.solana && window.solana.isPhantom;
+            if (isPhantomAvailable) {
+                try {
+                    const resp = await window.solana.connect();
+                    userWalletAddress = resp.publicKey.toString();
+                    walletStatus.innerText = "Connected: " + userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
+                    connectBtn.style.display = 'none';
+                } catch (err) {
+                    alert("Connection rejected!");
+                }
+            } else {
+                const currentUrl = window.location.href;
+                alert("Opening inside Phantom App Browser...");
+                window.location.href = "https://phantom.app/ul/browse/" + encodeURIComponent(currentUrl);
+            }
+        }
+        connectBtn.addEventListener('click', connectWallet);
+
+        // Fish Horizontal Movement Logic (Left to Right)
         class Fish {
             constructor() {
                 this.reset();
-                this.y = canvas.height + Math.random() * canvas.height; // Pehli dafa random spread
+                this.x = Math.random() * canvas.width; // Initial random spread
             }
             reset() {
-                this.x = Math.random() * (canvas.width - 60) + 30;
-                this.y = canvas.height + Math.random() * 100;
-                this.length = 35 + Math.random() * 15;
-                this.height = this.length * 0.6;
-                this.speed = 2 + Math.random() * 3;
+                this.x = -60 - Math.random() * 100; // Left screen se baahir spawn hogi
+                this.y = Math.random() * (canvas.height - 200) + 150; // Top header se bacha kar middle zone me
+                this.length = 45 + Math.random() * 15;
+                this.height = this.length * 0.55;
+                this.speed = 1.8 + Math.random() * 2.5; // Horizontal Speed
                 
-                // Neon Colors for Arcade Feel
+                // Neon Colors
                 const colors = ['#38bdf8', '#f43f5e', '#10b981', '#fbbf24', '#a855f7'];
                 this.color = colors[Math.floor(Math.random() * colors.length)];
             }
             update() {
-                this.y -= this.speed;
-                if (this.y < -50) {
-                    this.reset();
+                this.x += this.speed; // Right side ko move karegi
+                if (this.x > canvas.width + 60) {
+                    this.reset(); // Screen cross karne par wapas left par reset
                 }
             }
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
                 
-                // Fish Tail (Dum)
+                // Tail (Left side par kyunki fish right side ja rahi hai)
                 ctx.fillStyle = this.color;
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
@@ -125,12 +158,12 @@
                 ctx.closePath();
                 ctx.fill();
 
-                // Fish Body
+                // Body
                 ctx.beginPath();
                 ctx.ellipse(0, 0, this.length/2, this.height/2, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Fish Eye (Ankh)
+                // Eye (Right side facing)
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
                 ctx.arc(this.length/4, -this.height/6, 4, 0, Math.PI * 2);
@@ -144,13 +177,12 @@
             }
         }
 
-        // Bubbles Animation
         class Bubble {
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.radius = 2 + Math.random() * 4;
-                this.speed = 0.5 + Math.random() * 1;
+                this.radius = 1 + Math.random() * 3;
+                this.speed = 0.4 + Math.random() * 0.8;
             }
             update() {
                 this.y -= this.speed;
@@ -162,8 +194,7 @@
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                ctx.lineWidth = 1;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
                 ctx.stroke();
             }
         }
@@ -172,27 +203,18 @@
             fishes = [];
             bubbles = [];
             for (let i = 0; i < 6; i++) fishes.push(new Fish());
-            for (let i = 0; i < 20; i++) bubbles.push(new Bubble());
+            for (let i = 0; i < 15; i++) bubbles.push(new Bubble());
         }
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw & Update Bubbles
             bubbles.forEach(b => { b.update(); b.draw(); });
-
-            // Draw & Update Fishes
-            fishes.forEach(fish => {
-                fish.update();
-                fish.draw();
-            });
-
+            fishes.forEach(f => { f.update(); f.draw(); });
             requestAnimationFrame(animate);
         }
 
         function handleCatch(clickX, clickY) {
             fishes.forEach((fish) => {
-                // Hitbox detection
                 const dist = Math.hypot(clickX - fish.x, clickY - fish.y);
                 if (dist < fish.length) {
                     score += 10;
@@ -202,10 +224,7 @@
             });
         }
 
-        canvas.addEventListener('click', (e) => {
-            handleCatch(e.clientX, e.clientY);
-        });
-
+        canvas.addEventListener('click', (e) => handleCatch(e.clientX, e.clientY));
         canvas.addEventListener('touchstart', (e) => {
             const touch = e.touches[0];
             handleCatch(touch.clientX, touch.clientY);
