@@ -42,8 +42,13 @@
             justify-content: center;
         }
         h2 { margin: 2px 0; font-size: 18px; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
         .btn {
-            background-color: #10b981;
             color: white;
             border: none;
             padding: 8px 18px;
@@ -51,13 +56,24 @@
             cursor: pointer;
             border-radius: 6px;
             font-weight: bold;
-            margin-top: 5px;
-            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
             transition: 0.2s;
         }
-        .btn:hover { background-color: #059669; }
+        #connect-btn {
+            background-color: #10b981;
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+        }
+        #connect-btn:hover { background-color: #059669; }
+        
+        #withdraw-btn {
+            background-color: #e11d48;
+            box-shadow: 0 2px 10px rgba(225, 29, 72, 0.4);
+            display: none; /* Wallet connect hone ke baad dikhega */
+        }
+        #withdraw-btn:hover { background-color: #be123c; }
+
         #wallet-status { font-size: 12px; color: #38bdf8; margin-top: 4px; font-family: monospace; }
         #score-board { font-size: 22px; font-weight: bold; color: #fbbf24; margin-top: 4px; }
+        
         canvas {
             position: absolute;
             top: 0;
@@ -75,7 +91,10 @@
     <div id="game-container">
         <header>
             <h2>🐋 Lethal Orca Arcade</h2>
-            <button id="connect-btn" class="btn">Connect Phantom Wallet</button>
+            <div class="btn-group">
+                <button id="connect-btn" class="btn">Connect Phantom Wallet</button>
+                <button id="withdraw-btn" class="btn">Withdraw $LORCA</button>
+            </div>
             <div id="wallet-status">Wallet: Not Connected</div>
             <div id="score-board">Score: <span id="score">0</span> $LORCA</div>
         </header>
@@ -88,6 +107,7 @@
         const ctx = canvas.getContext('2d');
         const scoreTxt = document.getElementById('score');
         const connectBtn = document.getElementById('connect-btn');
+        const withdrawBtn = document.getElementById('withdraw-btn');
         const walletStatus = document.getElementById('wallet-status');
 
         let score = 0;
@@ -102,7 +122,7 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Wallet Connection Logic
+        // 1. Wallet Connection Logic
         async function connectWallet() {
             const isPhantomAvailable = window.solana && window.solana.isPhantom;
             if (isPhantomAvailable) {
@@ -111,6 +131,7 @@
                     userWalletAddress = resp.publicKey.toString();
                     walletStatus.innerText = "Connected: " + userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
                     connectBtn.style.display = 'none';
+                    withdrawBtn.style.display = 'inline-block'; // Show Withdraw Option
                 } catch (err) {
                     alert("Connection rejected!");
                 }
@@ -122,34 +143,80 @@
         }
         connectBtn.addEventListener('click', connectWallet);
 
-        // Fish Horizontal Movement Logic (Left to Right)
+        // 2. Withdraw / Claim Setup Logic
+        async function handleWithdraw() {
+            if (!userWalletAddress) {
+                alert("Pehle wallet connect karein!");
+                return;
+            }
+            if (score < 100) {
+                alert("Withdrawal ke liye kam se kam 100 $LORCA score chahiye!");
+                return;
+            }
+
+            try {
+                withdrawBtn.innerText = "Processing...";
+                withdrawBtn.disabled = true;
+
+                // Solana Web3 Transaction Pipeline Setup
+                const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
+                const transaction = new solanaWeb3.Transaction();
+
+                // NOTE: Real setup me yahan aap apna Backend Program Address lagayein ge
+                // Abhi yeh user se confirmation popup generate karega sign karne ke liye
+                const memoInstruction = new solanaWeb3.TransactionInstruction({
+                    keys: [{ pubkey: new solanaWeb3.PublicKey(userWalletAddress), isSigner: true, isWritable: true }],
+                    programId: new solanaWeb3.PublicKey("MemoSuj9HXvYrGvNu65Wj5QJgCcwYwYg77zJmZ64P"), // Standard Solana Memo Program
+                    data: Uint8Array.from(Array.from(`Claiming ${score} $LORCA Tokens`).map(c => c.charCodeAt(0))),
+                });
+
+                transaction.add(memoInstruction);
+                transaction.feePayer = new solanaWeb3.PublicKey(userWalletAddress);
+                
+                const anyTransaction = await connection.getLatestBlockhash();
+                transaction.recentBlockhash = anyTransaction.blockhash;
+
+                // Open Phantom Approval Popup
+                const { signature } = await window.solana.signAndSendTransaction(transaction);
+                
+                alert(`Withdrawal Request Sent! Tx Signature: ${signature.substring(0, 8)}...`);
+                
+                // Reset Score after successful blockchain pop
+                score = 0;
+                scoreTxt.innerText = score;
+
+            } catch (err) {
+                console.error(err);
+                alert("Transaction cancelled ya failed ho gayi!");
+            } finally {
+                withdrawBtn.innerText = "Withdraw $LORCA";
+                withdrawBtn.disabled = false;
+            }
+        }
+        withdrawBtn.addEventListener('click', handleWithdraw);
+
+        // --- Fish Engine (Horizontal Scroller) ---
         class Fish {
             constructor() {
                 this.reset();
-                this.x = Math.random() * canvas.width; // Initial random spread
+                this.x = Math.random() * canvas.width;
             }
             reset() {
-                this.x = -60 - Math.random() * 100; // Left screen se baahir spawn hogi
-                this.y = Math.random() * (canvas.height - 200) + 150; // Top header se bacha kar middle zone me
+                this.x = -60 - Math.random() * 100;
+                this.y = Math.random() * (canvas.height - 220) + 160;
                 this.length = 45 + Math.random() * 15;
                 this.height = this.length * 0.55;
-                this.speed = 1.8 + Math.random() * 2.5; // Horizontal Speed
-                
-                // Neon Colors
+                this.speed = 1.8 + Math.random() * 2.5;
                 const colors = ['#38bdf8', '#f43f5e', '#10b981', '#fbbf24', '#a855f7'];
                 this.color = colors[Math.floor(Math.random() * colors.length)];
             }
             update() {
-                this.x += this.speed; // Right side ko move karegi
-                if (this.x > canvas.width + 60) {
-                    this.reset(); // Screen cross karne par wapas left par reset
-                }
+                this.x += this.speed;
+                if (this.x > canvas.width + 60) this.reset();
             }
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
-                
-                // Tail (Left side par kyunki fish right side ja rahi hai)
                 ctx.fillStyle = this.color;
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
@@ -157,13 +224,9 @@
                 ctx.lineTo(-this.length/2, this.height/3);
                 ctx.closePath();
                 ctx.fill();
-
-                // Body
                 ctx.beginPath();
                 ctx.ellipse(0, 0, this.length/2, this.height/2, 0, 0, Math.PI * 2);
                 ctx.fill();
-
-                // Eye (Right side facing)
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
                 ctx.arc(this.length/4, -this.height/6, 4, 0, Math.PI * 2);
@@ -172,7 +235,6 @@
                 ctx.beginPath();
                 ctx.arc(this.length/4, -this.height/6, 1.5, 0, Math.PI * 2);
                 ctx.fill();
-
                 ctx.restore();
             }
         }
