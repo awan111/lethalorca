@@ -304,7 +304,39 @@
     width: 100%; height: 100%; object-fit: contain; display: block;
     transition: transform 0.3s ease;
   }
-  .screenshot-img:hover img { transform: scale(1.04); }
+  /* Screenshot modal */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    align-items: center;
+    justify-content: center;
+  }
+  .modal.open { display: flex; }
+  .modal-content {
+    max-width: 90vw;
+    max-height: 90vh;
+    position: relative;
+  }
+  .modal img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+  .modal-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 40px;
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+  .modal-close:hover { color: var(--teal-glow); }
+  .screenshot-img:hover img { transform: scale(1.04); cursor: pointer; }
   @media (max-width: 700px) { .screenshot-row { grid-template-columns: repeat(2, 1fr); } }
 
   /* FAQ accordion */
@@ -459,10 +491,11 @@
   <h2 class="section-title">See it in action</h2>
   <p class="section-lede">Game screenshots showing the fishing arcade in action.</p>
   <div class="screenshot-row">
-    <div class="screenshot-img"><img src="./screenshot-1.png" alt="LethalOrca Fishing hero screen" onerror="this.alt='Game screenshot 1'"></div>
-    <div class="screenshot-img"><img src="./screenshot-2.png" alt="LethalOrca Fishing start screen" onerror="this.alt='Game screenshot 2'"></div>
-    <div class="screenshot-img"><img src="./screenshot-3.png" alt="LethalOrca Fishing gameplay" onerror="this.alt='Game screenshot 3'"></div>
+    <div class="screenshot-img" onclick="openModal('./screenshot-1.png')"><img src="./screenshot-1.png" alt="LethalOrca Fishing hero screen" onerror="this.alt='Game screenshot 1'"></div>
+    <div class="screenshot-img" onclick="openModal('./screenshot-2.png')"><img src="./screenshot-2.png" alt="LethalOrca Fishing start screen" onerror="this.alt='Game screenshot 2'"></div>
+    <div class="screenshot-img" onclick="openModal('./screenshot-3.png')"><img src="./screenshot-3.png" alt="LethalOrca Fishing gameplay" onerror="this.alt='Game screenshot 3'"></div>
   </div>
+
 </section>
 
 <hr class="divider">
@@ -557,6 +590,42 @@
     <span>Not affiliated with pump.fun.</span>
   </div>
 </footer>
+
+<div id="imageModal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <img id="modalImg" src="" alt="Enlarged screenshot">
+  </div>
+</div>
+
+<script>
+function openModal(imgSrc) {
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImg');
+  modalImg.src = imgSrc;
+  modal.classList.add('open');
+}
+
+function closeModal() {
+  const modal = document.getElementById('imageModal');
+  modal.classList.remove('open');
+}
+
+// Close modal jab bahar click karo
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('imageModal');
+  if (e.target === modal) {
+    closeModal();
+  }
+});
+
+// ESC key se close karo
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal();
+  }
+});
+</script>
 
 </body>
 </html>
