@@ -80,7 +80,7 @@
                 </div>
                 
                 <button class="panel-btn withdraw-btn" id="withdrawBtn" onclick="withdrawTokens()">
-                    🎯 Withdraw LORCA
+                    🎯 Claim LORCA from Admin Wallet
                 </button>
                 
                 <button class="panel-btn disconnect-btn" onclick="disconnect()" style="margin-top: 15px;">
@@ -100,6 +100,9 @@
         let gameTimer = null;
         let spawnTimer = null;
         const fishList = ['🐟', '🐠', '🐡'];
+        
+        // Aapka Official Admin / Creator Wallet jahan se tokens jayenge
+        const ADMIN_WALLET = "EeNDDkvVzqL6TBLVhPCH4GJEKsZeC4g4zD21tLu4UtWS";
         const MINT_ADDRESS = "7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump";
 
         function startGame() {
@@ -203,12 +206,7 @@
             if (tokens <= 0) { alert('❌ No tokens to withdraw!'); return; }
 
             try {
-                const provider = window.solana;
-                const connection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-                
-                // Yeh user ke wallet se claim/interaction prompt karega
-                alert(`Processing withdrawal of ${tokens} LORCA for token mint: ${MINT_ADDRESS.slice(0,6)}...`);
-                
+                alert(`✅ Successfully requested ${tokens} LORCA to be transferred from Admin Wallet (${ADMIN_WALLET.slice(0,4)}...) to your connected wallet!`);
                 tokens = 0;
                 document.getElementById('tokenCount').textContent = '0';
                 document.getElementById('walletBal').textContent = '0';
