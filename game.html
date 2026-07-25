@@ -1,219 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LethalOrca - Play & Earn</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #0a3d5c, #1b9eb8); height: 100vh; overflow: hidden; }
-        .container { width: 100%; height: 100vh; position: relative; }
-        .top-bar { position: absolute; top: 0; left: 0; right: 0; padding: 20px; background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        .top-bar-left { display: flex; gap: 30px; align-items: center; color: white; font-size: 18px; font-weight: bold; }
-        .logo-box { width: 36px; height: 36px; border: 2px solid cyan; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,212,255,0.1); }
-        .timer { color: white; font-size: 20px; font-weight: bold; }
-        .wallet-btn { background: linear-gradient(135deg, cyan, #00a8cc); color: black; border: 2px solid cyan; padding: 12px 24px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .wallet-btn.connected { background: linear-gradient(135deg, lime, #00cc00); border-color: lime; color: black; }
-        #startScreen, #endScreen { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 200; text-align: center; }
-        #endScreen { display: none; }
-        #endScreen.show { display: flex; }
-        .start-btn { background: cyan; color: black; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 10px; }
-        .game-area { position: absolute; top: 70px; left: 0; right: 0; bottom: 0; background: inherit; overflow: hidden; }
-        .fish { position: absolute; font-size: 45px; cursor: pointer; user-select: none; }
-        .catch-text { position: absolute; font-size: 24px; font-weight: bold; color: gold; pointer-events: none; }
-        #walletPanel { position: fixed; right: -350px; top: 0; width: 350px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 30px; transition: right 0.3s; color: white; }
-        #walletPanel.open { right: 0; }
-        .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: cyan; font-size: 24px; cursor: pointer; }
-        .panel-title { font-size: 22px; color: cyan; margin-bottom: 20px; margin-top: 20px; }
-        .panel-btn { width: 100%; padding: 12px; margin-bottom: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; }
-        .connect-btn { background: cyan; color: black; }
-        .withdraw-btn { background: lime; color: black; }
-        .disconnect-btn { background: none; border: 1px solid red; color: red; }
-        .wallet-info { background: rgba(0,212,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 12px; font-size: 12px; }
-        .info-label { color: #888; text-transform: uppercase; margin-bottom: 5px; }
-        .info-value { color: cyan; font-family: monospace; word-break: break-all; }
-        #walletConnected { display: none; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div id="startScreen">
-            <h1>🐋 LethalOrca</h1>
-            <p>Tap fish to earn 100 LORCA per catch! You have 30 seconds.</p>
-            <button class="start-btn" onclick="startGame()">Start Fishing</button>
-        </div>
+async function withdrawTokens() {
+    if (!walletOk) {
+        alert('❌ Connect wallet first!');
+        return;
+    }
+    if (tokens <= 0) {
+        alert('❌ No tokens to withdraw!');
+        return;
+    }
 
-        <div id="endScreen">
-            <h2>Time's Up!</h2>
-            <p id="finalScore" style="font-size: 24px; margin-bottom: 30px;"></p>
-            <button class="start-btn" onclick="startGame()">Play Again</button>
-        </div>
+    try {
+        const response = await fetch('http://localhost:3000/api/claim-tokens', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                recipientWallet: userAddr,
+                amount: tokens
+            })
+        });
 
-        <div class="top-bar">
-            <div class="top-bar-left">
-                <div class="logo-box">🐋</div>
-                <span id="tokenCount">0</span> LORCA
-            </div>
-            <div class="timer" id="timer">30</div>
-            <button class="wallet-btn" id="walletBtn" onclick="togglePanel()">Connect Wallet</button>
-        </div>
+        const data = await response.json();
 
-        <div class="game-area" id="gameArea"></div>
-
-        <div id="walletPanel">
-            <button class="close-btn" onclick="togglePanel()">✕</button>
-            <div class="panel-title">Wallet</div>
-
-            <div id="walletDisconnected">
-                <p style="font-size: 13px; margin-bottom: 15px; color: #aaa;">Connect Phantom to claim LORCA</p>
-                <button class="panel-btn connect-btn" onclick="connectPhantom()">Connect Phantom</button>
-            </div>
-
-            <div id="walletConnected">
-                <div class="wallet-info">
-                    <div class="info-label">Wallet Address</div>
-                    <div class="info-value" id="walletAddr">—</div>
-                </div>
-                <div class="wallet-info">
-                    <div class="info-label">Earned Balance</div>
-                    <div class="info-value" style="font-size: 18px; color: lime;"><span id="walletBal">0</span> LORCA</div>
-                </div>
-                
-                <button class="panel-btn withdraw-btn" id="withdrawBtn" onclick="withdrawTokens()">
-                    🎯 Claim LORCA from Admin Wallet
-                </button>
-                
-                <button class="panel-btn disconnect-btn" onclick="disconnect()" style="margin-top: 15px;">
-                    Disconnect Wallet
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
-    <script>
-        let tokens = 0;
-        let timeLeft = 30;
-        let gameOn = false;
-        let walletOk = false;
-        let userAddr = null;
-        let gameTimer = null;
-        let spawnTimer = null;
-        const fishList = ['🐟', '🐠', '🐡'];
-        
-        // Aapka Official Admin / Creator Wallet jahan se tokens jayenge
-        const ADMIN_WALLET = "EeNDDkvVzqL6TBLVhPCH4GJEKsZeC4g4zD21tLu4UtWS";
-        const MINT_ADDRESS = "7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump";
-
-        function startGame() {
-            document.getElementById('startScreen').style.display = 'none';
-            document.getElementById('endScreen').classList.remove('show');
-            document.getElementById('gameArea').innerHTML = '';
+        if (data.success) {
+            alert(`✅ Successfully transferred ${tokens} LORCA to your wallet!\nSignature: ${data.signature.slice(0, 15)}...`);
             tokens = 0;
-            timeLeft = 30;
             document.getElementById('tokenCount').textContent = '0';
             document.getElementById('walletBal').textContent = '0';
-            document.getElementById('timer').textContent = '30';
-            gameOn = true;
-
-            spawnTimer = setInterval(spawnFish, 900);
-            gameTimer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer').textContent = timeLeft;
-                if (timeLeft <= 0) endGame();
-            }, 1000);
+        } else {
+            alert('❌ Transfer failed: ' + data.error);
         }
-
-        function spawnFish() {
-            if (!gameOn) return;
-            const fish = document.createElement('div');
-            fish.className = 'fish';
-            fish.textContent = fishList[Math.floor(Math.random() * fishList.length)];
-            fish.style.top = Math.random() * 50 + 20 + '%';
-            fish.onclick = () => catchFish(fish);
-            document.getElementById('gameArea').appendChild(fish);
-
-            let pos = window.innerWidth;
-            const move = setInterval(() => {
-                if (!gameOn || !fish.parentNode) { clearInterval(move); return; }
-                pos -= 2;
-                fish.style.left = pos + 'px';
-                if (pos < -50) { clearInterval(move); if (fish.parentNode) fish.remove(); }
-            }, 20);
-        }
-
-        function catchFish(fish) {
-            if (!gameOn) return;
-            tokens += 100;
-            document.getElementById('tokenCount').textContent = tokens;
-            document.getElementById('walletBal').textContent = tokens;
-
-            const txt = document.createElement('div');
-            txt.className = 'catch-text';
-            txt.textContent = '+100';
-            txt.style.left = fish.style.left;
-            txt.style.top = fish.style.top;
-            document.getElementById('gameArea').appendChild(txt);
-            setTimeout(() => txt.remove(), 800);
-            fish.remove();
-        }
-
-        function endGame() {
-            gameOn = false;
-            clearInterval(gameTimer);
-            clearInterval(spawnTimer);
-            document.getElementById('finalScore').textContent = 'You earned ' + tokens + ' LORCA!';
-            document.getElementById('endScreen').classList.add('show');
-            togglePanel();
-        }
-
-        function togglePanel() {
-            document.getElementById('walletPanel').classList.toggle('open');
-        }
-
-        async function connectPhantom() {
-            try {
-                const provider = window.solana;
-                if (!provider || !provider.isPhantom) {
-                    alert('Please install Phantom wallet');
-                    window.open('https://phantom.app/', '_blank');
-                    return;
-                }
-                const res = await provider.connect();
-                userAddr = res.publicKey.toString();
-                document.getElementById('walletDisconnected').style.display = 'none';
-                document.getElementById('walletConnected').style.display = 'block';
-                document.getElementById('walletAddr').textContent = userAddr.slice(0, 6) + '...' + userAddr.slice(-6);
-                document.getElementById('walletBtn').classList.add('connected');
-                document.getElementById('walletBtn').textContent = '✓ Connected';
-                walletOk = true;
-            } catch (e) {
-                alert('Error: ' + e.message);
-            }
-        }
-
-        function disconnect() {
-            walletOk = false;
-            userAddr = null;
-            document.getElementById('walletDisconnected').style.display = 'block';
-            document.getElementById('walletConnected').style.display = 'none';
-            document.getElementById('walletBtn').classList.remove('connected');
-            document.getElementById('walletBtn').textContent = 'Connect Wallet';
-        }
-
-        async function withdrawTokens() {
-            if (!walletOk) { alert('❌ Connect wallet first!'); return; }
-            if (tokens <= 0) { alert('❌ No tokens to withdraw!'); return; }
-
-            try {
-                alert(`✅ Successfully requested ${tokens} LORCA to be transferred from Admin Wallet (${ADMIN_WALLET.slice(0,4)}...) to your connected wallet!`);
-                tokens = 0;
-                document.getElementById('tokenCount').textContent = '0';
-                document.getElementById('walletBal').textContent = '0';
-            } catch (e) {
-                alert('Withdrawal error: ' + e.message);
-            }
-        }
-    </script>
-</body>
-</html>
+    } catch (e) {
+        alert('❌ Backend connection error! Make sure your local server is running.');
+        console.log(e);
+    }
+}
