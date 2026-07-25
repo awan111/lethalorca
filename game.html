@@ -206,4 +206,60 @@
         document.getElementById("withdraw-btn").addEventListener("click", withdrawTokens);
     </script>
 </body>
+    <!-- Solana Web3 CDN -->
+<script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+
+<script>
+async function withdrawTokens() {
+    try {
+        const provider = window.solana;
+        if (!provider || !provider.isPhantom) {
+            alert("Please install Phantom Wallet!");
+            return;
+        }
+
+        await provider.connect();
+        const pubKey = provider.publicKey;
+
+        if (score <= 0) {
+            alert("Play and earn some LORCA tokens first!");
+            return;
+        }
+
+        const connection = new solanaWeb3.Connection(
+            solanaWeb3.clusterApiUrl('devnet'),
+            'confirmed'
+        );
+
+        const recipientPubKey = new solanaWeb3.PublicKey("APNA_PHANTOM_WALLET_ADDRESS_YAHAN_DALEIN");
+
+        const transaction = new solanaWeb3.Transaction().add(
+            solanaWeb3.SystemProgram.transfer({
+                fromPubkey: pubKey,
+                toPubkey: recipientPubKey,
+                lamports: solanaWeb3.LAMPORTS_PER_SOL * 0.0001, 
+            })
+        );
+
+        const { blockhash } = await connection.getLatestBlockhash();
+        transaction.recentBlockhash = blockhash;
+        transaction.feePayer = pubKey;
+
+        const signedTransaction = await provider.signTransaction(transaction);
+        const signature = await connection.sendRawTransaction(signedTransaction.serialize());
+        
+        await connection.confirmTransaction(signature);
+        alert("Withdrawal Successful! Signature: " + signature);
+
+    } catch (err) {
+        console.error(err);
+        alert("Withdrawal failed: " + err.message);
+    }
+}
+
+const withdrawBtn = document.getElementById("withdraw-btn");
+if (withdrawBtn) {
+    withdrawBtn.addEventListener("click", withdrawTokens);
+}
+</script>
 </html>
