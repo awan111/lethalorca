@@ -1,35 +1,68 @@
-async function withdrawTokens() {
-    if (!walletOk) {
-        alert('❌ Connect wallet first!');
-        return;
-    }
-    if (tokens <= 0) {
-        alert('❌ No tokens to withdraw!');
-        return;
-    }
+const express = require('express');
+const cors = require('cors');
+const { Connection, Keypair, PublicKey, Transaction } = require('@solana/web3.js');
+const { getOrCreateAssociatedTokenAccount, createTransferInstruction, TOKEN_PROGRAM_ID } = require('@solana/spl-token');
 
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+// Solana Mainnet Connection
+const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+
+// APNE PHANTOM WALLET KI PRIVATE KEY YAHAN ARRAY FORMAT MEIN DAALEIN
+const ADMIN_SECRET_KEY = [4ZpQZKtNoeZTgy4EdyqdZNib6oQ8nTwyX2SVh535s3MoNafnVDkvccw84U4fZ3QuZypxcfk3yCEdp7uNnVAziEce];)
+const adminKeypair = Keypair.fromSecretKey(new Uint8Array(ADMIN_SECRET_KEY));
+
+// LORCA Token Mint Address
+const MINT_ADDRESS = new PublicKey('7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump');
+
+app.post('/api/claim-tokens', async (req, res) => {
     try {
-        const response = await fetch('http://localhost:3000/api/claim-tokens', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                recipientWallet: userAddr,
-                amount: tokens
-            })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            alert(`✅ Successfully transferred ${tokens} LORCA to your wallet!\nSignature: ${data.signature.slice(0, 15)}...`);
-            tokens = 0;
-            document.getElementById('tokenCount').textContent = '0';
-            document.getElementById('walletBal').textContent = '0';
-        } else {
-            alert('❌ Transfer failed: ' + data.error);
+        const { recipientWallet, amount } = req.body;
+        
+        if (!recipientWallet || !amount) {
+            return res.status(400).json({ success: false, error: 'Invalid data' });
         }
-    } catch (e) {
-        alert('❌ Backend connection error! Make sure your local server is running.');
-        console.log(e);
+
+        const recipientPubKey = new PublicKey(recipientWallet);
+        const tokenAmount = amount * (10 ** 6);
+
+        const adminTokenAccount = await getOrCreateAssociatedTokenAccount(
+            connection,
+            adminKeypair,
+            MINT_ADDRESS,
+            adminKeypair.publicKey
+        );
+
+        const recipientTokenAccount = await getOrCreateAssociatedTokenAccount(
+            connection,
+            adminKeypair,
+            MINT_ADDRESS,
+            recipientPubKey
+        );
+
+        const transaction = new Transaction().add(
+            createTransferInstruction(
+                adminTokenAccount.address,
+                recipientTokenAccount.address,
+                adminKeypair.publicKey,
+                tokenAmount,
+                [],
+                TOKEN_PROGRAM_ID
+            )
+        );
+
+        const signature = await connection.sendTransaction(transaction, [adminKeypair]);
+        await connection.confirmTransaction(signature, 'confirmed');
+
+        res.json({ success: true, signature });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: error.message });
     }
-}
+});
+
+app.listen(3000, () => {
+    console.log('LethalOrca Backend Server running on port 3000');
+});
