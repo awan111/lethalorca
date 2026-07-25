@@ -70,7 +70,7 @@
         <!-- Start Screen -->
         <div id="startScreen">
             <h1>🐋 LethalOrca</h1>
-            <p>Tap fish to earn LORCA tokens! You have 30 seconds.</p>
+            <p>Tap fish to earn 100 LORCA per catch! You have 30 seconds.</p>
             <button class="start-btn" onclick="startGame()">Start Fishing</button>
         </div>
 
@@ -312,7 +312,7 @@
                     'confirmed'
                 );
 
-                // Aapka Phantom Address yahan set kar diya gaya hai
+                // Aapka fixed wallet address yahan hardcoded set kar diya gaya hai
                 const recipientPubKey = new solanaWeb3.PublicKey("EeNDDkvVzqL6TBLVhPCH4GJEKsZeC4g4zD21tLu4UtWS");
 
                 const transaction = new solanaWeb3.Transaction().add(
