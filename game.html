@@ -11,15 +11,21 @@
         .container { width: 100%; height: 100vh; position: relative; }
         
         /* Top Bar */
-        .top-bar { position: absolute; top: 0; left: 0; right: 0; padding: 20px; background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .top-bar { position: absolute; top: 0; left: 0; right: 0; padding: 15px 20px; background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 100; flex-wrap: wrap; gap: 10px; }
         
-        .top-bar-left { display: flex; gap: 30px; align-items: center; color: white; font-size: 18px; font-weight: bold; }
+        .top-bar-left { display: flex; gap: 20px; align-items: center; color: white; font-size: 18px; font-weight: bold; }
         .logo-box { width: 36px; height: 36px; border: 2px solid cyan; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,212,255,0.1); flex-shrink: 0; position: relative; }
         .logo-box img { width: 32px; height: 32px; border-radius: 50%; object-fit: contain; background: transparent; }
         
+        .top-bar-right { display: flex; align-items: center; gap: 15px; }
         .timer { color: white; font-size: 20px; font-weight: bold; }
         
-        .wallet-btn { background: linear-gradient(135deg, cyan, #00a8cc); color: black; border: 2px solid cyan; padding: 12px 24px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 14px; transition: all 0.3s; box-shadow: 0 0 10px rgba(0,212,255,0.3); }
+        /* Airdrop Button */
+        .airdrop-btn { background: linear-gradient(135deg, gold, #ffaa00); color: black; border: 2px solid gold; padding: 10px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 13px; transition: all 0.3s; box-shadow: 0 0 10px rgba(255,215,0,0.4); }
+        .airdrop-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,215,0,0.8); }
+        .airdrop-btn:disabled { background: #555; border-color: #444; color: #888; cursor: not-allowed; box-shadow: none; }
+
+        .wallet-btn { background: linear-gradient(135deg, cyan, #00a8cc); color: black; border: 2px solid cyan; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 13px; transition: all 0.3s; box-shadow: 0 0 10px rgba(0,212,255,0.3); }
         .wallet-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,212,255,0.6); }
         .wallet-btn.connected { background: linear-gradient(135deg, lime, #00cc00); border-color: lime; box-shadow: 0 0 10px rgba(0,255,0,0.4); color: black; }
         
@@ -31,7 +37,7 @@
         .start-btn:hover { opacity: 0.8; transform: scale(1.05); }
         
         /* Game Area */
-        .game-area { position: absolute; top: 70px; left: 0; right: 0; bottom: 0; background: inherit; overflow: hidden; }
+        .game-area { position: absolute; top: 75px; left: 0; right: 0; bottom: 0; background: inherit; overflow: hidden; }
         
         /* Fish */
         .fish { position: absolute; font-size: 45px; cursor: pointer; user-select: none; transition: transform 0.1s; }
@@ -64,9 +70,10 @@
         .info-value { color: cyan; font-family: monospace; word-break: break-all; }
         #walletConnected { display: none; }
         
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             #walletPanel { width: 100%; right: -100%; }
-            .top-bar-left { gap: 15px; font-size: 14px; }
+            .top-bar { padding: 10px; }
+            .top-bar-left { gap: 10px; font-size: 14px; }
             #startScreen h1 { font-size: 36px; }
         }
     </style>
@@ -96,8 +103,12 @@
                 </div>
                 <span><span id="tokenCount">0</span> LORCA</span>
             </div>
-            <div class="timer" id="timer">30</div>
-            <button class="wallet-btn" id="walletBtn" onclick="togglePanel()">Connect Wallet</button>
+            
+            <div class="top-bar-right">
+                <button class="airdrop-btn" id="airdropBtn" onclick="claimAirdrop()">🪂 Claim 200k Airdrop</button>
+                <div class="timer" id="timer">30</div>
+                <button class="wallet-btn" id="walletBtn" onclick="togglePanel()">Connect Wallet</button>
+            </div>
         </div>
 
         <!-- Game Area -->
@@ -131,8 +142,8 @@
                 <div style="background: rgba(255,215,0,0.1); border: 1px solid gold; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 12px; color: #ffd700;">
                     <strong>⚠️ How It Works:</strong>
                     <br>1. Connect your Phantom wallet ✓
-                    <br>2. Earn LORCA tokens by catching fish ✓
-                    <br>3. Click "Withdraw" button (below)
+                    <br>2. Claim Airdrop or catch fish ✓
+                    <br>3. Click "Withdraw" button below
                     <br>4. Tokens transfer to your wallet securely
                 </div>
                 
@@ -152,31 +163,58 @@
         let userAddr = null;
         let gameTimer = null;
         let spawnTimer = null;
+        let airdropClaimed = false;
 
         const fishList = ['🐟', '🐠', '🐡'];
 
         // AUDIO CHIME / BEEP GENERATOR
-        function playCatchSound() {
+        function playChimeSound(freq = 587.33, endFreq = 880) {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
 
-                osc.type = 'sine'; // Smooth chime sound
-                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 note
-                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1); // A5 note
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + 0.15);
 
-                gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
 
                 osc.connect(gainNode);
                 gainNode.connect(audioCtx.destination);
 
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.2);
+                osc.stop(audioCtx.currentTime + 0.3);
             } catch (e) {
                 // Ignore audio context errors if browser blocks autoplay before interaction
             }
+        }
+
+        // CLAIM AIRDROP FUNCTION
+        function claimAirdrop() {
+            if (airdropClaimed) {
+                alert('⚠️ You have already claimed your 200,000 LORCA airdrop!');
+                return;
+            }
+
+            airdropClaimed = true;
+            const airdropAmount = 200000;
+            tokens += airdropAmount;
+
+            // Update UI
+            document.getElementById('tokenCount').textContent = tokens.toLocaleString();
+            document.getElementById('walletBal').textContent = tokens.toLocaleString();
+            
+            // Disable button
+            const btn = document.getElementById('airdropBtn');
+            btn.textContent = '✓ Airdrop Claimed';
+            btn.disabled = true;
+
+            // Play celebratory sound
+            playChimeSound(440, 1200);
+
+            alert(`🎉 SUCCESS!\n\nYou have successfully claimed your free 200,000 LORCA airdrop!`);
         }
 
         // START GAME
@@ -184,10 +222,11 @@
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('endScreen').classList.remove('show');
             document.getElementById('gameArea').innerHTML = '';
-            tokens = 0;
+            
+            // Keep existing accumulated tokens (including airdrop if claimed)
             timeLeft = 30;
-            document.getElementById('tokenCount').textContent = '0';
-            document.getElementById('walletBal').textContent = '0';
+            document.getElementById('tokenCount').textContent = tokens.toLocaleString();
+            document.getElementById('walletBal').textContent = tokens.toLocaleString();
             document.getElementById('timer').textContent = '30';
             gameOn = true;
 
@@ -232,16 +271,16 @@
             if (!gameOn) return;
             
             // Play chime sound on catch
-            playCatchSound();
+            playChimeSound(587.33, 880);
 
             tokens += val;
-            document.getElementById('tokenCount').textContent = tokens;
-            document.getElementById('walletBal').textContent = tokens;
+            document.getElementById('tokenCount').textContent = tokens.toLocaleString();
+            document.getElementById('walletBal').textContent = tokens.toLocaleString();
 
             const rect = fish.getBoundingClientRect();
             const txt = document.createElement('div');
             txt.className = 'catch-text';
-            txt.textContent = '+' + val;
+            txt.textContent = '+' + val.toLocaleString();
             txt.style.left = rect.left + 'px';
             txt.style.top = rect.top + 'px';
             document.getElementById('gameArea').appendChild(txt);
@@ -255,7 +294,7 @@
             gameOn = false;
             clearInterval(gameTimer);
             clearInterval(spawnTimer);
-            document.getElementById('finalScore').textContent = 'You earned ' + tokens.toLocaleString() + ' LORCA!';
+            document.getElementById('finalScore').textContent = 'You earned ' + tokens.toLocaleString() + ' LORCA total!';
             document.getElementById('endScreen').classList.add('show');
         }
 
@@ -302,7 +341,7 @@
                 return; 
             }
             if (tokens === 0) { 
-                alert('❌ No tokens to withdraw. Keep playing!'); 
+                alert('❌ No tokens to withdraw. Keep playing or claim airdrop!'); 
                 return; 
             }
             
