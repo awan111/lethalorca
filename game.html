@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LethalOrca - Play & Earn</title>
+    <title>LethalOrca - Auto Play & Earn</title>
     <style>
         * {
             margin: 0;
@@ -21,6 +21,7 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            position: relative;
         }
 
         .container {
@@ -28,6 +29,7 @@
             padding: 20px;
             max-width: 600px;
             width: 100%;
+            z-index: 10;
         }
 
         h1 {
@@ -85,6 +87,7 @@
             align-items: center;
             font-size: 1.2rem;
             font-weight: bold;
+            z-index: 10;
         }
 
         .wallet-btn {
@@ -99,6 +102,39 @@
 
         .wallet-btn:hover {
             background: #334155;
+        }
+
+        /* Fishing Arena for Bot Animation */
+        .game-arena {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle at center, #1e293b 0%, #0b0f19 100%);
+            z-index: 5;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bot-fisherman {
+            font-size: 5rem;
+            animation: bounceRod 1s infinite alternate ease-in-out;
+            margin-bottom: 20px;
+        }
+
+        @keyframes bounceRod {
+            0% { transform: rotate(0deg) translateY(0); }
+            100% { transform: rotate(-5deg) translateY(-10px); }
+        }
+
+        .status-text {
+            font-size: 1.5rem;
+            color: #38bdf8;
+            font-weight: bold;
+            margin-top: 10px;
         }
 
         /* Modal Popup Styles */
@@ -147,11 +183,17 @@
     <!-- Main Menu -->
     <div class="container" id="mainMenu">
         <h1>🐋 LethalOrca</h1>
-        <p>Tap fish to earn LORCA tokens! You have 30 seconds.</p>
+        <p>Auto-Bot Fishing! Click start and let the bot earn LORCA tokens for you.</p>
         <div>
-            <button class="btn" id="startBtn">Start Fishing</button>
+            <button class="btn" id="startBtn">Start Auto Fishing</button>
             <button class="btn btn-airdrop" id="airdropBtn">🎁 Claim 200,000 Airdrop</button>
         </div>
+    </div>
+
+    <!-- Game Arena (Auto Bot Fishing Screen) -->
+    <div class="game-arena" id="gameArena">
+        <div class="bot-fisherman">🎣🧑‍💻</div>
+        <div class="status-text" id="botStatusText">Bot is catching fish... 🐟</div>
     </div>
 
     <!-- Game Over / Congratulations Modal -->
@@ -182,9 +224,11 @@
         const startBtn = document.getElementById('startBtn');
         const airdropBtn = document.getElementById('airdropBtn');
         const mainMenu = document.getElementById('mainMenu');
+        const gameArena = document.getElementById('gameArena');
         const timerDisplay = document.getElementById('timerDisplay');
         const scoreDisplay = document.getElementById('scoreDisplay');
         const walletBtn = document.getElementById('walletBtn');
+        const botStatusText = document.getElementById('botStatusText');
         
         const gameOverModal = document.getElementById('gameOverModal');
         const modalMessage = document.getElementById('modalMessage');
@@ -200,31 +244,43 @@
         let score = 0;
         let timeLeft = 30;
         let gameInterval;
-        let isPlaying = false;
+        let fishingInterval;
         let isConnected = false;
 
-        // Start Game
+        // Start Auto Fishing Game
         startBtn.addEventListener('click', () => {
             mainMenu.style.display = 'none';
-            isPlaying = true;
+            gameArena.style.display = 'flex';
             score = 0;
             timeLeft = 30;
             scoreDisplay.textContent = `${score} LORCA`;
             timerDisplay.textContent = timeLeft;
 
+            // Timer countdown every second
             gameInterval = setInterval(() => {
                 timeLeft--;
                 timerDisplay.textContent = timeLeft;
 
                 if (timeLeft <= 0) {
                     clearInterval(gameInterval);
-                    isPlaying = false;
+                    clearInterval(fishingInterval);
+                    gameArena.style.display = 'none';
                     
                     // Show Congratulations Modal
-                    modalMessage.textContent = `Amazing job! You successfully earned ${score} LORCA tokens in this session.`;
+                    modalMessage.textContent = `Amazing job! Your automated bot successfully caught fish and earned ${score} LORCA tokens.`;
                     gameOverModal.style.display = 'flex';
                 }
             }, 1000);
+
+            // Auto Bot catching fish every 0.6 seconds
+            fishingInterval = setInterval(() => {
+                score += 10; // Earns 10 LORCA per fish caught by bot
+                scoreDisplay.textContent = `${score} LORCA`;
+                
+                const fishes = ['🐟', '🐠', '🐡', '🦈'];
+                const randomFish = fishes[Math.floor(Math.random() * fishes.length)];
+                botStatusText.textContent = `Bot caught a ${randomFish}! (+10 LORCA)`;
+            }, 600);
         });
 
         // 2 Lakh Airdrop Button
@@ -233,14 +289,6 @@
             scoreDisplay.textContent = `${score} LORCA`;
             walletBalance.textContent = `${score} LORCA`;
             alert("🎁 Success! 200,000 LORCA Airdrop has been added to your balance!");
-        });
-
-        // Tapping fish during game
-        document.addEventListener('click', (e) => {
-            if (isPlaying && e.target.tagName !== 'BUTTON' && !e.target.closest('.modal')) {
-                score++;
-                scoreDisplay.textContent = `${score} LORCA`;
-            }
         });
 
         // Close Game Over Modal
