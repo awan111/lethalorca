@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LethalOrca - Auto Play & Earn</title>
+    <!-- Solana Web3 SDK for Real Wallet Integration -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -104,7 +106,6 @@
             background: #334155;
         }
 
-        /* Fishing Arena for Bot Animation */
         .game-arena {
             display: none;
             position: absolute;
@@ -137,7 +138,6 @@
             margin-top: 10px;
         }
 
-        /* Modal Popup Styles */
         .modal {
             display: none;
             position: fixed;
@@ -190,13 +190,13 @@
         </div>
     </div>
 
-    <!-- Game Arena (Auto Bot Fishing Screen) -->
+    <!-- Game Arena -->
     <div class="game-arena" id="gameArena">
         <div class="bot-fisherman">🎣🧑‍💻</div>
         <div class="status-text" id="botStatusText">Bot is catching fish... 🐟</div>
     </div>
 
-    <!-- Game Over / Congratulations Modal -->
+    <!-- Game Over Modal -->
     <div class="modal" id="gameOverModal">
         <div class="modal-content">
             <h2>🎉 Congratulations!</h2>
@@ -209,7 +209,7 @@
     <div class="modal" id="walletModal">
         <div class="modal-content">
             <h2>💼 Phantom Wallet</h2>
-            <p id="walletStatus">Wallet not connected.</p>
+            <p id="walletStatus">Status: Not Connected</p>
             <p>Your Balance: <span id="walletBalance" style="color: #00f2fe; font-weight: bold;">0 LORCA</span></p>
             <div>
                 <button class="btn" id="connectPhantomBtn">Connect Phantom</button>
@@ -245,9 +245,47 @@
         let timeLeft = 30;
         let gameInterval;
         let fishingInterval;
-        let isConnected = false;
+        let userWalletAddress = null;
 
-        // Start Auto Fishing Game
+        // Helper function to get Phantom Provider
+        const getProvider = () => {
+            if ('solana' in window) {
+                const provider = window.solana;
+                if (provider.isPhantom) {
+                    return provider;
+                }
+            }
+            return null;
+        };
+
+        // Connect Real Phantom Wallet
+        const connectWallet = async () => {
+            const provider = getProvider();
+            if (provider) {
+                try {
+                    const response = await provider.connect();
+                    userWalletAddress = response.publicKey.toString();
+                    
+                    const shortenedAddress = userWalletAddress.slice(0, 4) + '...' + userWalletAddress.slice(-4);
+                    walletStatus.textContent = `Connected: ${shortenedAddress}`;
+                    walletBtn.textContent = shortenedAddress;
+                    
+                    connectPhantomBtn.style.display = 'none';
+                    withdrawBtn.style.display = 'inline-block';
+                    alert(`Phantom Wallet Connected!\nAddress: ${userWalletAddress}`);
+                } catch (err) {
+                    console.error(err);
+                    alert("Connection rejected by user!");
+                }
+            } else {
+                alert("Phantom Wallet extension not found! Please install Phantom from https://phantom.app");
+                window.open("https://phantom.app/", "_blank");
+            }
+        };
+
+        connectPhantomBtn.addEventListener('click', connectWallet);
+
+        // Start Auto Fishing
         startBtn.addEventListener('click', () => {
             mainMenu.style.display = 'none';
             gameArena.style.display = 'flex';
@@ -256,7 +294,6 @@
             scoreDisplay.textContent = `${score} LORCA`;
             timerDisplay.textContent = timeLeft;
 
-            // Timer countdown every second
             gameInterval = setInterval(() => {
                 timeLeft--;
                 timerDisplay.textContent = timeLeft;
@@ -266,15 +303,13 @@
                     clearInterval(fishingInterval);
                     gameArena.style.display = 'none';
                     
-                    // Show Congratulations Modal
                     modalMessage.textContent = `Amazing job! Your automated bot successfully caught fish and earned ${score} LORCA tokens.`;
                     gameOverModal.style.display = 'flex';
                 }
             }, 1000);
 
-            // Auto Bot catching fish every 0.6 seconds
             fishingInterval = setInterval(() => {
-                score += 10; // Earns 10 LORCA per fish caught by bot
+                score += 10;
                 scoreDisplay.textContent = `${score} LORCA`;
                 
                 const fishes = ['🐟', '🐠', '🐡', '🦈'];
@@ -283,7 +318,7 @@
             }, 600);
         });
 
-        // 2 Lakh Airdrop Button
+        // 2 Lakh Airdrop
         airdropBtn.addEventListener('click', () => {
             score += 200000;
             scoreDisplay.textContent = `${score} LORCA`;
@@ -291,39 +326,27 @@
             alert("🎁 Success! 200,000 LORCA Airdrop has been added to your balance!");
         });
 
-        // Close Game Over Modal
         claimRewardBtn.addEventListener('click', () => {
             gameOverModal.style.display = 'none';
             mainMenu.style.display = 'block';
             walletBalance.textContent = `${score} LORCA`;
         });
 
-        // Wallet Popup Open
         walletBtn.addEventListener('click', () => {
             walletModal.style.display = 'flex';
             walletBalance.textContent = `${score} LORCA`;
         });
 
-        // Close Wallet Modal
         closeWalletBtn.addEventListener('click', () => {
             walletModal.style.display = 'none';
         });
 
-        // Connect Phantom Wallet Simulation
-        connectPhantomBtn.addEventListener('click', () => {
-            isConnected = true;
-            walletStatus.textContent = "Connected: 7Rqpg...pump";
-            connectPhantomBtn.style.display = 'none';
-            withdrawBtn.style.display = 'inline-block';
-            alert("Phantom Wallet Connected Successfully!");
-        });
-
-        // Withdraw Functionality
+        // Withdraw Request
         withdrawBtn.addEventListener('click', () => {
             if (score <= 0) {
                 alert("You don't have enough balance to withdraw!");
             } else {
-                alert(`🚀 Successfully requested withdrawal of ${score} LORCA tokens to your Phantom wallet!`);
+                alert(`🚀 Withdrawal request of ${score} LORCA sent to ${userWalletAddress}!`);
                 score = 0;
                 scoreDisplay.textContent = `${score} LORCA`;
                 walletBalance.textContent = `${score} LORCA`;
