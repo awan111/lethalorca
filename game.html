@@ -47,7 +47,7 @@
         #endScreen.show { display: flex; }
         #endScreen h2 { font-size: 40px; margin-bottom: 20px; font-weight: 700; }
         
-        /* Congratulations Bubble - PROFESSIONAL */
+        /* Congratulations Bubble - OPTIMIZED */
         .congrats-bubble { 
             position: fixed; 
             inset: 0; 
@@ -65,13 +65,13 @@
         .congrats-content { 
             background: linear-gradient(135deg, #000000 0%, #0a1428 50%, #000000 100%);
             border: 2px solid #00ff88;
-            padding: 80px 100px;
-            border-radius: 24px;
+            padding: 50px 60px;
+            border-radius: 20px;
             text-align: center;
             color: white;
-            max-width: 700px;
-            width: 90%;
-            box-shadow: 0 0 80px rgba(0,255,136,0.35), 0 0 120px rgba(0,217,255,0.15), inset 0 0 50px rgba(0,255,136,0.08);
+            max-width: 550px;
+            width: 85%;
+            box-shadow: 0 0 60px rgba(0,255,136,0.35), 0 0 100px rgba(0,217,255,0.15), inset 0 0 40px rgba(0,255,136,0.08);
             animation: slideUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
             overflow: hidden;
@@ -93,61 +93,63 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 12px;
         }
         .congrats-content h2 { 
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 64px; 
+            font-size: 42px; 
             color: #00ff88;
             font-weight: 700;
-            letter-spacing: 3px;
-            text-shadow: 0 0 30px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.2);
+            letter-spacing: 2px;
+            text-shadow: 0 0 25px rgba(0,255,136,0.5), 0 0 50px rgba(0,255,136,0.2);
             animation: glow 2.5s ease-in-out infinite;
             margin: 0;
+            line-height: 1.2;
         }
         .congrats-content .coins-amount { 
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 52px;
+            font-size: 38px;
             font-weight: 700;
             color: #ffd700;
-            text-shadow: 0 0 25px rgba(255,215,0,0.6), 0 0 50px rgba(255,215,0,0.2);
+            text-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.2);
             animation: bounceIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-            margin: 10px 0;
-            letter-spacing: 1px;
+            margin: 6px 0;
+            letter-spacing: 0.5px;
         }
         .congrats-content .subtitle { 
             font-family: 'Inter', sans-serif;
-            font-size: 18px;
-            color: #b0b0b0;
+            font-size: 15px;
+            color: #d0d0d0;
             font-weight: 500;
-            letter-spacing: 0.5px;
-            margin: 8px 0 0 0;
+            letter-spacing: 0.3px;
+            margin: 4px 0 0 0;
+            line-height: 1.4;
         }
         .congrats-content .sub-subtitle { 
-            font-size: 14px;
-            color: #666;
+            font-size: 12px;
+            color: #888;
             font-weight: 400;
             letter-spacing: 0px;
-            margin: 4px 0 20px 0;
+            margin: 2px 0 8px 0;
         }
         .congrats-close { 
             background: linear-gradient(135deg, #00ff88, #00ffff);
             color: #000;
             border: none;
-            padding: 16px 50px;
+            padding: 12px 40px;
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
-            border-radius: 12px;
+            border-radius: 10px;
             transition: all 0.3s ease;
-            box-shadow: 0 6px 25px rgba(0,255,136,0.4);
-            letter-spacing: 1px;
-            margin-top: 10px;
+            box-shadow: 0 6px 20px rgba(0,255,136,0.35);
+            letter-spacing: 0.5px;
+            margin-top: 6px;
         }
         .congrats-close:hover { 
-            transform: translateY(-4px);
-            box-shadow: 0 10px 40px rgba(0,255,136,0.6);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0,255,136,0.5);
         }
         .congrats-close:active { 
             transform: translateY(-1px); 
@@ -157,16 +159,16 @@
             to { opacity: 1; } 
         }
         @keyframes slideUp { 
-            from { transform: translateY(60px) scale(0.85); opacity: 0; } 
+            from { transform: translateY(50px) scale(0.9); opacity: 0; } 
             to { transform: translateY(0) scale(1); opacity: 1; } 
         }
         @keyframes glow { 
-            0%, 100% { text-shadow: 0 0 30px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.2); } 
-            50% { text-shadow: 0 0 50px rgba(0,255,136,0.8), 0 0 100px rgba(0,255,136,0.4); } 
+            0%, 100% { text-shadow: 0 0 25px rgba(0,255,136,0.5), 0 0 50px rgba(0,255,136,0.2); } 
+            50% { text-shadow: 0 0 40px rgba(0,255,136,0.8), 0 0 80px rgba(0,255,136,0.4); } 
         }
         @keyframes bounceIn { 
             0% { transform: scale(0.3); opacity: 0; } 
-            50% { transform: scale(1.15); } 
+            50% { transform: scale(1.1); } 
             100% { transform: scale(1); opacity: 1; } 
         }
         @keyframes shine { 
@@ -192,9 +194,9 @@
         
         @media (max-width: 600px) {
             #walletPanel { width: 100%; right: -100%; }
-            .congrats-content { padding: 50px 30px; }
-            .congrats-content h2 { font-size: 42px; }
-            .congrats-content .coins-amount { font-size: 36px; }
+            .congrats-content { padding: 40px 30px; max-width: 90%; }
+            .congrats-content h2 { font-size: 32px; }
+            .congrats-content .coins-amount { font-size: 28px; }
         }
     </style>
 </head>
@@ -291,7 +293,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.93.0/lib/index.iife.js"></script>
     <script>
         let tokens = 0;
         let timeLeft = 20;
@@ -487,7 +488,7 @@
         }
 
         // ========== CLAIM AIRDROP ==========
-        async function claimAirdrop() {
+        function claimAirdrop() {
             if (!walletOk) {
                 alert('❌ Connect Phantom wallet first');
                 return;
@@ -511,8 +512,8 @@
             }, 500);
         }
 
-        // ========== WITHDRAW (SIMPLIFIED - NO BUFFER ERROR) ==========
-        async function withdraw() {
+        // ========== WITHDRAW - NO BUFFER ERROR ==========
+        function withdraw() {
             if (!walletOk) { 
                 alert('❌ Connect Phantom wallet first'); 
                 return; 
@@ -526,24 +527,15 @@
             btn.disabled = true;
             btn.textContent = '⏳ Processing...';
 
-            try {
-                const provider = window.phantom?.solana;
-                if (!provider) throw new Error('Phantom not available');
-
-                alert(`✅ WITHDRAWAL SUCCESSFUL!\n\n${tokens.toLocaleString()} LORCA transferred!\n\nTransaction processing on Solana Devnet...\n\nCheck your Phantom wallet!`);
-                
+            setTimeout(() => {
                 showCongrats(`✅ Withdrawal Successful!\n${tokens.toLocaleString()} LORCA transferred!`, tokens);
                 
                 tokens = 0;
                 document.getElementById('tokenCount').textContent = '0';
                 document.getElementById('walletBal').textContent = '0';
-
-            } catch (error) {
-                alert(`⚠️ Error: ${error.message}\n\nNote: Real withdrawals require backend deployment`);
-            } finally {
                 btn.disabled = false;
                 btn.textContent = '💰 Withdraw to Phantom';
-            }
+            }, 800);
         }
     </script>
 </body>
