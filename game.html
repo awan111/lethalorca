@@ -47,16 +47,82 @@
         #endScreen.show { display: flex; }
         #endScreen h2 { font-size: 40px; margin-bottom: 20px; }
         
-        /* Congratulations Bubble */
-        .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 300; }
-        .congrats-bubble.show { display: flex; animation: popIn 0.5s ease-out; }
-        .congrats-content { background: linear-gradient(135deg, #ff006e, #9d4edd); padding: 50px; border-radius: 20px; text-align: center; color: white; max-width: 500px; box-shadow: 0 0 50px rgba(255,0,110,0.8); animation: pulse 1s ease-in-out infinite; }
-        .congrats-content h2 { font-size: 50px; margin-bottom: 20px; }
-        .congrats-content p { font-size: 24px; margin-bottom: 20px; color: #ffed4e; }
-        .congrats-close { background: cyan; color: black; border: none; padding: 12px 30px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 10px; }
-        .congrats-close:hover { opacity: 0.8; }
-        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        /* Congratulations Bubble - Professional 4K */
+        .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; align-items: center; justify-content: center; z-index: 300; backdrop-filter: blur(5px); }
+        .congrats-bubble.show { display: flex; animation: fadeInBackdrop 0.4s ease-out; }
+        .congrats-content { 
+            background: linear-gradient(135deg, #000000 0%, #0a1428 50%, #000000 100%);
+            border: 2px solid #00ff88;
+            padding: 60px 80px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+            max-width: 600px;
+            box-shadow: 0 0 60px rgba(0,255,136,0.4), 0 0 100px rgba(0,217,255,0.2), inset 0 0 40px rgba(0,255,136,0.05);
+            animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .congrats-content::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,255,136,0.1) 0%, transparent 70%);
+            animation: shine 3s ease-in-out infinite;
+        }
+        .congrats-inner { position: relative; z-index: 2; }
+        .congrats-content h2 { 
+            font-size: 56px; 
+            margin-bottom: 16px;
+            color: #00ff88;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(0,255,136,0.5);
+            animation: glow 2s ease-in-out infinite;
+        }
+        .congrats-content .coins-amount { 
+            font-size: 48px;
+            font-weight: 700;
+            color: #ffd700;
+            margin: 20px 0;
+            text-shadow: 0 0 15px rgba(255,215,0,0.6);
+            animation: bounceIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .congrats-content p { 
+            font-size: 20px; 
+            margin: 16px 0;
+            color: #b0b0b0;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+        .congrats-close { 
+            background: linear-gradient(135deg, #00ff88, #00ffff);
+            color: #000;
+            border: none;
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-top: 24px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,255,136,0.4);
+            letter-spacing: 1px;
+        }
+        .congrats-close:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0,255,136,0.6);
+            opacity: 1;
+        }
+        .congrats-close:active { transform: translateY(-1px); }
+        @keyframes fadeInBackdrop { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(50px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        @keyframes glow { 0%, 100% { text-shadow: 0 0 20px rgba(0,255,136,0.5); } 50% { text-shadow: 0 0 40px rgba(0,255,136,0.8); } }
+        @keyframes bounceIn { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shine { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         /* Wallet Panel */
         #walletPanel { position: fixed; right: -350px; top: 0; width: 350px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 30px; overflow-y: auto; transition: right 0.3s; color: white; }
@@ -93,9 +159,13 @@
         <!-- Congratulations Bubble -->
         <div id="congratsBubble" class="congrats-bubble">
             <div class="congrats-content">
-                <h2>🎉 CONGRATULATIONS! 🎉</h2>
-                <p id="congratsText">You claimed 100,000 LORCA coins!</p>
-                <button class="congrats-close" onclick="closeCongrats()">✓ Awesome!</button>
+                <div class="congrats-inner">
+                    <h2>🎉 CONGRATULATIONS! 🎉</h2>
+                    <div class="coins-amount" id="congratsAmount">+100,000</div>
+                    <p id="congratsText">You claimed 100,000 LORCA coins!</p>
+                    <p style="font-size: 16px; color: #888;">Ready to withdraw anytime</p>
+                    <button class="congrats-close" onclick="closeCongrats()">✓ AWESOME!</button>
+                </div>
             </div>
         </div>
 
@@ -256,6 +326,7 @@
             document.getElementById('tokenCount').textContent = '0';
             document.getElementById('walletBal').textContent = '0';
             document.getElementById('timer').textContent = '20';
+            document.getElementById('congratsAmount').textContent = '+100,000';
             gameOn = true;
 
             spawnTimer = setInterval(spawnFish, 900);
@@ -302,8 +373,8 @@
             playBeep(800, 100);
             
             tokens += val;
-            document.getElementById('tokenCount').textContent = tokens;
-            document.getElementById('walletBal').textContent = tokens;
+            document.getElementById('tokenCount').textContent = tokens.toLocaleString();
+            document.getElementById('walletBal').textContent = tokens.toLocaleString();
 
             const txt = document.createElement('div');
             txt.className = 'catch-text';
@@ -321,14 +392,17 @@
             gameOn = false;
             clearInterval(gameTimer);
             clearInterval(spawnTimer);
-            document.getElementById('finalScore').textContent = 'You earned ' + tokens + ' LORCA!';
+            document.getElementById('finalScore').textContent = 'You earned ' + tokens.toLocaleString() + ' LORCA!';
             document.getElementById('endScreen').classList.add('show');
         }
 
         // CONGRATULATIONS POP
-        function showCongrats(message) {
+        function showCongrats(message, amount = null) {
             playCelebration();
             document.getElementById('congratsText').textContent = message;
+            if (amount) {
+                document.getElementById('congratsAmount').textContent = '+' + amount.toLocaleString();
+            }
             document.getElementById('congratsBubble').classList.add('show');
         }
 
@@ -379,15 +453,16 @@
             claimBtn.textContent = '⏳ Processing...';
 
             setTimeout(() => {
-                tokens += 100000;
-                document.getElementById('tokenCount').textContent = tokens;
-                document.getElementById('walletBal').textContent = tokens;
+                const airdropAmount = 100000;
+                tokens += airdropAmount;
+                document.getElementById('tokenCount').textContent = tokens.toLocaleString();
+                document.getElementById('walletBal').textContent = tokens.toLocaleString();
                 
-                showCongrats('🎁 You claimed 100,000 LORCA coins!\n\nReady to withdraw!');
+                showCongrats('You claimed 100,000 LORCA coins!\nReady to withdraw anytime!', airdropAmount);
                 
                 claimBtn.disabled = true;
                 claimBtn.textContent = '✓ Airdrop Claimed!';
-                claimBtn.style.opacity = '0.6';
+                claimBtn.style.opacity = '0.5';
             }, 500);
         }
 
@@ -434,8 +509,9 @@
 
                 if (confirmation.value.err === null) {
                     const explorerUrl = `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
+                    const withdrawAmount = tokens;
                     
-                    showCongrats(`✅ Withdrawal Successful!\n\n${tokens} LORCA transferred!\n\nCheck Explorer`);
+                    showCongrats(`✅ Withdrawal Successful!\n${withdrawAmount.toLocaleString()} LORCA transferred!`, withdrawAmount);
                     
                     tokens = 0;
                     document.getElementById('tokenCount').textContent = '0';
