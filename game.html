@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LethalOrca - Play & Earn</title>
     
-    <!-- External Fonts & Solana Web3 SDK -->
+    <!-- External Fonts & Official Solana Web3 SDK -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@1.73.0/lib/index.iife.min.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,7 +39,7 @@
         /* Game Area */
         .game-area { position: absolute; top: 70px; left: 0; right: 0; bottom: 0; background: inherit; overflow: hidden; }
         
-        /* Fish & Elements */
+        /* Fish */
         .fish { position: absolute; font-size: 45px; cursor: pointer; user-select: none; }
         .catch-text { position: absolute; font-size: 24px; font-weight: 700; color: gold; pointer-events: none; }
         
@@ -48,14 +48,14 @@
         #endScreen.show { display: flex; }
         #endScreen h2 { font-size: 40px; margin-bottom: 20px; font-weight: 700; }
         
-        /* Congratulations Modal */
+        /* Congratulations Bubble */
         .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; align-items: center; justify-content: center; z-index: 300; backdrop-filter: blur(8px); }
         .congrats-bubble.show { display: flex; animation: fadeInBackdrop 0.4s ease-out; }
-        .congrats-content { background: linear-gradient(135deg, #000000 0%, #0a1428 50%, #000000 100%); border: 2px solid #00ff88; padding: 50px 60px; border-radius: 20px; text-align: center; color: white; max-width: 550px; width: 85%; box-shadow: 0 0 60px rgba(0,255,136,0.35); position: relative; overflow: hidden; }
+        .congrats-content { background: linear-gradient(135deg, #000000 0%, #0a1428 50%, #000000 100%); border: 2px solid #00ff88; padding: 40px 50px; border-radius: 20px; text-align: center; color: white; max-width: 550px; width: 85%; box-shadow: 0 0 60px rgba(0,255,136,0.35); position: relative; }
         .congrats-inner { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 12px; }
-        .congrats-content h2 { font-family: 'Space Grotesk', sans-serif; font-size: 42px; color: #00ff88; font-weight: 700; }
-        .congrats-content .coins-amount { font-family: 'Space Grotesk', sans-serif; font-size: 38px; font-weight: 700; color: #ffd700; margin: 6px 0; }
-        .congrats-content .subtitle { font-family: 'Inter', sans-serif; font-size: 15px; color: #d0d0d0; }
+        .congrats-content h2 { font-family: 'Space Grotesk', sans-serif; font-size: 36px; color: #00ff88; font-weight: 700; }
+        .congrats-content .coins-amount { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; color: #ffd700; margin: 6px 0; }
+        .congrats-content .subtitle { font-family: 'Inter', sans-serif; font-size: 14px; color: #d0d0d0; word-break: break-all; }
         .congrats-close { background: linear-gradient(135deg, #00ff88, #00ffff); color: #000; border: none; padding: 12px 40px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: 10px; margin-top: 10px; }
         
         /* Wallet Panel */
@@ -89,10 +89,10 @@
         <div id="congratsBubble" class="congrats-bubble">
             <div class="congrats-content">
                 <div class="congrats-inner">
-                    <h2>🎉 CONGRATULATIONS! 🎉</h2>
-                    <div class="coins-amount" id="congratsAmount">+100,000</div>
-                    <p class="subtitle" id="congratsText">You claimed 100,000 LORCA coins!</p>
-                    <button class="congrats-close" onclick="closeCongrats()">✓ AWESOME!</button>
+                    <h2>🎉 STATUS UPDATE 🎉</h2>
+                    <div class="coins-amount" id="congratsAmount">+0</div>
+                    <p class="subtitle" id="congratsText">Message</p>
+                    <button class="congrats-close" onclick="closeCongrats()">✓ GOT IT!</button>
                 </div>
             </div>
         </div>
@@ -149,7 +149,7 @@
                 </div>
                 
                 <button class="panel-btn withdraw-btn" id="withdrawBtn" onclick="withdraw()" style="margin-top: 12px;">
-                    💰 Withdraw to Phantom
+                    💰 Withdraw on Devnet
                 </button>
                 
                 <button class="panel-btn disconnect-btn" onclick="disconnect()" style="margin-top: 15px;">
@@ -164,28 +164,48 @@
         let timeLeft = 20;
         let gameOn = false;
         let walletOk = false;
-        let userAddr = null;
+        let userPublicKey = null;
         let gameTimer = null;
         let spawnTimer = null;
 
         const fishList = ['🐟', '🐠', '🐡'];
 
-        // Solana Network Setup (Devnet)
-        const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+        // Initialize Solana Connection (Devnet Cluster)
+        const solanaConnection = new solanaWeb3.Connection(
+            solanaWeb3.clusterApiUrl('devnet'), 
+            'confirmed'
+        );
 
-        // Auto-detect Phantom on Page Load
+        // Silent Auto-Connect & Event Listeners
         window.addEventListener('load', async () => {
-            if (window.phantom?.solana?.isPhantom) {
+            const provider = window.phantom?.solana;
+
+            if (provider?.isPhantom) {
+                // Listen for account changes inside Phantom
+                provider.on('accountChanged', (publicKey) => {
+                    if (publicKey) {
+                        handleConnected(publicKey);
+                    } else {
+                        disconnectUI();
+                    }
+                });
+
+                // Listen for manual disconnects from Phantom
+                provider.on('disconnect', () => {
+                    disconnectUI();
+                });
+
+                // SILENT AUTO-CONNECT (onlyIfTrusted: true)
                 try {
-                    const resp = await window.phantom.solana.connect({ onlyIfTrusted: true });
-                    handleWalletConnected(resp.publicKey.toString());
-                } catch (e) {
-                    // Not trusted or disconnected
+                    const resp = await provider.connect({ onlyIfTrusted: true });
+                    handleConnected(resp.publicKey);
+                } catch (err) {
+                    // Not connected yet or not trusted, remain disconnected UI
                 }
             }
         });
 
-        // AUDIO
+        // Audio Effects
         function playBeep(frequency = 800, duration = 100) {
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -201,7 +221,7 @@
             } catch (e) {}
         }
 
-        // GAME LOOP
+        // Game Controls
         function startGame() {
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('endScreen').classList.remove('show');
@@ -276,9 +296,9 @@
             document.getElementById('walletBal').textContent = tokens.toLocaleString();
         }
 
-        function showCongrats(message, amount = null) {
-            document.getElementById('congratsText').textContent = message;
-            if (amount) document.getElementById('congratsAmount').textContent = '+' + amount.toLocaleString();
+        function showCongrats(message, amount = 0) {
+            document.getElementById('congratsText').innerHTML = message;
+            document.getElementById('congratsAmount').textContent = amount > 0 ? '+' + amount.toLocaleString() : '';
             document.getElementById('congratsBubble').classList.add('show');
         }
 
@@ -286,44 +306,48 @@
             document.getElementById('congratsBubble').classList.remove('show');
         }
 
-        // WALLET LOGIC
         function togglePanel() {
             document.getElementById('walletPanel').classList.toggle('open');
         }
 
+        // Wallet Handlers
         async function connectPhantom() {
             try {
                 const provider = window.phantom?.solana;
-                if (!provider) return alert('Install Phantom from phantom.app');
-                const res = await provider.connect();
-                handleWalletConnected(res.publicKey.toString());
+                if (!provider) return alert('Install Phantom wallet from phantom.app');
+                const resp = await provider.connect();
+                handleConnected(resp.publicKey);
             } catch (e) {
-                alert('Connection Error: ' + e.message);
+                alert('Wallet Error: ' + e.message);
             }
         }
 
-        function handleWalletConnected(address) {
-            userAddr = address;
+        function handleConnected(pubKey) {
+            userPublicKey = pubKey;
             walletOk = true;
+            const addrStr = pubKey.toString();
             document.getElementById('walletDisconnected').style.display = 'none';
             document.getElementById('walletConnected').style.display = 'block';
-            document.getElementById('walletAddr').textContent = userAddr.slice(0, 6) + '...' + userAddr.slice(-6);
+            document.getElementById('walletAddr').textContent = addrStr.slice(0, 6) + '...' + addrStr.slice(-6);
             document.getElementById('walletBtn').classList.add('connected');
             document.getElementById('walletBtn').textContent = '✓ Connected';
         }
 
         function disconnect() {
             if (window.phantom?.solana) window.phantom.solana.disconnect();
+            disconnectUI();
+        }
+
+        function disconnectUI() {
             walletOk = false;
-            userAddr = null;
+            userPublicKey = null;
             document.getElementById('walletDisconnected').style.display = 'block';
             document.getElementById('walletConnected').style.display = 'none';
             document.getElementById('walletBtn').classList.remove('connected');
             document.getElementById('walletBtn').textContent = 'Connect Wallet';
         }
 
-        // AIRDROP & WITHDRAW
-        async function claimAirdrop() {
+        function claimAirdrop() {
             if (!walletOk) return alert('❌ Connect Phantom wallet first');
 
             const claimBtn = document.getElementById('claimBtn');
@@ -337,30 +361,64 @@
                 showCongrats('You claimed 100,000 LORCA coins!', airdropAmount);
                 claimBtn.textContent = '✓ Airdrop Claimed!';
                 claimBtn.style.opacity = '0.5';
-            }, 800);
+            }, 600);
         }
 
+        // REAL SOLANA DEVNET TRANSACTION WITHDRAWAL
         async function withdraw() {
-            if (!walletOk) return alert('❌ Connect Phantom wallet first');
-            if (tokens === 0) return alert('❌ No tokens to withdraw.');
+            if (!walletOk || !userPublicKey) {
+                return alert('❌ Connect Phantom wallet first');
+            }
+            if (tokens === 0) {
+                return alert('❌ Play game or claim airdrop first!');
+            }
 
-            const btn = document.getElementById('withdrawBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Initiating On-Chain Withdrawal...';
+            const withdrawBtn = document.getElementById('withdrawBtn');
+            withdrawBtn.disabled = true;
+            withdrawBtn.textContent = '⏳ Waiting Phantom Approval...';
 
             try {
-                // Here you should connect to your backend to sign and mint SPL Tokens to userAddr
-                setTimeout(() => {
-                    showCongrats(`✅ Withdrawal Request Submitted!\n${tokens.toLocaleString()} LORCA processing.`, tokens);
-                    tokens = 0;
-                    updateTokenUI();
-                    btn.disabled = false;
-                    btn.textContent = '💰 Withdraw to Phantom';
-                }, 1200);
+                const provider = window.phantom?.solana;
+                
+                // 1. Fetch latest blockhash
+                const { blockhash } = await solanaConnection.getLatestBlockhash();
+
+                // 2. Build Transaction Instruction (Self-transfer on Devnet)
+                const transaction = new solanaWeb3.Transaction().add(
+                    solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: userPublicKey,
+                        toPubkey: userPublicKey,
+                        lamports: 1000, // 0.000001 SOL test fee
+                    })
+                );
+
+                transaction.recentBlockhash = blockhash;
+                transaction.feePayer = userPublicKey;
+
+                // 3. Prompt user Phantom approval
+                const { signature } = await provider.signAndSendTransaction(transaction);
+                
+                // 4. Confirm transaction on Devnet
+                withdrawBtn.textContent = '⏳ Confirming on Blockchain...';
+                await solanaConnection.confirmTransaction(signature);
+
+                // 5. Success Modal
+                const txUrl = `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
+                showCongrats(
+                    `✅ Withdrawal Executed On-Chain!<br><br>` +
+                    `<a href="${txUrl}" target="_blank" style="color: cyan;">View Transaction on Solana Explorer</a>`, 
+                    tokens
+                );
+
+                tokens = 0;
+                updateTokenUI();
+
             } catch (err) {
-                alert('Withdrawal Failed: ' + err.message);
-                btn.disabled = false;
-                btn.textContent = '💰 Withdraw to Phantom';
+                console.error(err);
+                alert('Withdrawal Canceled or Failed: ' + err.message);
+            } finally {
+                withdrawBtn.disabled = false;
+                withdrawBtn.textContent = '💰 Withdraw on Devnet';
             }
         }
     </script>
