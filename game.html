@@ -30,7 +30,7 @@
         .logo-box { 
             width: 36px; height: 36px; border: 2px solid cyan; border-radius: 50%; 
             display: flex; align-items: center; justify-content: center; 
-            background: rgba(0,212,255,0.1); flex-shrink: 0; 
+            background: rgba(0,212,255,0.1); flex-shrink: 0; font-size: 20px;
         }
         
         .timer { color: white; font-size: 20px; font-weight: 700; }
@@ -64,17 +64,29 @@
         .game-area { position: absolute; top: 70px; left: 0; right: 0; bottom: 0; overflow: hidden; }
         
         /* Fish */
-        .fish { position: absolute; font-size: 45px; cursor: pointer; user-select: none; transition: transform 0.1s; }
-        .fish:active { transform: scale(0.8); }
+        .fish { 
+            position: absolute; 
+            font-size: 45px; 
+            cursor: pointer; 
+            user-select: none; 
+            transition: transform 0.1s ease; 
+        }
+        .fish:active { transform: scale(0.75); }
         
-        /* Catch Text */
+        /* Catch Text Animation */
         .catch-text { 
-            position: absolute; font-size: 22px; font-weight: 700; color: gold; 
-            pointer-events: none; animation: floatUp 0.8s forwards; 
+            position: absolute; 
+            font-size: 24px; 
+            font-weight: 800; 
+            color: #ffd700; 
+            pointer-events: none; 
+            text-shadow: 0 0 10px rgba(255,215,0,0.8);
+            animation: floatUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards; 
         }
         @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-30px); }
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-40px) scale(0.9); }
         }
         
         /* End Screen */
@@ -84,7 +96,7 @@
             color: white; z-index: 200; text-align: center; 
         }
         #endScreen.show { display: flex; }
-        #endScreen h2 { font-size: 40px; margin-bottom: 15px; }
+        #endScreen h2 { font-size: 40px; margin-bottom: 15px; color: cyan; }
         
         /* Popup Bubble */
         .congrats-bubble { 
@@ -109,12 +121,13 @@
         #walletPanel { 
             position: fixed; right: -350px; top: 0; width: 350px; height: 100vh; 
             background: rgba(0,20,40,0.95); border-left: 2px solid cyan; 
-            z-index: 150; padding: 30px; transition: right 0.3s; color: white; 
+            z-index: 150; padding: 30px; transition: right 0.3s ease; color: white; 
         }
         #walletPanel.open { right: 0; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: cyan; font-size: 24px; cursor: pointer; }
         .panel-title { font-size: 22px; color: cyan; margin-bottom: 20px; margin-top: 10px; font-weight: 700; }
-        .panel-btn { width: 100%; padding: 12px; margin-bottom: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .panel-btn { width: 100%; padding: 12px; margin-bottom: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.2s; }
+        .panel-btn:hover { opacity: 0.9; transform: translateY(-2px); }
         .connect-btn { background: cyan; color: black; }
         .claim-airdrop-btn { background: #ffd700; color: black; font-weight: 700; }
         .withdraw-btn { background: #00ff88; color: black; }
@@ -231,6 +244,7 @@
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('endScreen').classList.remove('show');
             document.getElementById('gameArea').innerHTML = '';
+            
             tokens = 0;
             timeLeft = 20;
             updateUI();
@@ -239,7 +253,7 @@
             clearInterval(gameTimer);
             clearInterval(spawnTimer);
 
-            spawnTimer = setInterval(spawnFish, 800);
+            spawnTimer = setInterval(spawnFish, 750);
             gameTimer = setInterval(() => {
                 timeLeft--;
                 document.getElementById('timer').textContent = timeLeft;
@@ -255,16 +269,18 @@
             const isWhale = Math.random() < 0.15;
             const val = isWhale ? 25000 : 5000;
             fish.textContent = isWhale ? '🐋' : fishList[Math.floor(Math.random() * 3)];
-            fish.style.top = Math.random() * 60 + 15 + '%';
+            fish.style.top = Math.random() * 65 + 10 + '%';
             fish.style.fontSize = isWhale ? '55px' : '45px';
             
             fish.onclick = () => catchFish(fish, val);
             document.getElementById('gameArea').appendChild(fish);
 
             let pos = window.innerWidth;
+            const speed = isWhale ? 3.5 : 2.8;
+            
             const move = setInterval(() => {
                 if (!gameOn || !fish.parentNode) { clearInterval(move); return; }
-                pos -= 3;
+                pos -= speed;
                 fish.style.left = pos + 'px';
                 if (pos < -60) {
                     clearInterval(move);
@@ -275,7 +291,7 @@
 
         function catchFish(fish, val) {
             if (!gameOn) return;
-            playBeep(900, 80);
+            playBeep(val > 10000 ? 1100 : 850, 90);
             tokens += val;
             updateUI();
 
@@ -294,6 +310,7 @@
             gameOn = false;
             clearInterval(gameTimer);
             clearInterval(spawnTimer);
+            document.getElementById('gameArea').innerHTML = '';
             document.getElementById('finalScore').textContent = 'You earned ' + tokens.toLocaleString() + ' LORCA!';
             document.getElementById('endScreen').classList.add('show');
         }
