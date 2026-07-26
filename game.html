@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LethalOrca - Play & Earn</title>
+    
+    <!-- External Fonts & Solana Web3 SDK -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { font-size: 16px; }
@@ -15,7 +19,6 @@
         
         /* Top Bar */
         .top-bar { position: absolute; top: 0; left: 0; right: 0; padding: 20px; background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        
         .top-bar-left { display: flex; gap: 30px; align-items: center; color: white; font-size: 18px; font-weight: bold; }
         .logo-box { width: 36px; height: 36px; border: 2px solid cyan; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,212,255,0.1); flex-shrink: 0; }
         .logo-box img { width: 32px; height: 32px; border-radius: 50%; object-fit: contain; background: transparent; }
@@ -36,10 +39,8 @@
         /* Game Area */
         .game-area { position: absolute; top: 70px; left: 0; right: 0; bottom: 0; background: inherit; overflow: hidden; }
         
-        /* Fish */
+        /* Fish & Elements */
         .fish { position: absolute; font-size: 45px; cursor: pointer; user-select: none; }
-        
-        /* Catch Text */
         .catch-text { position: absolute; font-size: 24px; font-weight: 700; color: gold; pointer-events: none; }
         
         /* End Screen */
@@ -47,134 +48,15 @@
         #endScreen.show { display: flex; }
         #endScreen h2 { font-size: 40px; margin-bottom: 20px; font-weight: 700; }
         
-        /* Congratulations Bubble - OPTIMIZED */
-        .congrats-bubble { 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.92); 
-            display: none; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 300; 
-            backdrop-filter: blur(8px);
-        }
-        .congrats-bubble.show { 
-            display: flex; 
-            animation: fadeInBackdrop 0.4s ease-out;
-        }
-        .congrats-content { 
-            background: linear-gradient(135deg, #000000 0%, #0a1428 50%, #000000 100%);
-            border: 2px solid #00ff88;
-            padding: 50px 60px;
-            border-radius: 20px;
-            text-align: center;
-            color: white;
-            max-width: 550px;
-            width: 85%;
-            box-shadow: 0 0 60px rgba(0,255,136,0.35), 0 0 100px rgba(0,217,255,0.15), inset 0 0 40px rgba(0,255,136,0.08);
-            animation: slideUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        .congrats-content::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0,255,136,0.08) 0%, transparent 70%);
-            animation: shine 4s ease-in-out infinite;
-            pointer-events: none;
-        }
-        .congrats-inner { 
-            position: relative; 
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-        .congrats-content h2 { 
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 42px; 
-            color: #00ff88;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-shadow: 0 0 25px rgba(0,255,136,0.5), 0 0 50px rgba(0,255,136,0.2);
-            animation: glow 2.5s ease-in-out infinite;
-            margin: 0;
-            line-height: 1.2;
-        }
-        .congrats-content .coins-amount { 
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 38px;
-            font-weight: 700;
-            color: #ffd700;
-            text-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.2);
-            animation: bounceIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-            margin: 6px 0;
-            letter-spacing: 0.5px;
-        }
-        .congrats-content .subtitle { 
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            color: #d0d0d0;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-            margin: 4px 0 0 0;
-            line-height: 1.4;
-        }
-        .congrats-content .sub-subtitle { 
-            font-size: 12px;
-            color: #888;
-            font-weight: 400;
-            letter-spacing: 0px;
-            margin: 2px 0 8px 0;
-        }
-        .congrats-close { 
-            background: linear-gradient(135deg, #00ff88, #00ffff);
-            color: #000;
-            border: none;
-            padding: 12px 40px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(0,255,136,0.35);
-            letter-spacing: 0.5px;
-            margin-top: 6px;
-        }
-        .congrats-close:hover { 
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(0,255,136,0.5);
-        }
-        .congrats-close:active { 
-            transform: translateY(-1px); 
-        }
-        @keyframes fadeInBackdrop { 
-            from { opacity: 0; } 
-            to { opacity: 1; } 
-        }
-        @keyframes slideUp { 
-            from { transform: translateY(50px) scale(0.9); opacity: 0; } 
-            to { transform: translateY(0) scale(1); opacity: 1; } 
-        }
-        @keyframes glow { 
-            0%, 100% { text-shadow: 0 0 25px rgba(0,255,136,0.5), 0 0 50px rgba(0,255,136,0.2); } 
-            50% { text-shadow: 0 0 40px rgba(0,255,136,0.8), 0 0 80px rgba(0,255,136,0.4); } 
-        }
-        @keyframes bounceIn { 
-            0% { transform: scale(0.3); opacity: 0; } 
-            50% { transform: scale(1.1); } 
-            100% { transform: scale(1); opacity: 1; } 
-        }
-        @keyframes shine { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
+        /* Congratulations Modal */
+        .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; align-items: center; justify-content: center; z-index: 300; backdrop-filter: blur(8px); }
+        .congrats-bubble.show { display: flex; animation: fadeInBackdrop 0.4s ease-out; }
+        .congrats-content { background: linear-gradient(135deg, #000000 0%, #0a1428 50%, #000000 100%); border: 2px solid #00ff88; padding: 50px 60px; border-radius: 20px; text-align: center; color: white; max-width: 550px; width: 85%; box-shadow: 0 0 60px rgba(0,255,136,0.35); position: relative; overflow: hidden; }
+        .congrats-inner { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .congrats-content h2 { font-family: 'Space Grotesk', sans-serif; font-size: 42px; color: #00ff88; font-weight: 700; }
+        .congrats-content .coins-amount { font-family: 'Space Grotesk', sans-serif; font-size: 38px; font-weight: 700; color: #ffd700; margin: 6px 0; }
+        .congrats-content .subtitle { font-family: 'Inter', sans-serif; font-size: 15px; color: #d0d0d0; }
+        .congrats-close { background: linear-gradient(135deg, #00ff88, #00ffff); color: #000; border: none; padding: 12px 40px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: 10px; margin-top: 10px; }
         
         /* Wallet Panel */
         #walletPanel { position: fixed; right: -350px; top: 0; width: 350px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 30px; overflow-y: auto; transition: right 0.3s; color: white; }
@@ -184,7 +66,6 @@
         .panel-btn { width: 100%; padding: 12px; margin-bottom: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; }
         .connect-btn { background: cyan; color: black; }
         .claim-airdrop-btn { background: linear-gradient(135deg, #ffd700, #ffed4e); color: black; font-weight: 700; }
-        .claim-airdrop-btn:hover { transform: scale(1.02); box-shadow: 0 4px 15px rgba(255,215,0,0.4); }
         .withdraw-btn { background: lime; color: black; }
         .disconnect-btn { background: none; border: 1px solid red; color: red; }
         .wallet-info { background: rgba(0,212,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 12px; font-size: 12px; }
@@ -192,12 +73,7 @@
         .info-value { color: cyan; font-family: monospace; word-break: break-all; }
         #walletConnected { display: none; }
         
-        @media (max-width: 600px) {
-            #walletPanel { width: 100%; right: -100%; }
-            .congrats-content { padding: 40px 30px; max-width: 90%; }
-            .congrats-content h2 { font-size: 32px; }
-            .congrats-content .coins-amount { font-size: 28px; }
-        }
+        @keyframes fadeInBackdrop { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -209,14 +85,13 @@
             <button class="start-btn" onclick="startGame()">Start Fishing</button>
         </div>
 
-        <!-- Congratulations Bubble -->
+        <!-- Congratulations Modal -->
         <div id="congratsBubble" class="congrats-bubble">
             <div class="congrats-content">
                 <div class="congrats-inner">
                     <h2>🎉 CONGRATULATIONS! 🎉</h2>
                     <div class="coins-amount" id="congratsAmount">+100,000</div>
                     <p class="subtitle" id="congratsText">You claimed 100,000 LORCA coins!</p>
-                    <p class="sub-subtitle">Ready to withdraw anytime</p>
                     <button class="congrats-close" onclick="closeCongrats()">✓ AWESOME!</button>
                 </div>
             </div>
@@ -254,7 +129,7 @@
             <div id="walletDisconnected">
                 <p style="font-size: 13px; margin-bottom: 15px; color: #aaa;">Connect Phantom wallet to start</p>
                 <button class="panel-btn connect-btn" onclick="connectPhantom()">Connect Phantom</button>
-                <div style="font-size: 12px; color: #888;">Install from phantom.app</div>
+                <div style="font-size: 12px; color: #888; margin-top: 8px;">Install from phantom.app</div>
             </div>
 
             <div id="walletConnected">
@@ -267,24 +142,15 @@
                     <div class="info-value" style="font-size: 18px; color: lime;"><span id="walletBal">0</span> LORCA</div>
                 </div>
                 
-                <div style="background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,237,74,0.2)); border: 2px solid #ffd700; padding: 15px; border-radius: 10px; margin-top: 20px;">
-                    <button class="panel-btn claim-airdrop-btn" id="claimBtn" onclick="claimAirdrop()" style="width: 100%; padding: 15px; font-size: 15px;">
+                <div style="background: rgba(255,215,0,0.1); border: 2px solid #ffd700; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                    <button class="panel-btn claim-airdrop-btn" id="claimBtn" onclick="claimAirdrop()">
                         🎁 CLAIM AIRDROP - 100K FREE!
                     </button>
-                    <p style="font-size: 11px; color: #ffd700; margin-top: 8px; text-align: center; font-weight: 600;">Click to receive 100,000 LORCA coins!</p>
                 </div>
                 
                 <button class="panel-btn withdraw-btn" id="withdrawBtn" onclick="withdraw()" style="margin-top: 12px;">
                     💰 Withdraw to Phantom
                 </button>
-                
-                <div style="background: rgba(0,255,255,0.1); border: 1px solid cyan; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 12px; color: #00ffff;">
-                    <strong>⚡ Game Features:</strong>
-                    <br>✓ 20 second game timer
-                    <br>✓ Free 100K LORCA airdrop
-                    <br>✓ Sound effects ON
-                    <br>✓ Devnet testing ready
-                </div>
                 
                 <button class="panel-btn disconnect-btn" onclick="disconnect()" style="margin-top: 15px;">
                     Disconnect Wallet
@@ -304,75 +170,46 @@
 
         const fishList = ['🐟', '🐠', '🐡'];
 
-        // ========== CELEBRATION MUSIC ==========
-        function playCelebration() {
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                
-                const notes = [
-                    { freq: 523, time: 0 },
-                    { freq: 659, time: 150 },
-                    { freq: 784, time: 300 },
-                    { freq: 1047, time: 450 }
-                ];
+        // Solana Network Setup (Devnet)
+        const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
 
-                notes.forEach(note => {
-                    setTimeout(() => {
-                        const oscillator = audioContext.createOscillator();
-                        const gainNode = audioContext.createGain();
-                        
-                        oscillator.connect(gainNode);
-                        gainNode.connect(audioContext.destination);
-                        
-                        oscillator.frequency.value = note.freq;
-                        oscillator.type = 'sine';
-                        
-                        gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
-                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-                        
-                        oscillator.start(audioContext.currentTime);
-                        oscillator.stop(audioContext.currentTime + 0.3);
-                    }, note.time);
-                });
-            } catch (e) {
-                console.log('Audio unavailable');
+        // Auto-detect Phantom on Page Load
+        window.addEventListener('load', async () => {
+            if (window.phantom?.solana?.isPhantom) {
+                try {
+                    const resp = await window.phantom.solana.connect({ onlyIfTrusted: true });
+                    handleWalletConnected(resp.publicKey.toString());
+                } catch (e) {
+                    // Not trusted or disconnected
+                }
             }
-        }
+        });
 
-        // ========== BEEP SOUND ==========
+        // AUDIO
         function playBeep(frequency = 800, duration = 100) {
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
-
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
-
                 oscillator.frequency.value = frequency;
-                oscillator.type = 'sine';
-
                 gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
-
-                oscillator.start(audioContext.currentTime);
+                oscillator.start();
                 oscillator.stop(audioContext.currentTime + duration / 1000);
-            } catch (e) {
-                console.log('Audio unavailable');
-            }
+            } catch (e) {}
         }
 
-        // START GAME
+        // GAME LOOP
         function startGame() {
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('endScreen').classList.remove('show');
             document.getElementById('gameArea').innerHTML = '';
             tokens = 0;
             timeLeft = 20;
-            document.getElementById('tokenCount').textContent = '0';
-            document.getElementById('walletBal').textContent = '0';
+            updateTokenUI();
             document.getElementById('timer').textContent = '20';
-            document.getElementById('congratsAmount').textContent = '+100,000';
             gameOn = true;
 
             spawnTimer = setInterval(spawnFish, 900);
@@ -383,14 +220,13 @@
             }, 1000);
         }
 
-        // SPAWN FISH
         function spawnFish() {
             if (!gameOn) return;
             const fish = document.createElement('div');
             fish.className = 'fish';
-            
             const isWhale = Math.random() < 0.15;
             const val = isWhale ? 25000 : 5000;
+            
             fish.textContent = isWhale ? '🐋' : fishList[Math.floor(Math.random() * 3)];
             fish.style.top = Math.random() * 50 + 20 + '%';
             fish.style.fontSize = isWhale ? '55px' : '45px';
@@ -399,11 +235,9 @@
             document.getElementById('gameArea').appendChild(fish);
 
             let pos = window.innerWidth;
-            const speed = 2;
-            
             const move = setInterval(() => {
                 if (!gameOn || !fish.parentNode) { clearInterval(move); return; }
-                pos -= speed;
+                pos -= 2;
                 fish.style.left = pos + 'px';
                 if (pos < -50) {
                     clearInterval(move);
@@ -412,15 +246,11 @@
             }, 20);
         }
 
-        // CATCH FISH
         function catchFish(fish, val) {
             if (!gameOn) return;
-            
             playBeep(800, 100);
-            
             tokens += val;
-            document.getElementById('tokenCount').textContent = tokens.toLocaleString();
-            document.getElementById('walletBal').textContent = tokens.toLocaleString();
+            updateTokenUI();
 
             const txt = document.createElement('div');
             txt.className = 'catch-text';
@@ -433,7 +263,6 @@
             fish.remove();
         }
 
-        // END GAME
         function endGame() {
             gameOn = false;
             clearInterval(gameTimer);
@@ -442,13 +271,14 @@
             document.getElementById('endScreen').classList.add('show');
         }
 
-        // CONGRATULATIONS
+        function updateTokenUI() {
+            document.getElementById('tokenCount').textContent = tokens.toLocaleString();
+            document.getElementById('walletBal').textContent = tokens.toLocaleString();
+        }
+
         function showCongrats(message, amount = null) {
-            playCelebration();
             document.getElementById('congratsText').textContent = message;
-            if (amount) {
-                document.getElementById('congratsAmount').textContent = '+' + amount.toLocaleString();
-            }
+            if (amount) document.getElementById('congratsAmount').textContent = '+' + amount.toLocaleString();
             document.getElementById('congratsBubble').classList.add('show');
         }
 
@@ -456,7 +286,7 @@
             document.getElementById('congratsBubble').classList.remove('show');
         }
 
-        // WALLET
+        // WALLET LOGIC
         function togglePanel() {
             document.getElementById('walletPanel').classList.toggle('open');
         }
@@ -464,21 +294,26 @@
         async function connectPhantom() {
             try {
                 const provider = window.phantom?.solana;
-                if (!provider) { alert('Install Phantom from phantom.app'); return; }
+                if (!provider) return alert('Install Phantom from phantom.app');
                 const res = await provider.connect();
-                userAddr = res.publicKey.toString();
-                document.getElementById('walletDisconnected').style.display = 'none';
-                document.getElementById('walletConnected').style.display = 'block';
-                document.getElementById('walletAddr').textContent = userAddr.slice(0, 8) + '...' + userAddr.slice(-8);
-                document.getElementById('walletBtn').classList.add('connected');
-                document.getElementById('walletBtn').textContent = '✓ Connected';
-                walletOk = true;
+                handleWalletConnected(res.publicKey.toString());
             } catch (e) {
-                alert('Error: ' + e.message);
+                alert('Connection Error: ' + e.message);
             }
         }
 
+        function handleWalletConnected(address) {
+            userAddr = address;
+            walletOk = true;
+            document.getElementById('walletDisconnected').style.display = 'none';
+            document.getElementById('walletConnected').style.display = 'block';
+            document.getElementById('walletAddr').textContent = userAddr.slice(0, 6) + '...' + userAddr.slice(-6);
+            document.getElementById('walletBtn').classList.add('connected');
+            document.getElementById('walletBtn').textContent = '✓ Connected';
+        }
+
         function disconnect() {
+            if (window.phantom?.solana) window.phantom.solana.disconnect();
             walletOk = false;
             userAddr = null;
             document.getElementById('walletDisconnected').style.display = 'block';
@@ -487,55 +322,46 @@
             document.getElementById('walletBtn').textContent = 'Connect Wallet';
         }
 
-        // ========== CLAIM AIRDROP ==========
-        function claimAirdrop() {
-            if (!walletOk) {
-                alert('❌ Connect Phantom wallet first');
-                return;
-            }
+        // AIRDROP & WITHDRAW
+        async function claimAirdrop() {
+            if (!walletOk) return alert('❌ Connect Phantom wallet first');
 
             const claimBtn = document.getElementById('claimBtn');
             claimBtn.disabled = true;
-            claimBtn.textContent = '⏳ Processing...';
+            claimBtn.textContent = '⏳ Processing Airdrop...';
 
             setTimeout(() => {
                 const airdropAmount = 100000;
                 tokens += airdropAmount;
-                document.getElementById('tokenCount').textContent = tokens.toLocaleString();
-                document.getElementById('walletBal').textContent = tokens.toLocaleString();
-                
-                showCongrats('You claimed 100,000 LORCA coins!\nReady to withdraw anytime!', airdropAmount);
-                
-                claimBtn.disabled = true;
+                updateTokenUI();
+                showCongrats('You claimed 100,000 LORCA coins!', airdropAmount);
                 claimBtn.textContent = '✓ Airdrop Claimed!';
                 claimBtn.style.opacity = '0.5';
-            }, 500);
+            }, 800);
         }
 
-        // ========== WITHDRAW - NO BUFFER ERROR ==========
-        function withdraw() {
-            if (!walletOk) { 
-                alert('❌ Connect Phantom wallet first'); 
-                return; 
-            }
-            if (tokens === 0) { 
-                alert('❌ No tokens to withdraw. Claim airdrop or play the game!'); 
-                return; 
-            }
-            
+        async function withdraw() {
+            if (!walletOk) return alert('❌ Connect Phantom wallet first');
+            if (tokens === 0) return alert('❌ No tokens to withdraw.');
+
             const btn = document.getElementById('withdrawBtn');
             btn.disabled = true;
-            btn.textContent = '⏳ Processing...';
+            btn.textContent = '⏳ Initiating On-Chain Withdrawal...';
 
-            setTimeout(() => {
-                showCongrats(`✅ Withdrawal Successful!\n${tokens.toLocaleString()} LORCA transferred!`, tokens);
-                
-                tokens = 0;
-                document.getElementById('tokenCount').textContent = '0';
-                document.getElementById('walletBal').textContent = '0';
+            try {
+                // Here you should connect to your backend to sign and mint SPL Tokens to userAddr
+                setTimeout(() => {
+                    showCongrats(`✅ Withdrawal Request Submitted!\n${tokens.toLocaleString()} LORCA processing.`, tokens);
+                    tokens = 0;
+                    updateTokenUI();
+                    btn.disabled = false;
+                    btn.textContent = '💰 Withdraw to Phantom';
+                }, 1200);
+            } catch (err) {
+                alert('Withdrawal Failed: ' + err.message);
                 btn.disabled = false;
                 btn.textContent = '💰 Withdraw to Phantom';
-            }, 800);
+            }
         }
     </script>
 </body>
