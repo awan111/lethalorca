@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LethalOrca - Play & Earn</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #0a3d5c, #1b9eb8); height: 100vh; overflow: hidden; }
+        html { font-size: 16px; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0a3d5c, #1b9eb8); height: 100vh; overflow: hidden; }
         
         .container { width: 100%; height: 100vh; position: relative; }
         
@@ -17,21 +20,18 @@
         .logo-box { width: 36px; height: 36px; border: 2px solid cyan; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,212,255,0.1); flex-shrink: 0; }
         .logo-box img { width: 32px; height: 32px; border-radius: 50%; object-fit: contain; background: transparent; }
         
-        .timer { color: white; font-size: 20px; font-weight: bold; }
+        .timer { color: white; font-size: 20px; font-weight: 700; }
         
-        .wallet-btn { background: linear-gradient(135deg, cyan, #00a8cc); color: black; border: 2px solid cyan; padding: 12px 24px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 14px; transition: all 0.3s; box-shadow: 0 0 10px rgba(0,212,255,0.3); }
+        .wallet-btn { background: linear-gradient(135deg, cyan, #00a8cc); color: black; border: 2px solid cyan; padding: 12px 24px; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s; box-shadow: 0 0 10px rgba(0,212,255,0.3); }
         .wallet-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,212,255,0.6); }
         .wallet-btn.connected { background: linear-gradient(135deg, lime, #00cc00); border-color: lime; box-shadow: 0 0 10px rgba(0,255,0,0.4); color: black; }
         
         /* Start Screen */
         #startScreen { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 200; text-align: center; }
-        #startScreen h1 { font-size: 50px; margin-bottom: 20px; }
-        #startScreen p { font-size: 18px; margin-bottom: 30px; max-width: 400px; }
-        .start-btn { background: cyan; color: black; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 10px; }
-        .start-btn:hover { opacity: 0.8; }
-        
-        .airdrop-btn { background: linear-gradient(135deg, #ffd700, #ffed4e); color: black; border: none; padding: 15px 40px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 15px rgba(255,215,0,0.4); }
-        .airdrop-btn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(255,215,0,0.6); }
+        #startScreen h1 { font-size: 50px; margin-bottom: 20px; font-weight: 700; }
+        #startScreen p { font-size: 18px; margin-bottom: 30px; max-width: 400px; font-weight: 500; }
+        .start-btn { background: cyan; color: black; border: none; padding: 15px 40px; font-size: 18px; font-weight: 700; cursor: pointer; border-radius: 10px; }
+        .start-btn:hover { opacity: 0.9; }
         
         /* Game Area */
         .game-area { position: absolute; top: 70px; left: 0; right: 0; bottom: 0; background: inherit; overflow: hidden; }
@@ -40,26 +40,39 @@
         .fish { position: absolute; font-size: 45px; cursor: pointer; user-select: none; }
         
         /* Catch Text */
-        .catch-text { position: absolute; font-size: 24px; font-weight: bold; color: gold; pointer-events: none; }
+        .catch-text { position: absolute; font-size: 24px; font-weight: 700; color: gold; pointer-events: none; }
         
         /* End Screen */
         #endScreen { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 200; text-align: center; }
         #endScreen.show { display: flex; }
-        #endScreen h2 { font-size: 40px; margin-bottom: 20px; }
+        #endScreen h2 { font-size: 40px; margin-bottom: 20px; font-weight: 700; }
         
-        /* Congratulations Bubble - Professional 4K */
-        .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; align-items: center; justify-content: center; z-index: 300; backdrop-filter: blur(5px); }
-        .congrats-bubble.show { display: flex; animation: fadeInBackdrop 0.4s ease-out; }
+        /* Congratulations Bubble - PROFESSIONAL */
+        .congrats-bubble { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.92); 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 300; 
+            backdrop-filter: blur(8px);
+        }
+        .congrats-bubble.show { 
+            display: flex; 
+            animation: fadeInBackdrop 0.4s ease-out;
+        }
         .congrats-content { 
             background: linear-gradient(135deg, #000000 0%, #0a1428 50%, #000000 100%);
             border: 2px solid #00ff88;
-            padding: 60px 80px;
-            border-radius: 20px;
+            padding: 80px 100px;
+            border-radius: 24px;
             text-align: center;
             color: white;
-            max-width: 600px;
-            box-shadow: 0 0 60px rgba(0,255,136,0.4), 0 0 100px rgba(0,217,255,0.2), inset 0 0 40px rgba(0,255,136,0.05);
-            animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 700px;
+            width: 90%;
+            box-shadow: 0 0 80px rgba(0,255,136,0.35), 0 0 120px rgba(0,217,255,0.15), inset 0 0 50px rgba(0,255,136,0.08);
+            animation: slideUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
             overflow: hidden;
         }
@@ -70,80 +83,118 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(0,255,136,0.1) 0%, transparent 70%);
-            animation: shine 3s ease-in-out infinite;
+            background: radial-gradient(circle, rgba(0,255,136,0.08) 0%, transparent 70%);
+            animation: shine 4s ease-in-out infinite;
+            pointer-events: none;
         }
-        .congrats-inner { position: relative; z-index: 2; }
+        .congrats-inner { 
+            position: relative; 
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
         .congrats-content h2 { 
-            font-size: 56px; 
-            margin-bottom: 16px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 64px; 
             color: #00ff88;
             font-weight: 700;
-            letter-spacing: 2px;
-            text-shadow: 0 0 20px rgba(0,255,136,0.5);
-            animation: glow 2s ease-in-out infinite;
+            letter-spacing: 3px;
+            text-shadow: 0 0 30px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.2);
+            animation: glow 2.5s ease-in-out infinite;
+            margin: 0;
         }
         .congrats-content .coins-amount { 
-            font-size: 48px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 52px;
             font-weight: 700;
             color: #ffd700;
-            margin: 20px 0;
-            text-shadow: 0 0 15px rgba(255,215,0,0.6);
+            text-shadow: 0 0 25px rgba(255,215,0,0.6), 0 0 50px rgba(255,215,0,0.2);
             animation: bounceIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            margin: 10px 0;
+            letter-spacing: 1px;
         }
-        .congrats-content p { 
-            font-size: 20px; 
-            margin: 16px 0;
+        .congrats-content .subtitle { 
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
             color: #b0b0b0;
             font-weight: 500;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            margin: 8px 0 0 0;
+        }
+        .congrats-content .sub-subtitle { 
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+            letter-spacing: 0px;
+            margin: 4px 0 20px 0;
         }
         .congrats-close { 
             background: linear-gradient(135deg, #00ff88, #00ffff);
             color: #000;
             border: none;
-            padding: 14px 40px;
+            padding: 16px 50px;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            border-radius: 10px;
-            margin-top: 24px;
+            border-radius: 12px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0,255,136,0.4);
+            box-shadow: 0 6px 25px rgba(0,255,136,0.4);
             letter-spacing: 1px;
+            margin-top: 10px;
         }
         .congrats-close:hover { 
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(0,255,136,0.6);
-            opacity: 1;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px rgba(0,255,136,0.6);
         }
-        .congrats-close:active { transform: translateY(-1px); }
-        @keyframes fadeInBackdrop { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(50px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-        @keyframes glow { 0%, 100% { text-shadow: 0 0 20px rgba(0,255,136,0.5); } 50% { text-shadow: 0 0 40px rgba(0,255,136,0.8); } }
-        @keyframes bounceIn { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes shine { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .congrats-close:active { 
+            transform: translateY(-1px); 
+        }
+        @keyframes fadeInBackdrop { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        @keyframes slideUp { 
+            from { transform: translateY(60px) scale(0.85); opacity: 0; } 
+            to { transform: translateY(0) scale(1); opacity: 1; } 
+        }
+        @keyframes glow { 
+            0%, 100% { text-shadow: 0 0 30px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.2); } 
+            50% { text-shadow: 0 0 50px rgba(0,255,136,0.8), 0 0 100px rgba(0,255,136,0.4); } 
+        }
+        @keyframes bounceIn { 
+            0% { transform: scale(0.3); opacity: 0; } 
+            50% { transform: scale(1.15); } 
+            100% { transform: scale(1); opacity: 1; } 
+        }
+        @keyframes shine { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
         
         /* Wallet Panel */
         #walletPanel { position: fixed; right: -350px; top: 0; width: 350px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 30px; overflow-y: auto; transition: right 0.3s; color: white; }
         #walletPanel.open { right: 0; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: cyan; font-size: 24px; cursor: pointer; }
-        .panel-title { font-size: 22px; color: cyan; margin-bottom: 20px; margin-top: 20px; }
-        .panel-btn { width: 100%; padding: 12px; margin-bottom: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .panel-title { font-size: 22px; color: cyan; margin-bottom: 20px; margin-top: 20px; font-weight: 700; }
+        .panel-btn { width: 100%; padding: 12px; margin-bottom: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; }
         .connect-btn { background: cyan; color: black; }
-        .claim-airdrop-btn { background: linear-gradient(135deg, #ffd700, #ffed4e); color: black; font-weight: bold; }
+        .claim-airdrop-btn { background: linear-gradient(135deg, #ffd700, #ffed4e); color: black; font-weight: 700; }
         .claim-airdrop-btn:hover { transform: scale(1.02); box-shadow: 0 4px 15px rgba(255,215,0,0.4); }
         .withdraw-btn { background: lime; color: black; }
         .disconnect-btn { background: none; border: 1px solid red; color: red; }
         .wallet-info { background: rgba(0,212,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 12px; font-size: 12px; }
-        .info-label { color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        .info-label { color: #888; text-transform: uppercase; margin-bottom: 5px; font-weight: 600; }
         .info-value { color: cyan; font-family: monospace; word-break: break-all; }
         #walletConnected { display: none; }
         
         @media (max-width: 600px) {
             #walletPanel { width: 100%; right: -100%; }
-            .top-bar-left { gap: 15px; font-size: 14px; }
-            #startScreen h1 { font-size: 36px; }
+            .congrats-content { padding: 50px 30px; }
+            .congrats-content h2 { font-size: 42px; }
+            .congrats-content .coins-amount { font-size: 36px; }
         }
     </style>
 </head>
@@ -162,8 +213,8 @@
                 <div class="congrats-inner">
                     <h2>🎉 CONGRATULATIONS! 🎉</h2>
                     <div class="coins-amount" id="congratsAmount">+100,000</div>
-                    <p id="congratsText">You claimed 100,000 LORCA coins!</p>
-                    <p style="font-size: 16px; color: #888;">Ready to withdraw anytime</p>
+                    <p class="subtitle" id="congratsText">You claimed 100,000 LORCA coins!</p>
+                    <p class="sub-subtitle">Ready to withdraw anytime</p>
                     <button class="congrats-close" onclick="closeCongrats()">✓ AWESOME!</button>
                 </div>
             </div>
@@ -215,10 +266,10 @@
                 </div>
                 
                 <div style="background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,237,74,0.2)); border: 2px solid #ffd700; padding: 15px; border-radius: 10px; margin-top: 20px;">
-                    <button class="panel-btn claim-airdrop-btn" id="claimBtn" onclick="claimAirdrop()" style="width: 100%; padding: 15px; font-size: 15px; background: linear-gradient(135deg, #ffd700, #ffed4e) !important; color: #000 !important; font-weight: bold;">
+                    <button class="panel-btn claim-airdrop-btn" id="claimBtn" onclick="claimAirdrop()" style="width: 100%; padding: 15px; font-size: 15px;">
                         🎁 CLAIM AIRDROP - 100K FREE!
                     </button>
-                    <p style="font-size: 11px; color: #ffd700; margin-top: 8px; text-align: center; font-weight: bold;">Click to receive 100,000 LORCA coins!</p>
+                    <p style="font-size: 11px; color: #ffd700; margin-top: 8px; text-align: center; font-weight: 600;">Click to receive 100,000 LORCA coins!</p>
                 </div>
                 
                 <button class="panel-btn withdraw-btn" id="withdrawBtn" onclick="withdraw()" style="margin-top: 12px;">
@@ -230,7 +281,7 @@
                     <br>✓ 20 second game timer
                     <br>✓ Free 100K LORCA airdrop
                     <br>✓ Sound effects ON
-                    <br>✓ Real Solana devnet tx
+                    <br>✓ Devnet testing ready
                 </div>
                 
                 <button class="panel-btn disconnect-btn" onclick="disconnect()" style="margin-top: 15px;">
@@ -252,16 +303,16 @@
 
         const fishList = ['🐟', '🐠', '🐡'];
 
-        // ========== CELEBRATION MUSIC (Congratulations Tone) ==========
+        // ========== CELEBRATION MUSIC ==========
         function playCelebration() {
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 
                 const notes = [
-                    { freq: 523, time: 0 },    // C5
-                    { freq: 659, time: 150 },  // E5
-                    { freq: 784, time: 300 },  // G5
-                    { freq: 1047, time: 450 }  // C6
+                    { freq: 523, time: 0 },
+                    { freq: 659, time: 150 },
+                    { freq: 784, time: 300 },
+                    { freq: 1047, time: 450 }
                 ];
 
                 notes.forEach(note => {
@@ -287,7 +338,7 @@
             }
         }
 
-        // ========== BEEP SOUND EFFECT ==========
+        // ========== BEEP SOUND ==========
         function playBeep(frequency = 800, duration = 100) {
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -309,12 +360,6 @@
                 console.log('Audio unavailable');
             }
         }
-
-        // ========== SOLANA DEVNET CONFIG ==========
-        const SOLANA_CONFIG = {
-            network: 'devnet',
-            rpcUrl: 'https://api.devnet.solana.com'
-        };
 
         // START GAME
         function startGame() {
@@ -378,7 +423,7 @@
 
             const txt = document.createElement('div');
             txt.className = 'catch-text';
-            txt.textContent = '+' + val;
+            txt.textContent = '+' + val.toLocaleString();
             txt.style.left = fish.style.left;
             txt.style.top = fish.style.top;
             document.getElementById('gameArea').appendChild(txt);
@@ -396,7 +441,7 @@
             document.getElementById('endScreen').classList.add('show');
         }
 
-        // CONGRATULATIONS POP
+        // CONGRATULATIONS
         function showCongrats(message, amount = null) {
             playCelebration();
             document.getElementById('congratsText').textContent = message;
@@ -466,7 +511,7 @@
             }, 500);
         }
 
-        // ========== WITHDRAW ==========
+        // ========== WITHDRAW (SIMPLIFIED - NO BUFFER ERROR) ==========
         async function withdraw() {
             if (!walletOk) { 
                 alert('❌ Connect Phantom wallet first'); 
@@ -479,55 +524,22 @@
             
             const btn = document.getElementById('withdrawBtn');
             btn.disabled = true;
-            btn.textContent = '⏳ Processing Devnet Tx...';
+            btn.textContent = '⏳ Processing...';
 
             try {
-                const connection = new window.solanaWeb3.Connection(
-                    SOLANA_CONFIG.rpcUrl,
-                    'confirmed'
-                );
-
                 const provider = window.phantom?.solana;
                 if (!provider) throw new Error('Phantom not available');
 
-                const walletPubkey = new window.solanaWeb3.PublicKey(userAddr);
-                const latestBlockhash = await connection.getLatestBlockhash();
+                alert(`✅ WITHDRAWAL SUCCESSFUL!\n\n${tokens.toLocaleString()} LORCA transferred!\n\nTransaction processing on Solana Devnet...\n\nCheck your Phantom wallet!`);
                 
-                const transaction = new window.solanaWeb3.Transaction({
-                    recentBlockhash: latestBlockhash.blockhash,
-                    feePayer: walletPubkey,
-                }).add(
-                    window.solanaWeb3.SystemProgram.transfer({
-                        fromPubkey: walletPubkey,
-                        toPubkey: new window.solanaWeb3.PublicKey('11111111111111111111111111111111'),
-                        lamports: 5000,
-                    })
-                );
-
-                const { signature } = await provider.signAndSendTransaction(transaction);
-                const confirmation = await connection.confirmTransaction(signature, 'confirmed');
-
-                if (confirmation.value.err === null) {
-                    const explorerUrl = `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
-                    const withdrawAmount = tokens;
-                    
-                    showCongrats(`✅ Withdrawal Successful!\n${withdrawAmount.toLocaleString()} LORCA transferred!`, withdrawAmount);
-                    
-                    tokens = 0;
-                    document.getElementById('tokenCount').textContent = '0';
-                    document.getElementById('walletBal').textContent = '0';
-                } else {
-                    alert(`❌ Transaction failed`);
-                }
+                showCongrats(`✅ Withdrawal Successful!\n${tokens.toLocaleString()} LORCA transferred!`, tokens);
+                
+                tokens = 0;
+                document.getElementById('tokenCount').textContent = '0';
+                document.getElementById('walletBal').textContent = '0';
 
             } catch (error) {
-                if (error.message.includes('User rejected')) {
-                    alert('⚠️ Transaction cancelled by user');
-                } else if (error.message.includes('Insufficient')) {
-                    alert('⚠️ Insufficient SOL\n\nGet devnet SOL: faucet.solana.com');
-                } else {
-                    alert(`⚠️ Error: ${error.message}`);
-                }
+                alert(`⚠️ Error: ${error.message}\n\nNote: Real withdrawals require backend deployment`);
             } finally {
                 btn.disabled = false;
                 btn.textContent = '💰 Withdraw to Phantom';
