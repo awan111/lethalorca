@@ -43,26 +43,26 @@
         #endScreen.show { display: flex; }
         #endScreen h2 { font-size: 40px; margin-bottom: 20px; font-weight: 700; }
         
-        /* Congratulations Pop-up (High Z-Index) */
+        /* Congratulations Pop-up Overlay (Top Priority) */
         .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(8px); }
         .congrats-bubble.show { display: flex; animation: fadeIn 0.3s ease-out; }
-        .congrats-content { background: linear-gradient(135deg, #051923 0%, #003554 100%); border: 3px solid #00ff88; padding: 40px; border-radius: 20px; text-align: center; color: white; max-width: 450px; width: 90%; box-shadow: 0 0 50px rgba(0,255,136,0.5); }
+        .congrats-content { background: linear-gradient(135deg, #051923 0%, #003554 100%); border: 3px solid #00ff88; padding: 35px 40px; border-radius: 20px; text-align: center; color: white; max-width: 450px; width: 90%; box-shadow: 0 0 50px rgba(0,255,136,0.5); }
         .congrats-content h2 { font-size: 32px; color: #00ff88; font-weight: 700; margin-bottom: 10px; }
         .congrats-content .coins-amount { font-size: 36px; font-weight: 700; color: #ffd700; margin: 15px 0; }
         .congrats-close { background: linear-gradient(135deg, #00ff88, #00ffff); color: #000; border: none; padding: 12px 35px; font-weight: 700; cursor: pointer; border-radius: 10px; margin-top: 15px; font-size: 16px; }
 
         /* Wallet Panel */
-        #walletPanel { position: fixed; right: -350px; top: 0; width: 350px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 25px; overflow-y: auto; transition: right 0.3s; color: white; }
+        #walletPanel { position: fixed; right: -360px; top: 0; width: 360px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 25px; overflow-y: auto; transition: right 0.3s; color: white; }
         #walletPanel.open { right: 0; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: cyan; font-size: 24px; cursor: pointer; }
-        .panel-title { font-size: 22px; color: cyan; margin-bottom: 20px; font-weight: 700; }
-        .panel-btn { width: 100%; padding: 12px; margin-bottom: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; }
-        .connect-btn { background: cyan; color: black; }
+        .panel-title { font-size: 22px; color: cyan; margin-bottom: 15px; font-weight: 700; }
+        .panel-btn { width: 100%; padding: 12px; margin-bottom: 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .connect-btn { background: cyan; color: black; font-size: 14px; }
         .reward-btn { background: linear-gradient(135deg, #ffd700, #ffed4e); color: black; font-weight: 700; }
         .reward-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #555; color: #aaa; }
-        .withdraw-btn { background: lime; color: black; font-weight: 700; }
+        .withdraw-btn { background: lime; color: black; font-weight: 700; font-size: 15px; margin-top: 10px; }
         .disconnect-btn { background: none; border: 1px solid red; color: red; }
-        .wallet-info { background: rgba(0,212,255,0.1); padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; }
+        .wallet-info { background: rgba(0,212,255,0.1); padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; }
         .info-label { color: #888; text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
         .info-value { color: cyan; font-family: monospace; word-break: break-all; }
         #walletConnected { display: none; }
@@ -130,27 +130,37 @@
                     <div class="info-value" style="font-size: 18px; color: lime;"><span id="walletBal">0</span> LORCA</div>
                 </div>
                 
-                <!-- Rewards Section -->
-                <div style="margin-top: 15px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; border: 1px solid rgba(0,255,255,0.2);">
-                    <button class="panel-btn reward-btn" id="dailyBtn" onclick="claimDaily()">
-                        📅 Daily Reward (500 LORCA)
-                    </button>
+                <!-- 4 Rewards Options Section -->
+                <div style="margin-top: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; border: 1px solid rgba(0,255,255,0.2);">
+                    <p style="font-size: 12px; color: cyan; margin-bottom: 8px; font-weight: 700;">🎁 CLAIMABLE REWARDS:</p>
                     
+                    <!-- Option 1: Login Claim -->
+                    <button class="panel-btn reward-btn" id="loginBtn" onclick="claimLoginBonus()">
+                        🔑 Login Bonus (500 LORCA)
+                    </button>
+
+                    <!-- Option 2: Free Airdrop -->
+                    <button class="panel-btn reward-btn" id="airdropBtn" onclick="claimAirdrop()">
+                        🎁 Free Airdrop (500 LORCA)
+                    </button>
+
+                    <!-- Option 3: Hourly Reward -->
                     <button class="panel-btn reward-btn" id="hourlyBtn" onclick="claimHourly()">
                         ⏱️ Hourly Reward (500 LORCA)
                     </button>
-                    
-                    <button class="panel-btn reward-btn" id="airdropBtn" onclick="claimAirdrop()">
-                        🎁 Airdrop (500 LORCA)
+
+                    <!-- Option 4: Daily Reward -->
+                    <button class="panel-btn reward-btn" id="dailyBtn" onclick="claimDaily()">
+                        📅 Daily Reward (500 LORCA)
                     </button>
                 </div>
                 
                 <!-- Withdraw Button -->
-                <button class="panel-btn withdraw-btn" id="withdrawBtn" onclick="withdraw()" style="margin-top: 15px;">
+                <button class="panel-btn withdraw-btn" id="withdrawBtn" onclick="withdraw()">
                     💰 Withdraw LORCA
                 </button>
                 
-                <button class="panel-btn disconnect-btn" onclick="disconnect()" style="margin-top: 15px;">
+                <button class="panel-btn disconnect-btn" onclick="disconnect()" style="margin-top: 10px;">
                     Disconnect Wallet
                 </button>
             </div>
@@ -253,12 +263,12 @@
             document.getElementById('walletBal').textContent = walletBalance.toLocaleString();
         }
 
-        // CONGRATS POPUP TRIGGER
         function showCongrats(msg, amt) {
             document.getElementById('congratsText').textContent = msg;
             document.getElementById('congratsAmount').textContent = typeof amt === 'number' ? '+' + amt : amt;
             document.getElementById('congratsBubble').classList.add('show');
         }
+
         function closeCongrats() {
             document.getElementById('congratsBubble').classList.remove('show');
         }
@@ -293,19 +303,25 @@
             document.getElementById('walletBtn').textContent = 'Connect Wallet';
         }
 
+        // REWARD TIMERS & STATES
         function checkRewardTimers() {
             const now = Date.now();
             const lastDaily = localStorage.getItem('lastDaily') || 0;
             const lastHourly = localStorage.getItem('lastHourly') || 0;
 
-            if (now - lastDaily < 86400000) {
-                document.getElementById('dailyBtn').disabled = true;
-                document.getElementById('dailyBtn').textContent = '📅 Daily Claimed';
-            } else {
-                document.getElementById('dailyBtn').disabled = false;
-                document.getElementById('dailyBtn').textContent = '📅 Daily Reward (500 LORCA)';
+            // 1. Login Claim
+            if (localStorage.getItem('loginClaimed')) {
+                document.getElementById('loginBtn').disabled = true;
+                document.getElementById('loginBtn').textContent = '🔑 Login Bonus Claimed';
             }
 
+            // 2. Airdrop
+            if (localStorage.getItem('airdropClaimed')) {
+                document.getElementById('airdropBtn').disabled = true;
+                document.getElementById('airdropBtn').textContent = '🎁 Airdrop Claimed';
+            }
+
+            // 3. Hourly (1 hour)
             if (now - lastHourly < 3600000) {
                 document.getElementById('hourlyBtn').disabled = true;
                 document.getElementById('hourlyBtn').textContent = '⏱️ Hourly Claimed';
@@ -314,27 +330,23 @@
                 document.getElementById('hourlyBtn').textContent = '⏱️ Hourly Reward (500 LORCA)';
             }
 
-            if (localStorage.getItem('airdropClaimed')) {
-                document.getElementById('airdropBtn').disabled = true;
-                document.getElementById('airdropBtn').textContent = '🎁 Airdrop Claimed';
+            // 4. Daily (24 hours)
+            if (now - lastDaily < 86400000) {
+                document.getElementById('dailyBtn').disabled = true;
+                document.getElementById('dailyBtn').textContent = '📅 Daily Claimed';
+            } else {
+                document.getElementById('dailyBtn').disabled = false;
+                document.getElementById('dailyBtn').textContent = '📅 Daily Reward (500 LORCA)';
             }
         }
 
-        function claimDaily() {
+        // CLAIM FUNCTIONS WITH CONGRATS POPUP
+        function claimLoginBonus() {
             if (!walletOk) return alert('Connect Phantom Wallet first');
             walletBalance += 500;
-            localStorage.setItem('lastDaily', Date.now());
+            localStorage.setItem('loginClaimed', 'true');
             updateBalanceDisplay();
-            showCongrats('You claimed 500 LORCA Daily Reward!', 500);
-            checkRewardTimers();
-        }
-
-        function claimHourly() {
-            if (!walletOk) return alert('Connect Phantom Wallet first');
-            walletBalance += 500;
-            localStorage.setItem('lastHourly', Date.now());
-            updateBalanceDisplay();
-            showCongrats('You claimed 500 LORCA Hourly Reward!', 500);
+            showCongrats('You claimed 500 LORCA Login Bonus!', 500);
             checkRewardTimers();
         }
 
@@ -347,6 +359,25 @@
             checkRewardTimers();
         }
 
+        function claimHourly() {
+            if (!walletOk) return alert('Connect Phantom Wallet first');
+            walletBalance += 500;
+            localStorage.setItem('lastHourly', Date.now());
+            updateBalanceDisplay();
+            showCongrats('You claimed 500 LORCA Hourly Reward!', 500);
+            checkRewardTimers();
+        }
+
+        function claimDaily() {
+            if (!walletOk) return alert('Connect Phantom Wallet first');
+            walletBalance += 500;
+            localStorage.setItem('lastDaily', Date.now());
+            updateBalanceDisplay();
+            showCongrats('You claimed 500 LORCA Daily Reward!', 500);
+            checkRewardTimers();
+        }
+
+        // WITHDRAW VIA BACKEND
         async function withdraw() {
             if (!walletOk || !userAddr) return alert('❌ Connect Phantom wallet first');
             if (walletBalance === 0) return alert('❌ No tokens to withdraw. Play or claim rewards!');
