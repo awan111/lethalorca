@@ -43,13 +43,13 @@
         #endScreen.show { display: flex; }
         #endScreen h2 { font-size: 40px; margin-bottom: 20px; font-weight: 700; }
         
-        /* Congratulations Pop-up */
-        .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; align-items: center; justify-content: center; z-index: 300; backdrop-filter: blur(8px); }
-        .congrats-bubble.show { display: flex; animation: fadeInBackdrop 0.4s ease-out; }
-        .congrats-content { background: linear-gradient(135deg, #000000 0%, #0a1428 50%, #000000 100%); border: 2px solid #00ff88; padding: 40px 50px; border-radius: 20px; text-align: center; color: white; max-width: 500px; width: 85%; box-shadow: 0 0 60px rgba(0,255,136,0.35); }
-        .congrats-content h2 { font-size: 36px; color: #00ff88; font-weight: 700; }
-        .congrats-content .coins-amount { font-size: 32px; font-weight: 700; color: #ffd700; margin: 10px 0; }
-        .congrats-close { background: linear-gradient(135deg, #00ff88, #00ffff); color: #000; border: none; padding: 12px 30px; font-weight: 700; cursor: pointer; border-radius: 10px; margin-top: 15px; }
+        /* Congratulations Pop-up (High Z-Index) */
+        .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(8px); }
+        .congrats-bubble.show { display: flex; animation: fadeIn 0.3s ease-out; }
+        .congrats-content { background: linear-gradient(135deg, #051923 0%, #003554 100%); border: 3px solid #00ff88; padding: 40px; border-radius: 20px; text-align: center; color: white; max-width: 450px; width: 90%; box-shadow: 0 0 50px rgba(0,255,136,0.5); }
+        .congrats-content h2 { font-size: 32px; color: #00ff88; font-weight: 700; margin-bottom: 10px; }
+        .congrats-content .coins-amount { font-size: 36px; font-weight: 700; color: #ffd700; margin: 15px 0; }
+        .congrats-close { background: linear-gradient(135deg, #00ff88, #00ffff); color: #000; border: none; padding: 12px 35px; font-weight: 700; cursor: pointer; border-radius: 10px; margin-top: 15px; font-size: 16px; }
 
         /* Wallet Panel */
         #walletPanel { position: fixed; right: -350px; top: 0; width: 350px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 25px; overflow-y: auto; transition: right 0.3s; color: white; }
@@ -67,7 +67,7 @@
         .info-value { color: cyan; font-family: monospace; word-break: break-all; }
         #walletConnected { display: none; }
         
-        @keyframes fadeInBackdrop { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -79,12 +79,12 @@
             <button class="start-btn" onclick="startGame()">Start Fishing</button>
         </div>
 
-        <!-- Congratulations Bubble -->
+        <!-- Congratulations Pop-up -->
         <div id="congratsBubble" class="congrats-bubble">
             <div class="congrats-content">
                 <h2>🎉 CONGRATULATIONS! 🎉</h2>
                 <div class="coins-amount" id="congratsAmount">+500</div>
-                <p id="congratsText">You claimed 500 LORCA coins!</p>
+                <p id="congratsText" style="font-size: 16px; color: #e0e0e0;">You claimed 500 LORCA coins!</p>
                 <button class="congrats-close" onclick="closeCongrats()">✓ AWESOME!</button>
             </div>
         </div>
@@ -158,8 +158,8 @@
     </div>
 
     <script>
-        let walletBalance = 0; // Persistent Balance (Zero Nahi Hoga)
-        let roundScore = 0;   // Current Round Score
+        let walletBalance = 0;
+        let roundScore = 0;
         let timeLeft = 20;
         let gameOn = false;
         let walletOk = false;
@@ -169,7 +169,6 @@
 
         const fishList = ['🐠', '🐟', '🐡'];
 
-        // Sound FX
         function playBeep(freq = 800, dur = 100) {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -183,15 +182,12 @@
             } catch(e) {}
         }
 
-        // START GAME
         function startGame() {
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('endScreen').classList.remove('show');
             document.getElementById('gameArea').innerHTML = '';
             roundScore = 0;
             timeLeft = 20;
-            
-            // Sync display with saved total balance
             updateBalanceDisplay();
             document.getElementById('timer').textContent = '20';
             gameOn = true;
@@ -210,7 +206,7 @@
             fish.className = 'fish';
             
             const isWhale = Math.random() < 0.15;
-            const val = 20; // 20 LORCA per catch
+            const val = 20;
             fish.textContent = isWhale ? '🐋' : fishList[Math.floor(Math.random() * 3)];
             fish.style.top = Math.random() * 50 + 20 + '%';
             fish.style.fontSize = isWhale ? '55px' : '45px';
@@ -231,7 +227,7 @@
             if (!gameOn) return;
             playBeep(800, 100);
             roundScore += val;
-            walletBalance += val; // Total wallet balance mein add ho gaya
+            walletBalance += val;
             updateBalanceDisplay();
 
             const txt = document.createElement('div');
@@ -257,17 +253,16 @@
             document.getElementById('walletBal').textContent = walletBalance.toLocaleString();
         }
 
-        // CONGRATS POPUP
+        // CONGRATS POPUP TRIGGER
         function showCongrats(msg, amt) {
             document.getElementById('congratsText').textContent = msg;
-            document.getElementById('congratsAmount').textContent = '+' + amt;
+            document.getElementById('congratsAmount').textContent = typeof amt === 'number' ? '+' + amt : amt;
             document.getElementById('congratsBubble').classList.add('show');
         }
         function closeCongrats() {
             document.getElementById('congratsBubble').classList.remove('show');
         }
 
-        // WALLET
         function togglePanel() {
             document.getElementById('walletPanel').classList.toggle('open');
             checkRewardTimers();
@@ -298,13 +293,11 @@
             document.getElementById('walletBtn').textContent = 'Connect Wallet';
         }
 
-        // REWARD TIMERS CHECK
         function checkRewardTimers() {
             const now = Date.now();
             const lastDaily = localStorage.getItem('lastDaily') || 0;
             const lastHourly = localStorage.getItem('lastHourly') || 0;
 
-            // Daily 24 Hours (86400000 ms)
             if (now - lastDaily < 86400000) {
                 document.getElementById('dailyBtn').disabled = true;
                 document.getElementById('dailyBtn').textContent = '📅 Daily Claimed';
@@ -313,7 +306,6 @@
                 document.getElementById('dailyBtn').textContent = '📅 Daily Reward (500 LORCA)';
             }
 
-            // Hourly 1 Hour (3600000 ms)
             if (now - lastHourly < 3600000) {
                 document.getElementById('hourlyBtn').disabled = true;
                 document.getElementById('hourlyBtn').textContent = '⏱️ Hourly Claimed';
@@ -322,34 +314,30 @@
                 document.getElementById('hourlyBtn').textContent = '⏱️ Hourly Reward (500 LORCA)';
             }
 
-            // Airdrop Claimed Check
             if (localStorage.getItem('airdropClaimed')) {
                 document.getElementById('airdropBtn').disabled = true;
                 document.getElementById('airdropBtn').textContent = '🎁 Airdrop Claimed';
             }
         }
 
-        // CLAIM DAILY
         function claimDaily() {
             if (!walletOk) return alert('Connect Phantom Wallet first');
             walletBalance += 500;
             localStorage.setItem('lastDaily', Date.now());
             updateBalanceDisplay();
-            showCongrats('You claimed your 500 LORCA Daily Reward!', 500);
+            showCongrats('You claimed 500 LORCA Daily Reward!', 500);
             checkRewardTimers();
         }
 
-        // CLAIM HOURLY
         function claimHourly() {
             if (!walletOk) return alert('Connect Phantom Wallet first');
             walletBalance += 500;
             localStorage.setItem('lastHourly', Date.now());
             updateBalanceDisplay();
-            showCongrats('You claimed your 500 LORCA Hourly Reward!', 500);
+            showCongrats('You claimed 500 LORCA Hourly Reward!', 500);
             checkRewardTimers();
         }
 
-        // CLAIM AIRDROP
         function claimAirdrop() {
             if (!walletOk) return alert('Connect Phantom Wallet first');
             walletBalance += 500;
@@ -359,7 +347,6 @@
             checkRewardTimers();
         }
 
-        // WITHDRAW VIA BACKEND
         async function withdraw() {
             if (!walletOk || !userAddr) return alert('❌ Connect Phantom wallet first');
             if (walletBalance === 0) return alert('❌ No tokens to withdraw. Play or claim rewards!');
@@ -383,7 +370,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showCongrats(`✅ Transfer Successful!\nTx: ${data.data.txHash.slice(0, 12)}...`, withdrawAmount);
+                    showCongrats(`✅ Withdrawal Successful!\nTx: ${data.data.txHash.slice(0, 10)}...`, `${withdrawAmount} LORCA`);
                     walletBalance = 0;
                     updateBalanceDisplay();
                 } else {
