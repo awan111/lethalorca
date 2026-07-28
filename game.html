@@ -377,7 +377,7 @@
             checkRewardTimers();
         }
 
-        // WITHDRAW VIA BACKEND
+        // WITHDRAW VIA LOCAL BACKEND (UPDATED)
         async function withdraw() {
             if (!walletOk || !userAddr) return alert('❌ Connect Phantom wallet first');
             if (walletBalance === 0) return alert('❌ No tokens to withdraw. Play or claim rewards!');
@@ -388,27 +388,32 @@
 
             const withdrawAmount = walletBalance;
 
+            // Scores ko backend formula (score * 10) ke hisab se calculate karna:
+            const scoreToSubmit = Math.max(10, Math.floor(withdrawAmount / 10));
+
             try {
-                const response = await fetch('https://lethalorca-backend-qc6b.vercel.app/api/withdraw', {
+                const response = await fetch('http://localhost:5000/api/withdraw', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        receiverAddress: userAddr,
-                        amount: withdrawAmount
+                        playerWallet: userAddr,
+                        score: scoreToSubmit
                     })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    showCongrats(`✅ Withdrawal Successful!\nTx: ${data.data.txHash.slice(0, 10)}...`, `${withdrawAmount} LORCA`);
+                    const txShort = data.txSignature ? data.txSignature.slice(0, 10) + '...' : 'Done';
+                    showCongrats(`✅ Withdrawal Successful!\nTx: ${txShort}`, `${withdrawAmount} LORCA`);
                     walletBalance = 0;
                     updateBalanceDisplay();
                 } else {
                     alert('❌ Withdrawal Failed: ' + data.message);
                 }
             } catch (error) {
-                alert("❌ Server / Network Error. Please try again!");
+                console.error("Error:", error);
+                alert("❌ Server Offline or Connection Error. Make sure 'node server.js' is running!");
             } finally {
                 btn.disabled = false;
                 btn.textContent = '💰 Withdraw LORCA';
