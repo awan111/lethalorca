@@ -170,12 +170,14 @@
 
     <script>
         // -------------------------------------------------------------
-        // WEB3 & SOLANA CONFIGURATION
+        // SOLANA RPC & WEB3 CONFIGURATION
         // -------------------------------------------------------------
-        const RPC_URL = "https://api.devnet.solana.com"; // Devnet URL (production mainnet API URL post karein yahan)
+        const RPC_URL = "https://api.devnet.solana.com"; 
         let connection = null;
+
         if (typeof solanaWeb3 !== 'undefined') {
             connection = new solanaWeb3.Connection(RPC_URL, 'confirmed');
+            console.log("Solana RPC Connected:", RPC_URL);
         }
 
         let walletBalance = 0;
@@ -295,7 +297,7 @@
             try {
                 const provider = window.solana || window.phantom?.solana;
                 if (!provider || !provider.isPhantom) { 
-                    alert('Phantom Wallet install nahi hai! Pehle Extension install karein.'); 
+                    alert('Phantom Wallet install nahi hai! Pehle Extension/App install karein.'); 
                     return; 
                 }
                 const res = await provider.connect();
@@ -311,9 +313,9 @@
                 
                 walletOk = true;
                 checkRewardTimers();
-                console.log("Wallet connected:", userAddr);
+                console.log("Phantom Connected:", userAddr);
             } catch (e) { 
-                console.error("Connection error:", e);
+                console.error("Phantom Connection Error:", e);
                 alert('Connection Failed: ' + e.message); 
             }
         }
@@ -399,7 +401,7 @@
         }
 
         // -------------------------------------------------------------
-        // WITHDRAW FUNCTION (WITH BACKEND API & SOLANA RPC SUPPORT)
+        // WITHDRAW FUNCTION (WEB3 BLOCKHASH & BACKEND API INTEGRATION)
         // -------------------------------------------------------------
         async function withdraw() {
             if (!walletOk || !userAddr) return alert('❌ Connect Phantom wallet first');
@@ -407,12 +409,18 @@
             
             const btn = document.getElementById('withdrawBtn');
             btn.disabled = true;
-            btn.textContent = '⏳ Transferring LORCA...';
+            btn.textContent = '⏳ Processing Withdrawal...';
 
             const withdrawAmount = walletBalance;
 
             try {
-                // Backend Withdrawal Call
+                // Step 1: Optional Blockhash Fetch Test via Web3 Connection
+                if (connection) {
+                    const latestBlockhash = await connection.getLatestBlockhash();
+                    console.log("Solana RPC Latest Blockhash:", latestBlockhash.blockhash);
+                }
+
+                // Step 2: Send Withdrawal Request to Vercel Backend API
                 const response = await fetch('https://lethalorca-backend-qc6b.vercel.app/api/withdraw', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -432,8 +440,8 @@
                     alert('❌ Withdrawal Failed: ' + data.message);
                 }
             } catch (error) {
-                console.error("Backend Error, fallback check:", error);
-                alert("❌ Server / Network Error. Please try again!");
+                console.error("Withdrawal Error:", error);
+                alert("❌ Withdrawal Request Error: " + error.message);
             } finally {
                 btn.disabled = false;
                 btn.textContent = '💰 Withdraw LORCA';
