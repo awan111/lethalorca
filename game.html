@@ -8,24 +8,53 @@
     <!-- Solana Web3 SDK (CDN) -->
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
 
-    <!-- 1. CSS STYLES (Single File mein Design) -->
+    <!-- 1. CSS STYLES (Game Modal & Responsive Fixes) -->
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             background-color: #0d1b2a;
             color: #ffffff;
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Modal Overlay for Game Integration */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Game Canvas ke upar show karne ke liye */
         }
 
         .container {
-            max-width: 600px;
-            margin: auto;
+            width: 90%;
+            max-width: 480px;
             background: #1b263b;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            border: 1px solid #415a77;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #e0e1dd;
         }
 
         button {
@@ -33,11 +62,13 @@
             color: #fff;
             border: none;
             padding: 12px 20px;
-            margin: 10px;
+            margin: 8px 0;
+            width: 100%;
             font-size: 16px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
+            transition: all 0.2s ease;
         }
 
         button:hover {
@@ -45,102 +76,162 @@
             color: #000;
         }
 
+        button:disabled {
+            background-color: #555555;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
         .status-box {
             background: #415a77;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 8px;
             margin: 15px 0;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .status-box p {
+            margin: 6px 0;
+            word-break: break-all;
+        }
+
+        .status-val {
+            font-weight: bold;
+            color: #90e0ef;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>🐋 LethalOrca Web3 Panel</h1>
-        
-        <div class="status-box">
-            <p>Wallet Status: <span id="walletStatus">Not Connected</span></p>
-            <p>LORCA Balance: <span id="balance">0</span> LORCA</p>
-        </div>
+    <!-- Pop-up Wrapper for Game Integration -->
+    <div class="modal-overlay" id="web3Modal">
+        <div class="container">
+            <h1>🐋 LethalOrca Web3 Panel</h1>
+            
+            <div class="status-box">
+                <p>Wallet Status: <span id="walletStatus" class="status-val">Not Connected</span></p>
+                <p>LORCA Balance: <span id="balance" class="status-val">0</span> LORCA</p>
+            </div>
 
-        <button id="connectBtn" onclick="connectPhantom()">Connect Phantom Wallet</button>
-        <button id="claimBtn" onclick="claimGeneratedLorca()">Sign Tx & Transfer LORCA</button>
+            <button id="connectBtn" onclick="connectPhantom()">Connect Phantom Wallet</button>
+            <button id="claimBtn" onclick="claimGeneratedLorca()">Sign Tx & Transfer LORCA</button>
+        </div>
     </div>
 
-    <!-- 2. JAVASCRIPT & WEB3 LOGIC (Single File mein Code) -->
+    <!-- 2. JAVASCRIPT & FIXED WEB3 LOGIC -->
     <script>
-        // -------------------------------------------------------------
-        // RPC SETUP (Public URL 403 deta hai, is liye Devnet ya Helius URL use karein)
-        // -------------------------------------------------------------
-        
-        // Option A: Free Devnet Testing URL
+        // RPC Setup
         const RPC_URL = "https://api.devnet.solana.com"; 
-        
-        // Option B: Helius Mainnet URL (Jab Mainnet par shift hona ho to apni API Key dalein):
-        // const RPC_URL = "https://mainnet.helius-rpc.com/?api-key=YOUR_HELIUS_API_KEY";
-
         const connection = new solanaWeb3.Connection(RPC_URL, 'confirmed');
 
         let userWalletAddress = null;
+
+        // Safe Phantom Provider Fetch (Game loop safe)
+        function getPhantomProvider() {
+            if ("solana" in window) {
+                const provider = window.solana;
+                if (provider.isPhantom) {
+                    return provider;
+                }
+            }
+            return null;
+        }
 
         // -------------------------------------------------------------
         // PHANTOM CONNECT FUNCTION
         // -------------------------------------------------------------
         async function connectPhantom() {
-            try {
-                if ("solana" in window) {
-                    const provider = window.solana;
-                    if (provider.isPhantom) {
-                        const response = await provider.connect();
-                        userWalletAddress = response.publicKey.toString();
-                        
-                        document.getElementById("walletStatus").innerText = "Connected: " + userWalletAddress.slice(0, 6) + "..." + userWalletAddress.slice(-4);
-                        console.log("Connected Wallet:", userWalletAddress);
-                    }
-                } else {
-                    alert("Phantom Wallet install nahi hai! Pehle Extension install karein.");
-                }
-            } catch (err) {
-                console.error("Connection Error:", err);
-            }
-        }
+            const provider = getPhantomProvider();
 
-        // -------------------------------------------------------------
-        // CLAIM / TRANSFER FUNCTION (FIXED BLOCKHASH ERROR)
-        // -------------------------------------------------------------
-        async function claimGeneratedLorca() {
-            if (!userWalletAddress) {
-                alert("Pehle Wallet Connect Karein!");
+            if (!provider) {
+                alert("Phantom Wallet install nahi hai! Pehle Extension install karein.");
+                window.open("https://phantom.app/", "_blank");
                 return;
             }
 
             try {
-                console.log("Fetching Blockhash from RPC...");
+                const response = await provider.connect();
+                userWalletAddress = response.publicKey.toString();
                 
-                // 1. Get Latest Blockhash (403 error yahan aata tha jab public mainnet blocked ho)
-                const { blockhash } = await connection.getLatestBlockhash('finalized');
-                console.log("Blockhash fetched successfully:", blockhash);
+                // UI Label Update
+                document.getElementById("walletStatus").innerText = 
+                    userWalletAddress.slice(0, 6) + "..." + userWalletAddress.slice(-4);
+                
+                console.log("Connected Wallet:", userWalletAddress);
 
-                // 2. Transaction Create karein
+            } catch (err) {
+                console.error("Connection Error:", err);
+                alert("Wallet Connect nahi ho saka!");
+            }
+        }
+
+        // -------------------------------------------------------------
+        // CLAIM / TRANSFER FUNCTION (FIXED INSTRUCTION & BLOCKHASH)
+        // -------------------------------------------------------------
+        async function claimGeneratedLorca() {
+            const provider = getPhantomProvider();
+
+            if (!userWalletAddress || !provider) {
+                alert("Pehle Wallet Connect Karein!");
+                return;
+            }
+
+            const claimBtn = document.getElementById("claimBtn");
+            claimBtn.disabled = true;
+            claimBtn.innerText = "Processing Transaction...";
+
+            try {
+                console.log("Fetching Blockhash from RPC...");
+                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+
+                // 1. Create Transaction
                 const transaction = new solanaWeb3.Transaction({
                     recentBlockhash: blockhash,
-                    feePayer: window.solana.publicKey
+                    feePayer: provider.publicKey
                 });
 
-                // (Yahan aap ki LORCA Token transfer ki instructions ayegi)
+                // 2. Add Valid Instruction (Phantom prompt tabhi open hota hai jab instruction maujood ho)
+                transaction.add(
+                    solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: provider.publicKey,
+                        toPubkey: provider.publicKey, // Testing ke liye Self-transfer
+                        lamports: 1000 // 0.000001 SOL
+                    })
+                );
+
                 console.log("Sending Transaction to Phantom for Signature...");
 
-                // 3. Phantom se sign karwayein
-                const { signature } = await window.solana.signAndSendTransaction(transaction);
-                console.log("Transaction Success Signature:", signature);
+                // 3. Request Signature from Wallet
+                const { signature } = await provider.signAndSendTransaction(transaction);
+                
+                console.log("Waiting for network confirmation:", signature);
+                await connection.confirmTransaction({
+                    blockhash: blockhash,
+                    lastValidBlockHeight: lastValidBlockHeight,
+                    signature: signature
+                });
 
-                alert("Transaction Successful! Hash: " + signature);
+                alert("Transaction Successful!\nHash: " + signature);
 
             } catch (error) {
                 console.error("Transfer Error Details:", error);
-                alert("Transaction Failed! Console (Ctrl+Shift+J) dekhein.");
+                alert("Transaction Cancel ya Fail ho gayi! Console dekhein.");
+            } finally {
+                claimBtn.disabled = false;
+                claimBtn.innerText = "Sign Tx & Transfer LORCA";
             }
         }
+
+        // Auto-detect existing wallet connection on load
+        window.addEventListener('load', () => {
+            const provider = getPhantomProvider();
+            if (provider && provider.isConnected && provider.publicKey) {
+                userWalletAddress = provider.publicKey.toString();
+                document.getElementById("walletStatus").innerText = 
+                    userWalletAddress.slice(0, 6) + "..." + userWalletAddress.slice(-4);
+            }
+        });
     </script>
 </body>
 </html>
