@@ -6,6 +6,10 @@
     <title>LethalOrca - Play & Earn P2E Arena</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Solana Web3.js SDK for On-Chain Transfers -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { font-size: 16px; }
@@ -14,7 +18,7 @@
         .container { width: 100%; height: 100vh; position: relative; }
         
         /* Top Bar */
-        .top-bar { position: absolute; top: 0; left: 0; right: 0; padding: 20px; background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .top-bar { position: absolute; top: 0; left: 0; right: 0; padding: 20px; background: rgba(0,0,0,0.6); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
         .top-bar-left { display: flex; gap: 30px; align-items: center; color: white; font-size: 18px; font-weight: bold; }
         .logo-box { width: 36px; height: 36px; border: 2px solid cyan; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,212,255,0.1); flex-shrink: 0; }
         
@@ -29,7 +33,7 @@
         #startScreen h1 { font-size: 50px; margin-bottom: 10px; font-weight: 700; }
         #startScreen p { font-size: 16px; margin-bottom: 20px; max-width: 450px; font-weight: 500; color: #a0aec0; }
         
-        /* P2E Pool Card on Start Screen */
+        /* P2E Pool Card */
         .p2e-card { background: rgba(0,212,255,0.08); border: 2px solid cyan; border-radius: 15px; padding: 20px; margin-bottom: 25px; width: 90%; max-width: 400px; box-shadow: 0 0 20px rgba(0,212,255,0.2); }
         .pool-title { font-size: 14px; color: #00ff88; font-weight: bold; text-transform: uppercase; }
         .pool-amount { font-size: 36px; font-weight: 800; color: #ffd700; margin: 5px 0; }
@@ -59,16 +63,31 @@
         .rank-3 { color: #cd7f32; font-weight: bold; }
 
         /* Congratulations Pop-up Overlay */
-        .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(8px); }
+        .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 99999; backdrop-filter: blur(8px); }
         .congrats-bubble.show { display: flex; animation: fadeIn 0.3s ease-out; }
         .congrats-content { background: linear-gradient(135deg, #051923 0%, #003554 100%); border: 3px solid #00ff88; padding: 35px 40px; border-radius: 20px; text-align: center; color: white; max-width: 450px; width: 90%; box-shadow: 0 0 50px rgba(0,255,136,0.5); }
         .congrats-content h2 { font-size: 32px; color: #00ff88; font-weight: 700; margin-bottom: 10px; }
         .congrats-content .coins-amount { font-size: 36px; font-weight: 700; color: #ffd700; margin: 15px 0; }
         .congrats-close { background: linear-gradient(135deg, #00ff88, #00ffff); color: #000; border: none; padding: 12px 35px; font-weight: 700; cursor: pointer; border-radius: 10px; margin-top: 15px; font-size: 16px; }
 
-        /* Wallet Panel */
-        #walletPanel { position: fixed; right: -360px; top: 0; width: 360px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 25px; overflow-y: auto; transition: right 0.3s; color: white; }
+        /* FIXED: Wallet Panel High Z-Index & Visibility */
+        #walletPanel { 
+            position: fixed; 
+            right: -380px; 
+            top: 0; 
+            width: 360px; 
+            height: 100vh; 
+            background: #051923; 
+            border-left: 2px solid cyan; 
+            z-index: 10000; /* Highest priority to fix soft/blur issue */
+            padding: 25px; 
+            overflow-y: auto; 
+            transition: right 0.3s ease-in-out; 
+            color: white; 
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+        }
         #walletPanel.open { right: 0; }
+        
         .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: cyan; font-size: 24px; cursor: pointer; }
         .panel-title { font-size: 22px; color: cyan; margin-bottom: 15px; font-weight: 700; }
         .panel-btn { width: 100%; padding: 12px; margin-bottom: 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
@@ -90,7 +109,7 @@
         <!-- Start Screen -->
         <div id="startScreen">
             <h1>🐋 LethalOrca P2E</h1>
-            <p>Pay entry fee, catch fish to set high score & win the Prize Pool!</p>
+            <p>Pay entry fee via Phantom, catch fish & win the Prize Pool!</p>
             
             <div class="p2e-card">
                 <div class="pool-title">🏆 Hourly Prize Pool</div>
@@ -143,13 +162,13 @@
         <!-- Game Area -->
         <div class="game-area" id="gameArea"></div>
 
-        <!-- Wallet Panel -->
+        <!-- Wallet Panel (Side Menu) -->
         <div id="walletPanel">
             <button class="close-btn" onclick="togglePanel()">✕</button>
             <div class="panel-title">Wallet & Rewards</div>
 
             <div id="walletDisconnected">
-                <p style="font-size: 13px; margin-bottom: 15px; color: #aaa;">Connect Phantom wallet to claim rewards & withdraw</p>
+                <p style="font-size: 13px; margin-bottom: 15px; color: #aaa;">Connect Phantom wallet to play & claim rewards</p>
                 <button class="panel-btn connect-btn" onclick="connectPhantom()">Connect Phantom</button>
             </div>
 
@@ -159,7 +178,7 @@
                     <div class="info-value" id="walletAddr">—</div>
                 </div>
                 <div class="wallet-info">
-                    <div class="info-label">Available Balance</div>
+                    <div class="info-label">Earned Score Balance</div>
                     <div class="info-value" style="font-size: 18px; color: lime;"><span id="walletBal">0</span> LORCA</div>
                 </div>
                 
@@ -197,6 +216,9 @@
     </div>
 
     <script>
+        // CONFIGURATION: Set your Solana wallet receiver address here
+        const RECEIVER_WALLET_ADDRESS = "YOUR_RECEIVER_WALLET_ADDRESS"; // <-- REPLACE WITH YOUR SOLANA WALLET ADDRESS
+        
         let walletBalance = 0;
         let roundScore = 0;
         let timeLeft = 20;
@@ -206,7 +228,6 @@
         let gameTimer = null;
         let spawnTimer = null;
 
-        // P2E System Variables
         let totalPrizePool = 1250;
         const entryFee = 100;
         let leaderboard = [
@@ -217,11 +238,9 @@
 
         const fishList = ['🐠', '🐟', '🐡'];
 
-        // Get Phantom Provider Helper
         function getPhantomProvider() {
-            if ('phantom' in window) {
-                const provider = window.phantom?.solana;
-                if (provider?.isPhantom) return provider;
+            if ('phantom' in window && window.phantom?.solana?.isPhantom) {
+                return window.phantom.solana;
             }
             if ('solana' in window && window.solana?.isPhantom) {
                 return window.solana;
@@ -229,7 +248,6 @@
             return null;
         }
 
-        // Auto Connect on Load if already trusted
         window.addEventListener('load', async () => {
             const provider = getPhantomProvider();
             if (provider) {
@@ -258,7 +276,7 @@
         async function connectPhantom() {
             const provider = getPhantomProvider();
             if (!provider) {
-                alert('Phantom Wallet not detected! Please install Phantom browser extension or open this site inside Phantom Mobile App.');
+                alert('Phantom Wallet not detected! Please install Phantom browser extension or use Phantom Mobile App.');
                 return false;
             }
             try {
@@ -266,7 +284,7 @@
                 setWalletConnected(res.publicKey.toString());
                 return true;
             } catch (e) {
-                console.error('Wallet connection error:', e);
+                console.error('Wallet connect failed:', e);
                 return false;
             }
         }
@@ -283,26 +301,47 @@
         }
 
         async function payEntryAndStart() {
-            // Auto prompt wallet connection if not connected
+            const provider = getPhantomProvider();
             if (!walletOk) {
                 const connected = await connectPhantom();
                 if (!connected) return; 
             }
 
-            // Check for entry fee balance
-            if (walletBalance < entryFee) {
-                alert(`Insufficient LORCA! You need ${entryFee} LORCA entry fee to play. Please claim free rewards from Wallet side menu!`);
-                togglePanel(); // Open panel automatically so user can claim bonus
-                return;
+            const btn = document.getElementById('startBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Confirm Transaction in Phantom...';
+
+            try {
+                // Real On-Chain Transfer (Triggering Phantom Pop-Up)
+                const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
+                const transaction = new solanaWeb3.Transaction().add(
+                    solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: provider.publicKey,
+                        toPubkey: new solanaWeb3.PublicKey(RECEIVER_WALLET_ADDRESS === "YOUR_RECEIVER_WALLET_ADDRESS" ? provider.publicKey.toString() : RECEIVER_WALLET_ADDRESS),
+                        lamports: 1000000 // Sample micro-transfer or token transfer logic
+                    })
+                );
+
+                transaction.feePayer = provider.publicKey;
+                let { blockhash } = await connection.getLatestBlockhash();
+                transaction.recentBlockhash = blockhash;
+
+                // Prompt user to approve transaction in Phantom
+                const { signature } = await provider.signAndSendTransaction(transaction);
+                console.log("Transaction Signature:", signature);
+
+                // Transaction Success -> Start Game
+                totalPrizePool += Math.floor(entryFee * 0.80);
+                document.getElementById('startPrizePool').textContent = `${totalPrizePool.toLocaleString()} LORCA`;
+                
+                startGame();
+            } catch (error) {
+                console.error("Payment rejected or failed:", error);
+                alert("❌ Payment Cancelled or Failed! You must confirm 100 LORCA entry fee in Phantom to play.");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Pay 100 LORCA & Start';
             }
-
-            walletBalance -= entryFee;
-            totalPrizePool += Math.floor(entryFee * 0.80); // 80% added to prize pool
-            
-            document.getElementById('startPrizePool').textContent = `${totalPrizePool.toLocaleString()} LORCA`;
-            updateBalanceDisplay();
-
-            startGame();
         }
 
         function startGame() {
@@ -426,7 +465,6 @@
             document.getElementById('walletBtn').textContent = 'Connect Wallet';
         }
 
-        // REWARD TIMERS & STATES
         function checkRewardTimers() {
             const now = Date.now();
             const lastDaily = localStorage.getItem('lastDaily') || 0;
