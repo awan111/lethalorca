@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LethalOrca - Play & Earn</title>
+    
+    <!-- Solana Web3 SDK CDN (Solana Blockchain Connection ke liye) -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -43,7 +47,7 @@
         #endScreen.show { display: flex; }
         #endScreen h2 { font-size: 40px; margin-bottom: 20px; font-weight: 700; }
         
-        /* Congratulations Pop-up Overlay (Top Priority) */
+        /* Congratulations Pop-up Overlay */
         .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(8px); }
         .congrats-bubble.show { display: flex; animation: fadeIn 0.3s ease-out; }
         .congrats-content { background: linear-gradient(135deg, #051923 0%, #003554 100%); border: 3px solid #00ff88; padding: 35px 40px; border-radius: 20px; text-align: center; color: white; max-width: 450px; width: 90%; box-shadow: 0 0 50px rgba(0,255,136,0.5); }
@@ -168,6 +172,17 @@
     </div>
 
     <script>
+        // -------------------------------------------------------------
+        // HELIUS MAINNET RPC SETUP (403 Error Se Bachnay Ke Liye)
+        // -------------------------------------------------------------
+        const HELIUS_RPC = "https://mainnet.helius-rpc.com/?api-key=e99cd0cc-21ab-4628-b44e-1da0b88f0f26";
+        let solanaConnection = null;
+        
+        if (typeof solanaWeb3 !== 'undefined') {
+            solanaConnection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
+            console.log("Connected to Helius Solana RPC!");
+        }
+
         let walletBalance = 0;
         let roundScore = 0;
         let timeLeft = 20;
@@ -280,8 +295,8 @@
 
         async function connectPhantom() {
             try {
-                const provider = window.phantom?.solana;
-                if (!provider) { alert('Install Phantom from phantom.app'); return; }
+                const provider = window.phantom?.solana || window.solana;
+                if (!provider || !provider.isPhantom) { alert('Install Phantom from phantom.app'); return; }
                 const res = await provider.connect();
                 userAddr = res.publicKey.toString();
                 document.getElementById('walletDisconnected').style.display = 'none';
@@ -408,7 +423,7 @@
                     alert('❌ Withdrawal Failed: ' + data.message);
                 }
             } catch (error) {
-                alert("❌ Server / Network Error. Please try again!");
+                alert("❌ Server / Network Error. Please check Vercel CORS or network!");
             } finally {
                 btn.disabled = false;
                 btn.textContent = '💰 Withdraw LORCA';
