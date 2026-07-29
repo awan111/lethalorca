@@ -284,10 +284,9 @@
     </div>
 
     <script>
-        // --- WEB3 CONFIGURATION ---
-        // Yahan apna real Master Wallet address aur LORCA Token Mint address dalein:
-        const MASTER_WALLET_ADDRESS = "YOUR_MASTER_WALLET_SOL_ADDRESS_HERE";
-        const LORCA_TOKEN_MINT = "YOUR_LORCA_TOKEN_MINT_ADDRESS_HERE";
+        // --- WEB3 CONFIGURATION (UPDATED WITH YOUR EXACT ADDRESSES) ---
+        const MASTER_WALLET_ADDRESS = "EeNDDkvVzqL6TBLVhPCH4GJEKsZeC4g4zD21tLu4UtWS";
+        const LORCA_TOKEN_MINT = "7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump";
 
         let walletBalance = 0;
         let roundScore = 0;
@@ -512,7 +511,6 @@
             checkRewardTimers();
         }
 
-        // --- REAL WEB3 ON-CHAIN TRANSACTIONS ---
         let currentDepCapital = 0;
         let currentDepTotalReturn = 0;
         let generatorTimer = null;
@@ -579,12 +577,11 @@
                 const provider = window.phantom?.solana;
                 const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
                 
-                // Real Phantom Transaction trigger
                 const transaction = new solanaWeb3.Transaction().add(
                     solanaWeb3.SystemProgram.transfer({
                         fromPubkey: new solanaWeb3.PublicKey(userAddr),
                         toPubkey: new solanaWeb3.PublicKey(MASTER_WALLET_ADDRESS),
-                        lamports: 1000 // Small network fee or placeholder lamport interaction
+                        lamports: 1000 
                     })
                 );
 
