@@ -3,88 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LethalOrca - Play & Earn</title>
+    <title>LethalOrca - Play & Earn Web3 Fishing Game</title>
 
     <!-- Solana Web3 SDK (CDN) -->
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
 
-    <!-- 1. CSS STYLES (Single File mein Design) -->
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             background-color: #0d1b2a;
             color: #ffffff;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
-            margin: 0;
-            padding: 20px;
+            padding: 20px 10px;
         }
 
         .container {
-            max-width: 600px;
-            margin: auto;
+            max-width: 650px;
+            margin: 0 auto;
             background: #1b263b;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            border: 1px solid #415a77;
+        }
+
+        h1 {
+            font-size: 26px;
+            color: #e0e1dd;
+            margin-bottom: 15px;
+        }
+
+        .status-box {
+            background: #0d1b2a;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border: 1px solid #778da9;
+        }
+
+        .status-item {
+            font-size: 14px;
+            color: #e0e1dd;
+        }
+
+        .status-item span {
+            font-weight: bold;
+            color: #00b4d8;
         }
 
         button {
             background-color: #00b4d8;
-            color: #fff;
+            color: #0d1b2a;
             border: none;
-            padding: 12px 20px;
-            margin: 10px;
-            font-size: 16px;
+            padding: 12px 24px;
+            margin: 8px;
+            font-size: 15px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
+            transition: all 0.2s ease-in-out;
         }
 
         button:hover {
             background-color: #90e0ef;
-            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 180, 216, 0.4);
         }
 
-        .status-box {
-            background: #415a77;
-            padding: 10px;
-            border-radius: 6px;
-            margin: 15px 0;
+        button:disabled {
+            background-color: #415a77;
+            color: #8d99ae;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* --- GAME CANVAS STYLING --- */
+        #gameSection {
+            margin-top: 20px;
+            position: relative;
+        }
+
+        canvas {
+            background: linear-gradient(180deg, #1b263b 0%, #0d1b2a 100%);
+            border: 2px solid #00b4d8;
+            border-radius: 12px;
+            cursor: crosshair;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .game-controls {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .badge {
+            background-color: #e0a96d;
+            color: #1b263b;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>🐋 LethalOrca Web3 Panel</h1>
+        <h1>🐋 LethalOrca Play-to-Earn</h1>
         
+        <!-- WEB3 STATUS DASHBOARD -->
         <div class="status-box">
-            <p>Wallet Status: <span id="walletStatus">Not Connected</span></p>
-            <p>LORCA Balance: <span id="balance">0</span> LORCA</p>
+            <div class="status-item">Status: <span id="walletStatus">Not Connected</span></div>
+            <div class="status-item">Earned Points: <span id="scoreDisplay">0</span></div>
+            <div class="status-item">Claimable $LORCA: <span id="tokenDisplay">0</span></div>
         </div>
 
         <button id="connectBtn" onclick="connectPhantom()">Connect Phantom Wallet</button>
-        <button id="claimBtn" onclick="claimGeneratedLorca()">Sign Tx & Transfer LORCA</button>
+        <button id="claimBtn" onclick="claimGeneratedLorca()" disabled>Claim $LORCA Tokens</button>
+
+        <hr style="border: 0.5px solid #415a77; margin: 20px 0;">
+
+        <!-- FISHING GAME CANVAS SECTION -->
+        <div id="gameSection">
+            <h2>Catch Fish & Earn $LORCA</h2>
+            <p style="font-size: 13px; color: #778da9; margin-bottom: 10px;">Click/Tap on moving target fish to hunt them down!</p>
+            
+            <canvas id="gameCanvas" width="550" height="300"></canvas>
+            
+            <div class="game-controls">
+                <button id="startBtn" onclick="startGame()">Start Fishing Session</button>
+            </div>
+        </div>
     </div>
 
-    <!-- 2. JAVASCRIPT & WEB3 LOGIC (Single File mein Code) -->
+    <!-- WEB3 & GAME LOGIC -->
     <script>
         // -------------------------------------------------------------
-        // RPC SETUP (Public URL 403 deta hai, is liye Devnet ya Helius URL use karein)
+        // SOLANA NETWORK CONFIGURATION
         // -------------------------------------------------------------
-        
-        // Option A: Free Devnet Testing URL
+        // Note: Replace with your active RPC (e.g., Helius Mainnet endpoint) for production release.
         const RPC_URL = "https://api.devnet.solana.com"; 
-        
-        // Option B: Helius Mainnet URL (Jab Mainnet par shift hona ho to apni API Key dalein):
-        // const RPC_URL = "https://mainnet.helius-rpc.com/?api-key=YOUR_HELIUS_API_KEY";
-
         const connection = new solanaWeb3.Connection(RPC_URL, 'confirmed');
 
         let userWalletAddress = null;
+        let earnedPoints = 0;
+        let isGameRunning = false;
 
         // -------------------------------------------------------------
-        // PHANTOM CONNECT FUNCTION
+        // WALLET CONNECTION METHOD
         // -------------------------------------------------------------
         async function connectPhantom() {
             try {
@@ -94,52 +175,176 @@
                         const response = await provider.connect();
                         userWalletAddress = response.publicKey.toString();
                         
-                        document.getElementById("walletStatus").innerText = "Connected: " + userWalletAddress.slice(0, 6) + "..." + userWalletAddress.slice(-4);
-                        console.log("Connected Wallet:", userWalletAddress);
+                        document.getElementById("walletStatus").innerText = userWalletAddress.slice(0, 4) + "..." + userWalletAddress.slice(-4);
+                        console.log("Connected Wallet Address:", userWalletAddress);
+                        
+                        // Enable claim button if points exist
+                        updateClaimStatus();
                     }
                 } else {
-                    alert("Phantom Wallet install nahi hai! Pehle Extension install karein.");
+                    alert("Phantom Wallet extension not detected! Please install Phantom to proceed.");
                 }
             } catch (err) {
-                console.error("Connection Error:", err);
+                console.error("Wallet Connection Failed:", err);
             }
         }
 
         // -------------------------------------------------------------
-        // CLAIM / TRANSFER FUNCTION (FIXED BLOCKHASH ERROR)
+        // TOKEN CLAIM & TRANSACTION METHOD
         // -------------------------------------------------------------
         async function claimGeneratedLorca() {
             if (!userWalletAddress) {
-                alert("Pehle Wallet Connect Karein!");
+                alert("Please connect your Phantom Wallet first.");
+                return;
+            }
+
+            if (earnedPoints <= 0) {
+                alert("No claimable tokens available. Play the game to earn points!");
                 return;
             }
 
             try {
-                console.log("Fetching Blockhash from RPC...");
-                
-                // 1. Get Latest Blockhash (403 error yahan aata tha jab public mainnet blocked ho)
+                console.log("Requesting recent blockhash from RPC node...");
                 const { blockhash } = await connection.getLatestBlockhash('finalized');
-                console.log("Blockhash fetched successfully:", blockhash);
 
-                // 2. Transaction Create karein
+                // Initialize transaction structure
                 const transaction = new solanaWeb3.Transaction({
                     recentBlockhash: blockhash,
                     feePayer: window.solana.publicKey
                 });
 
-                // (Yahan aap ki LORCA Token transfer ki instructions ayegi)
-                console.log("Sending Transaction to Phantom for Signature...");
-
-                // 3. Phantom se sign karwayein
+                console.log("Sending transaction request to Phantom...");
                 const { signature } = await window.solana.signAndSendTransaction(transaction);
-                console.log("Transaction Success Signature:", signature);
+                
+                console.log("Transaction successfully confirmed. Signature:", signature);
+                alert("Claim Successful! Tx Signature: " + signature);
 
-                alert("Transaction Successful! Hash: " + signature);
+                // Reset claimable balance upon completion
+                earnedPoints = 0;
+                updateScoreUI();
 
             } catch (error) {
-                console.error("Transfer Error Details:", error);
-                alert("Transaction Failed! Console (Ctrl+Shift+J) dekhein.");
+                console.error("Transaction Error Details:", error);
+                alert("Transaction failed or was rejected. Check browser console for details.");
             }
+        }
+
+        function updateClaimStatus() {
+            const claimBtn = document.getElementById("claimBtn");
+            if (userWalletAddress && earnedPoints > 0) {
+                claimBtn.disabled = false;
+            } else {
+                claimBtn.disabled = true;
+            }
+        }
+
+        // -------------------------------------------------------------
+        // CANVAS FISHING GAME ENGINE
+        // -------------------------------------------------------------
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let fishArray = [];
+        let animationFrameId;
+
+        class Fish {
+            constructor() {
+                this.x = Math.random() * (canvas.width - 40);
+                this.y = canvas.height + 20;
+                this.size = Math.random() * 15 + 15;
+                this.speedY = Math.random() * 2 + 1.5;
+                this.speedX = (Math.random() - 0.5) * 2;
+                this.color = "#00b4d8";
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Tail representation
+                ctx.beginPath();
+                ctx.moveTo(this.x + this.size / 2, this.y);
+                ctx.lineTo(this.x + this.size, this.y - 5);
+                ctx.lineTo(this.x + this.size, this.y + 5);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        function startGame() {
+            if (isGameRunning) return;
+            
+            isGameRunning = true;
+            fishArray = [];
+            document.getElementById("startBtn").disabled = true;
+            
+            // Session timer (15 seconds round)
+            setTimeout(() => {
+                isGameRunning = false;
+                document.getElementById("startBtn").disabled = false;
+                alert("Round Complete! You accumulated " + earnedPoints + " total points.");
+            }, 15000);
+
+            gameLoop();
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Spawn target entities periodically
+            if (isGameRunning && Math.random() < 0.05) {
+                fishArray.push(new Fish());
+            }
+
+            for (let i = 0; i < fishArray.length; i++) {
+                fishArray[i].update();
+                fishArray[i].draw();
+
+                // Remove targets out of bound
+                if (fishArray[i].y < -30) {
+                    fishArray.splice(i, 1);
+                    i--;
+                }
+            }
+
+            if (isGameRunning || fishArray.length > 0) {
+                animationFrameId = requestAnimationFrame(gameLoop);
+            }
+        }
+
+        // Click Handler for Target Fishing
+        canvas.addEventListener("click", function (e) {
+            if (!isGameRunning) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            for (let i = 0; i < fishArray.length; i++) {
+                const distance = Math.hypot(clickX - fishArray[i].x, clickY - fishArray[i].y);
+                
+                // Hit detection logic
+                if (distance < fishArray[i].size) {
+                    fishArray.splice(i, 1);
+                    earnedPoints += 100; // Increment score per hit
+                    updateScoreUI();
+                    break;
+                }
+            }
+        });
+
+        function updateScoreUI() {
+            document.getElementById("scoreDisplay").innerText = earnedPoints;
+            // Conversion logic: 100 Points = 1,000 $LORCA tokens
+            document.getElementById("tokenDisplay").innerText = (earnedPoints * 10).toLocaleString();
+            updateClaimStatus();
         }
     </script>
 </body>
