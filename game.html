@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LethalOrca - Play & Earn</title>
     
-    <!-- Solana Web3 SDK CDN (Solana Blockchain Connection ke liye) -->
+    <!-- Solana Web3 SDK CDN -->
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -134,26 +134,22 @@
                     <div class="info-value" style="font-size: 18px; color: lime;"><span id="walletBal">0</span> LORCA</div>
                 </div>
                 
-                <!-- 4 Rewards Options Section -->
+                <!-- Rewards Section -->
                 <div style="margin-top: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; border: 1px solid rgba(0,255,255,0.2);">
                     <p style="font-size: 12px; color: cyan; margin-bottom: 8px; font-weight: 700;">🎁 CLAIMABLE REWARDS:</p>
                     
-                    <!-- Option 1: Login Claim -->
                     <button class="panel-btn reward-btn" id="loginBtn" onclick="claimLoginBonus()">
                         🔑 Login Bonus (500 LORCA)
                     </button>
 
-                    <!-- Option 2: Free Airdrop -->
                     <button class="panel-btn reward-btn" id="airdropBtn" onclick="claimAirdrop()">
                         🎁 Free Airdrop (500 LORCA)
                     </button>
 
-                    <!-- Option 3: Hourly Reward -->
                     <button class="panel-btn reward-btn" id="hourlyBtn" onclick="claimHourly()">
                         ⏱️ Hourly Reward (500 LORCA)
                     </button>
 
-                    <!-- Option 4: Daily Reward -->
                     <button class="panel-btn reward-btn" id="dailyBtn" onclick="claimDaily()">
                         📅 Daily Reward (500 LORCA)
                     </button>
@@ -173,17 +169,19 @@
 
     <script>
         // -------------------------------------------------------------
-        // HELIUS MAINNET RPC SETUP
+        // HELIUS MAINNET RPC SETUP WITH FALLBACK
         // -------------------------------------------------------------
-        const HELIUS_RPC = "https://mainnet.helius-rpc.com/?api-key=e99cd0cc-21ab-4628-b44e-1da0b88f0f26";
+        const HELIUS_RPC = "https://mainnet.helius-rpc.com/?api-key=e99cd0cc-8db8-40a8-b64d-ca9d7f082e66";
         let solanaConnection = null;
         
-        if (typeof solanaWeb3 !== 'undefined') {
-            solanaConnection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
-            console.log("Connected to Helius Solana RPC!");
-        }
+        try {
+            if (typeof solanaWeb3 !== 'undefined') {
+                solanaConnection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
+                console.log("Connected to Helius Solana RPC!");
+            }
+        } catch(e) { console.error("Solana Web3 Init Error", e); }
 
-        let walletBalance = 0;
+        let walletBalance = parseInt(localStorage.getItem('lorca_balance') || '0');
         let roundScore = 0;
         let timeLeft = 20;
         let gameOn = false;
@@ -193,6 +191,11 @@
         let spawnTimer = null;
 
         const fishList = ['🐠', '🐟', '🐡'];
+
+        // Sync initial balance display on load
+        window.addEventListener('load', () => {
+            updateBalanceDisplay();
+        });
 
         function playBeep(freq = 800, dur = 100) {
             try {
@@ -274,6 +277,7 @@
         }
 
         function updateBalanceDisplay() {
+            localStorage.setItem('lorca_balance', walletBalance);
             document.getElementById('tokenCount').textContent = walletBalance.toLocaleString();
             document.getElementById('walletBal').textContent = walletBalance.toLocaleString();
         }
@@ -324,19 +328,16 @@
             const lastDaily = localStorage.getItem('lastDaily') || 0;
             const lastHourly = localStorage.getItem('lastHourly') || 0;
 
-            // 1. Login Claim
             if (localStorage.getItem('loginClaimed')) {
                 document.getElementById('loginBtn').disabled = true;
                 document.getElementById('loginBtn').textContent = '🔑 Login Bonus Claimed';
             }
 
-            // 2. Airdrop
             if (localStorage.getItem('airdropClaimed')) {
                 document.getElementById('airdropBtn').disabled = true;
                 document.getElementById('airdropBtn').textContent = '🎁 Airdrop Claimed';
             }
 
-            // 3. Hourly (1 hour)
             if (now - lastHourly < 3600000) {
                 document.getElementById('hourlyBtn').disabled = true;
                 document.getElementById('hourlyBtn').textContent = '⏱️ Hourly Claimed';
@@ -345,7 +346,6 @@
                 document.getElementById('hourlyBtn').textContent = '⏱️ Hourly Reward (500 LORCA)';
             }
 
-            // 4. Daily (24 hours)
             if (now - lastDaily < 86400000) {
                 document.getElementById('dailyBtn').disabled = true;
                 document.getElementById('dailyBtn').textContent = '📅 Daily Claimed';
@@ -355,7 +355,6 @@
             }
         }
 
-        // CLAIM FUNCTIONS WITH CONGRATS POPUP
         function claimLoginBonus() {
             if (!walletOk) return alert('Connect Phantom Wallet first');
             walletBalance += 500;
@@ -420,10 +419,11 @@
                     walletBalance = 0;
                     updateBalanceDisplay();
                 } else {
-                    alert('❌ Withdrawal Failed: ' + data.message);
+                    alert('❌ Withdrawal Failed: ' + (data.message || 'Server error'));
                 }
             } catch (error) {
-                alert("❌ Server / Network Error. Please check Vercel CORS or network!");
+                console.error(error);
+                alert("❌ Server / Network Error. Please try again!");
             } finally {
                 btn.disabled = false;
                 btn.textContent = '💰 Withdraw LORCA';
