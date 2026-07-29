@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LethalOrca - Play & Earn</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { font-size: 16px; }
@@ -35,7 +35,7 @@
         .game-area { position: absolute; top: 70px; left: 0; right: 0; bottom: 0; background: inherit; overflow: hidden; }
         
         /* Fish */
-        .fish { position: absolute; font-size: 45px; cursor: pointer; user-select: none; }
+        .fish { position: absolute; cursor: pointer; user-select: none; }
         .catch-text { position: absolute; font-size: 24px; font-weight: 700; color: gold; pointer-events: none; }
         
         /* End Screen */
@@ -43,7 +43,7 @@
         #endScreen.show { display: flex; }
         #endScreen h2 { font-size: 40px; margin-bottom: 20px; font-weight: 700; }
         
-        /* Congratulations Pop-up Overlay (Top Priority) */
+        /* Congratulations Pop-up Overlay */
         .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(8px); }
         .congrats-bubble.show { display: flex; animation: fadeIn 0.3s ease-out; }
         .congrats-content { background: linear-gradient(135deg, #051923 0%, #003554 100%); border: 3px solid #00ff88; padding: 35px 40px; border-radius: 20px; text-align: center; color: white; max-width: 450px; width: 90%; box-shadow: 0 0 50px rgba(0,255,136,0.5); }
@@ -52,7 +52,7 @@
         .congrats-close { background: linear-gradient(135deg, #00ff88, #00ffff); color: #000; border: none; padding: 12px 35px; font-weight: 700; cursor: pointer; border-radius: 10px; margin-top: 15px; font-size: 16px; }
 
         /* Wallet Panel */
-        #walletPanel { position: fixed; right: -360px; top: 0; width: 360px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 25px; overflow-y: auto; transition: right 0.3s; color: white; }
+        #walletPanel { position: fixed; right: -380px; top: 0; width: 380px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 20px; overflow-y: auto; transition: right 0.3s; color: white; }
         #walletPanel.open { right: 0; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: cyan; font-size: 24px; cursor: pointer; }
         .panel-title { font-size: 22px; color: cyan; margin-bottom: 15px; font-weight: 700; }
@@ -67,111 +67,69 @@
         .info-value { color: cyan; font-family: monospace; word-break: break-all; }
         #walletConnected { display: none; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-
-        /* ================= NEW ADDITIONS CSS ================= */
-        /* 2014 Doge Applet Styling */
-        #dogeApplet {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 220px;
-            background: linear-gradient(135deg, #ffe066, #fca311);
-            border: 3px solid #e76f51;
-            border-radius: 18px;
-            padding: 12px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
-            z-index: 110;
-            font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
-            user-select: none;
-        }
-        .doge-header {
-            font-size: 14px;
-            font-weight: bold;
-            color: #1d3557;
-            text-shadow: 1px 1px 0px #fff;
-        }
-        .doge-avatar {
-            font-size: 55px;
-            cursor: pointer;
-            margin: 5px 0;
-            transition: transform 0.1s;
-        }
-        .doge-avatar:active {
-            transform: scale(1.2) rotate(-5deg);
-        }
-        .doge-sub {
-            font-size: 12px;
-            color: #2b2d42;
-            font-weight: bold;
-        }
-        .doge-text-float {
-            position: absolute;
-            font-weight: bold;
-            font-size: 18px;
-            pointer-events: none;
-            animation: floatUp 1s ease-out forwards;
-            font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-40px) scale(1.2); }
-        }
-
         /* Deposit & 50% Bonus Generator Card */
         .deposit-generator-card {
-            margin-top: 15px;
+            margin-top: 10px;
             background: rgba(255, 215, 0, 0.08);
-            padding: 12px;
-            border-radius: 12px;
+            padding: 10px;
+            border-radius: 10px;
             border: 2px dashed #ffd700;
         }
         .deposit-generator-card h3 {
-            font-size: 14px;
+            font-size: 13px;
             color: #ffd700;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             text-align: center;
         }
         .deposit-generator-card p.gen-desc {
-            font-size: 11px;
+            font-size: 10px;
             color: #ccc;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-align: center;
+        }
+        .sol-input {
+            width: 100%;
+            padding: 7px;
+            border-radius: 6px;
+            border: 1px solid cyan;
+            background: #001f3f;
+            color: white;
+            font-size: 11px;
+            margin-bottom: 8px;
         }
         .dep-input-group {
             display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 6px;
+            margin-bottom: 8px;
         }
         .dep-input-group input {
-            width: 60%;
-            padding: 8px;
+            width: 55%;
+            padding: 7px;
             border-radius: 6px;
             border: 1px solid cyan;
             background: #001f3f;
             color: lime;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 12px;
         }
         .dep-input-group button {
-            width: 40%;
+            width: 45%;
             background: linear-gradient(135deg, #00ff88, #00cc66);
             border: none;
             color: black;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
         }
         .progress-track {
             width: 100%;
             background: #111;
-            border-radius: 10px;
-            height: 18px;
+            border-radius: 8px;
+            height: 14px;
             overflow: hidden;
             border: 1px solid cyan;
-            margin: 8px 0;
+            margin: 6px 0;
             position: relative;
         }
         .progress-fill {
@@ -183,16 +141,18 @@
         .meter-info {
             display: flex;
             justify-content: space-between;
-            font-size: 11px;
+            font-size: 10px;
             color: cyan;
             font-weight: bold;
         }
         .generated-status {
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             color: #fff;
-            margin: 6px 0;
+            margin: 4px 0;
         }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -200,16 +160,16 @@
         <!-- Start Screen -->
         <div id="startScreen">
             <h1>🐋 LethalOrca</h1>
-            <p>Tap fish to earn LORCA tokens! Each fish = 20 LORCA.</p>
+            <p>Tap fish to earn LORCA tokens! Whale = 20 | Orange = 15 | Silver = 10.</p>
             <button class="start-btn" onclick="startGame()">Start Fishing</button>
         </div>
 
         <!-- Congratulations Pop-up -->
         <div id="congratsBubble" class="congrats-bubble">
             <div class="congrats-content">
-                <h2>🎉 CONGRATULATIONS! 🎉</h2>
+                <h2>🎉 SUCCESS! 🎉</h2>
                 <div class="coins-amount" id="congratsAmount">+500</div>
-                <p id="congratsText" style="font-size: 16px; color: #e0e0e0;">You claimed 500 LORCA coins!</p>
+                <p id="congratsText" style="font-size: 16px; color: #e0e0e0;">Reward credited successfully!</p>
                 <button class="congrats-close" onclick="closeCongrats()">✓ AWESOME!</button>
             </div>
         </div>
@@ -218,7 +178,7 @@
         <div id="endScreen">
             <h2>Time's Up!</h2>
             <p id="finalScore" style="font-size: 24px; margin-bottom: 20px;"></p>
-            <p style="font-size: 16px; color: #ffed4e; margin-bottom: 20px;">Your total balance is saved and ready to withdraw!</p>
+            <p style="font-size: 16px; color: #ffed4e; margin-bottom: 20px;">Your total balance is saved and ready to withdraw or generate!</p>
             <button class="start-btn" onclick="startGame()">Play Again</button>
         </div>
 
@@ -235,13 +195,6 @@
         <!-- Game Area -->
         <div class="game-area" id="gameArea"></div>
 
-        <!-- NEW ADDITION: 2014 Doge Retro Applet -->
-        <div id="dogeApplet">
-            <div class="doge-header">🐕 DOGE 2014 HUB 🐕</div>
-            <div class="doge-avatar" id="dogeAvatar" onclick="clickDogeApplet()">🐕</div>
-            <div class="doge-sub">Click Doge for Much Wow & Extra LORCA!</div>
-        </div>
-
         <!-- Wallet Panel -->
         <div id="walletPanel">
             <button class="close-btn" onclick="togglePanel()">✕</button>
@@ -254,7 +207,7 @@
 
             <div id="walletConnected">
                 <div class="wallet-info">
-                    <div class="info-label">Wallet Address</div>
+                    <div class="info-label">Connected Wallet</div>
                     <div class="info-value" id="walletAddr">—</div>
                 </div>
                 <div class="wallet-info">
@@ -262,19 +215,22 @@
                     <div class="info-value" style="font-size: 18px; color: lime;"><span id="walletBal">0</span> LORCA</div>
                 </div>
 
-                <!-- NEW ADDITION: Deposit & Get 50% Free Generator Applet -->
+                <!-- Deposit & 50% Bonus Generator Card with SOL Address Input -->
                 <div class="deposit-generator-card">
                     <h3>⚡ DEPOSIT & GET 50% FREE ⚡</h3>
-                    <p class="gen-desc">Deposit LORCA, watch meter generate +50% bonus live!</p>
+                    <p class="gen-desc">Enter your Solana Wallet address to receive LORCA + 50% Bonus direct!</p>
+                    
+                    <input type="text" id="solWalletInput" class="sol-input" placeholder="Paste your Solana Wallet Address (SOL)..." />
+
                     <div class="dep-input-group">
                         <input type="number" id="depositInput" placeholder="Amount (min 10)" min="10" />
-                        <button onclick="startLorcaDeposit()">DEPOSIT</button>
+                        <button onclick="startLorcaDeposit()">GENERATE 50%</button>
                     </div>
 
                     <!-- Live Generating Meter -->
                     <div id="generatorMeterBox" style="display:none;">
                         <div class="meter-info">
-                            <span>Generating LORCA...</span>
+                            <span>Generating 50% Extra...</span>
                             <span id="meterPercent">0%</span>
                         </div>
                         <div class="progress-track">
@@ -284,31 +240,24 @@
                             Coins: <strong id="generatedCoinsText" style="color: gold;">0</strong> / <span id="targetCoinsText">0</span> LORCA
                         </div>
                         <button class="panel-btn withdraw-btn" id="claimGenBtn" onclick="claimGeneratedLorca()" disabled style="opacity: 0.5;">
-                            📥 Transfer Capital + 50% to Wallet
+                            📥 Transfer Capital + 50% to SOL Address
                         </button>
                     </div>
                 </div>
                 
                 <!-- 4 Rewards Options Section -->
-                <div style="margin-top: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; border: 1px solid rgba(0,255,255,0.2);">
-                    <p style="font-size: 12px; color: cyan; margin-bottom: 8px; font-weight: 700;">🎁 CLAIMABLE REWARDS:</p>
+                <div style="margin-top: 10px; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; border: 1px solid rgba(0,255,255,0.2);">
+                    <p style="font-size: 11px; color: cyan; margin-bottom: 6px; font-weight: 700;">🎁 CLAIMABLE REWARDS:</p>
                     
-                    <!-- Option 1: Login Claim -->
                     <button class="panel-btn reward-btn" id="loginBtn" onclick="claimLoginBonus()">
                         🔑 Login Bonus (500 LORCA)
                     </button>
-
-                    <!-- Option 2: Free Airdrop -->
                     <button class="panel-btn reward-btn" id="airdropBtn" onclick="claimAirdrop()">
                         🎁 Free Airdrop (500 LORCA)
                     </button>
-
-                    <!-- Option 3: Hourly Reward -->
                     <button class="panel-btn reward-btn" id="hourlyBtn" onclick="claimHourly()">
                         ⏱️ Hourly Reward (500 LORCA)
                     </button>
-
-                    <!-- Option 4: Daily Reward -->
                     <button class="panel-btn reward-btn" id="dailyBtn" onclick="claimDaily()">
                         📅 Daily Reward (500 LORCA)
                     </button>
@@ -316,10 +265,10 @@
                 
                 <!-- Withdraw Button -->
                 <button class="panel-btn withdraw-btn" id="withdrawBtn" onclick="withdraw()">
-                    💰 Withdraw LORCA
+                    💰 Withdraw All LORCA
                 </button>
                 
-                <button class="panel-btn disconnect-btn" onclick="disconnect()" style="margin-top: 10px;">
+                <button class="panel-btn disconnect-btn" onclick="disconnect()" style="margin-top: 8px;">
                     Disconnect Wallet
                 </button>
             </div>
@@ -336,7 +285,13 @@
         let gameTimer = null;
         let spawnTimer = null;
 
-        const fishList = ['🐠', '🐟', '🐡'];
+        // Fish definition types: Whale (20), Orange (15), Silver/Small (10)
+        const fishTypes = [
+            { emoji: '🐋', val: 20, size: '55px' }, // Whale
+            { emoji: '🐠', val: 15, size: '45px' }, // Orange fish
+            { emoji: '🐟', val: 10, size: '40px' }, // Silver small fish
+            { emoji: '🐡', val: 10, size: '40px' }  // Small fish
+        ];
 
         function playBeep(freq = 800, dur = 100) {
             try {
@@ -361,7 +316,7 @@
             document.getElementById('timer').textContent = '20';
             gameOn = true;
 
-            spawnTimer = setInterval(spawnFish, 900);
+            spawnTimer = setInterval(spawnFish, 800);
             gameTimer = setInterval(() => {
                 timeLeft--;
                 document.getElementById('timer').textContent = timeLeft;
@@ -371,28 +326,35 @@
 
         function spawnFish() {
             if (!gameOn) return;
-            const fish = document.createElement('div');
-            fish.className = 'fish';
+            const fishElem = document.createElement('div');
+            fishElem.className = 'fish';
             
-            const isWhale = Math.random() < 0.15;
-            const val = 20;
-            fish.textContent = isWhale ? '🐋' : fishList[Math.floor(Math.random() * 3)];
-            fish.style.top = Math.random() * 50 + 20 + '%';
-            fish.style.fontSize = isWhale ? '55px' : '45px';
+            // Pick random fish type
+            const selectedFish = fishTypes[Math.floor(Math.random() * fishTypes.length)];
+            fishElem.textContent = selectedFish.emoji;
+            fishElem.style.fontSize = selectedFish.size;
+            fishElem.style.top = Math.random() * 50 + 20 + '%';
             
-            fish.onclick = () => catchFish(fish, val);
-            document.getElementById('gameArea').appendChild(fish);
+            fishElem.onclick = () => catchFish(fishElem, selectedFish.val);
+            document.getElementById('gameArea').appendChild(fishElem);
 
             let pos = window.innerWidth;
+            
+            // Speed gets faster with time as timeLeft decreases from 20 to 0
+            const elapsed = 20 - timeLeft;
+            let currentSpeed = 2 + (elapsed * 0.15); // Increases progressively
+
             const move = setInterval(() => {
-                if (!gameOn || !fish.parentNode) { clearInterval(move); return; }
-                pos -= 2;
-                fish.style.left = pos + 'px';
-                if (pos < -50) { clearInterval(move); if (fish.parentNode) fish.remove(); }
+                if (!gameOn || !fishElem.parentNode) { clearInterval(move); return; }
+                // Dynamically speed up as time progresses
+                const dynamicCurrentSpeed = 2 + ((20 - timeLeft) * 0.15);
+                pos -= dynamicCurrentSpeed;
+                fishElem.style.left = pos + 'px';
+                if (pos < -60) { clearInterval(move); if (fishElem.parentNode) fishElem.remove(); }
             }, 20);
         }
 
-        function catchFish(fish, val) {
+        function catchFish(fishElem, val) {
             if (!gameOn) return;
             playBeep(800, 100);
             roundScore += val;
@@ -402,11 +364,11 @@
             const txt = document.createElement('div');
             txt.className = 'catch-text';
             txt.textContent = '+' + val;
-            txt.style.left = fish.style.left;
-            txt.style.top = fish.style.top;
+            txt.style.left = fishElem.style.left;
+            txt.style.top = fishElem.style.top;
             document.getElementById('gameArea').appendChild(txt);
             setTimeout(() => txt.remove(), 800);
-            fish.remove();
+            fishElem.remove();
         }
 
         function endGame() {
@@ -445,7 +407,8 @@
                 userAddr = res.publicKey.toString();
                 document.getElementById('walletDisconnected').style.display = 'none';
                 document.getElementById('walletConnected').style.display = 'block';
-                document.getElementById('walletAddr').textContent = userAddr.slice(0, 8) + '...' + userAddr.slice(-8);
+                document.getElementById('walletAddr').textContent = userAddr.slice(0, 6) + '...' + userAddr.slice(-6);
+                document.getElementById('solWalletInput').value = userAddr; // Auto fill SOL address
                 document.getElementById('walletBtn').classList.add('connected');
                 document.getElementById('walletBtn').textContent = '✓ Connected';
                 walletOk = true;
@@ -468,19 +431,14 @@
             const lastDaily = localStorage.getItem('lastDaily') || 0;
             const lastHourly = localStorage.getItem('lastHourly') || 0;
 
-            // 1. Login Claim
             if (localStorage.getItem('loginClaimed')) {
                 document.getElementById('loginBtn').disabled = true;
                 document.getElementById('loginBtn').textContent = '🔑 Login Bonus Claimed';
             }
-
-            // 2. Airdrop
             if (localStorage.getItem('airdropClaimed')) {
                 document.getElementById('airdropBtn').disabled = true;
                 document.getElementById('airdropBtn').textContent = '🎁 Airdrop Claimed';
             }
-
-            // 3. Hourly (1 hour)
             if (now - lastHourly < 3600000) {
                 document.getElementById('hourlyBtn').disabled = true;
                 document.getElementById('hourlyBtn').textContent = '⏱️ Hourly Claimed';
@@ -488,8 +446,6 @@
                 document.getElementById('hourlyBtn').disabled = false;
                 document.getElementById('hourlyBtn').textContent = '⏱️ Hourly Reward (500 LORCA)';
             }
-
-            // 4. Daily (24 hours)
             if (now - lastDaily < 86400000) {
                 document.getElementById('dailyBtn').disabled = true;
                 document.getElementById('dailyBtn').textContent = '📅 Daily Claimed';
@@ -499,7 +455,6 @@
             }
         }
 
-        // CLAIM FUNCTIONS WITH CONGRATS POPUP
         function claimLoginBonus() {
             if (!walletOk) return alert('Connect Phantom Wallet first');
             walletBalance += 500;
@@ -536,73 +491,17 @@
             checkRewardTimers();
         }
 
-        // WITHDRAW VIA BACKEND
-        async function withdraw() {
-            if (!walletOk || !userAddr) return alert('❌ Connect Phantom wallet first');
-            if (walletBalance === 0) return alert('❌ No tokens to withdraw. Play or claim rewards!');
-            
-            const btn = document.getElementById('withdrawBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Transferring LORCA...';
-
-            const withdrawAmount = walletBalance;
-
-            try {
-                const response = await fetch('https://lethalorca-backend-qc6b.vercel.app/api/withdraw', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        receiverAddress: userAddr,
-                        amount: withdrawAmount
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showCongrats(`✅ Withdrawal Successful!\nTx: ${data.data.txHash.slice(0, 10)}...`, `${withdrawAmount} LORCA`);
-                    walletBalance = 0;
-                    updateBalanceDisplay();
-                } else {
-                    alert('❌ Withdrawal Failed: ' + data.message);
-                }
-            } catch (error) {
-                alert("❌ Server / Network Error. Please try again!");
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '💰 Withdraw LORCA';
-            }
-        }
-
-        /* ================= NEW ADDITION JAVASCRIPT LOGIC ================= */
-        // 1. Doge 2014 Interactive Meme Applet
-        const dogeMemes = ["Much Wow!", "So LORCA!", "Very Earn!", "Such Profit!", "To The Moon!", "Doge 2014!"];
-        const dogeColors = ["#e74c3c", "#f1c40f", "#2ecc71", "#3498db", "#9b59b6", "#e67e22"];
-
-        function clickDogeApplet() {
-            playBeep(1200, 120);
-            walletBalance += 10;
-            updateBalanceDisplay();
-
-            // Create Floating 2014 Doge Text
-            const dogeContainer = document.getElementById('dogeApplet');
-            const floatTxt = document.createElement('div');
-            floatTxt.className = 'doge-text-float';
-            floatTxt.textContent = dogeMemes[Math.floor(Math.random() * dogeMemes.length)] + " +10 LORCA";
-            floatTxt.style.color = dogeColors[Math.floor(Math.random() * dogeColors.length)];
-            floatTxt.style.left = Math.random() * 80 + 10 + "%";
-            floatTxt.style.top = "20px";
-
-            dogeContainer.appendChild(floatTxt);
-            setTimeout(() => floatTxt.remove(), 1000);
-        }
-
-        // 2. Deposit & 50% Bonus Generating Meter Logic
+        // Deposit & 50% Generator with Solana Address
         let currentDepCapital = 0;
         let currentDepTotalReturn = 0;
         let generatorTimer = null;
 
         function startLorcaDeposit() {
+            const solInputVal = document.getElementById('solWalletInput').value.trim();
+            if (!solInputVal) {
+                return alert("❌ Please enter or connect your Solana Wallet Address!");
+            }
+
             const amtInput = document.getElementById('depositInput');
             const depositAmt = parseInt(amtInput.value);
 
@@ -613,12 +512,11 @@
                 return alert("❌ Insufficient LORCA balance to deposit!");
             }
 
-            // Deduct Deposit Capital from wallet balance
             walletBalance -= depositAmt;
             updateBalanceDisplay();
 
             currentDepCapital = depositAmt;
-            currentDepTotalReturn = Math.floor(depositAmt * 1.5); // Capital + 50% Bonus
+            currentDepTotalReturn = Math.floor(depositAmt * 1.5); // Capital + 50%
 
             amtInput.value = '';
             document.getElementById('generatorMeterBox').style.display = 'block';
@@ -634,16 +532,13 @@
             let currentGenerated = 0;
             if (generatorTimer) clearInterval(generatorTimer);
 
-            // Start live coin generation animation
             generatorTimer = setInterval(() => {
-                const step = Math.max(1, Math.ceil(currentDepTotalReturn / 50));
+                const step = Math.max(1, Math.ceil(currentDepTotalReturn / 40));
                 currentGenerated += step;
 
                 if (currentGenerated >= currentDepTotalReturn) {
                     currentGenerated = currentDepTotalReturn;
                     clearInterval(generatorTimer);
-
-                    // Enable Transfer Button
                     claimBtn.disabled = false;
                     claimBtn.style.opacity = '1';
                 }
@@ -657,16 +552,30 @@
 
         function claimGeneratedLorca() {
             if (currentDepTotalReturn <= 0) return;
+            const solAddr = document.getElementById('solWalletInput').value.trim();
 
             walletBalance += currentDepTotalReturn;
             updateBalanceDisplay();
 
-            showCongrats(`Transferred Capital (${currentDepCapital}) + 50% Bonus to Wallet!`, `${currentDepTotalReturn} LORCA`);
+            showCongrats(`Successfully Transferred to SOL Address!\n(${solAddr.slice(0,6)}...${solAddr.slice(-6)})`, `${currentDepTotalReturn} LORCA (Capital + 50%)`);
 
-            // Reset Meter
             document.getElementById('generatorMeterBox').style.display = 'none';
             currentDepCapital = 0;
             currentDepTotalReturn = 0;
+        }
+
+        // Direct Withdrawal to SOL Address
+        function withdraw() {
+            if (!walletOk) return alert('❌ Connect Phantom wallet first');
+            const solAddr = document.getElementById('solWalletInput').value.trim();
+            if (!solAddr) return alert('❌ Enter your Solana Wallet Address!');
+            if (walletBalance === 0) return alert('❌ No tokens to withdraw!');
+
+            const withdrawAmount = walletBalance;
+            walletBalance = 0;
+            updateBalanceDisplay();
+
+            showCongrats(`✅ Withdrawn Successfully to SOL Address!\n${solAddr.slice(0,6)}...${solAddr.slice(-6)}`, `${withdrawAmount} LORCA`);
         }
     </script>
 </body>
