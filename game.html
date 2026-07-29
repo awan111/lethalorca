@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LethalOrca — Fishing Arcade</title>
+<title>LORCA Fishing Adventure</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -15,601 +15,693 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    padding: 16px;
   }
 
   h1 {
-    font-size: 28px;
+    font-size: 26px;
     letter-spacing: 2px;
     color: #f2b84b;
     text-shadow: 0 0 12px rgba(242,184,75,0.5);
-    margin-bottom: 4px;
+    margin-bottom: 10px;
   }
 
-  .subtitle {
-    font-size: 13px;
-    color: #7fd8c9;
-    margin-bottom: 16px;
-    text-align: center;
-    max-width: 500px;
-  }
-
-  /* ---------- HUD ---------- */
   .hud {
     display: flex;
-    gap: 14px;
-    margin-bottom: 14px;
+    gap: 10px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
     justify-content: center;
+    width: 100%;
+    max-width: 780px;
   }
 
   .hud-card {
-    background: rgba(20, 58, 74, 0.65);
-    border: 1px solid rgba(46, 230, 199, 0.35);
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(46, 230, 199, 0.3);
     border-radius: 10px;
-    padding: 10px 18px;
+    padding: 8px 14px;
     text-align: center;
-    min-width: 120px;
+    min-width: 92px;
   }
 
-  .hud-label {
-    font-size: 11px;
-    color: #7fd8c9;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
+  .hud-label { font-size: 10px; color: #7fd8c9; text-transform: uppercase; letter-spacing: 1px; }
+  .hud-value { font-size: 17px; font-weight: bold; color: #f2b84b; margin-top: 2px; }
 
-  .hud-value {
-    font-size: 20px;
-    font-weight: bold;
-    color: #f2b84b;
-    margin-top: 2px;
-  }
+  .energy-bar-wrap { width: 100%; max-width: 780px; margin-bottom: 10px; }
+  .energy-bar-bg { background: rgba(255,255,255,0.08); border-radius: 20px; height: 10px; overflow: hidden; }
+  .energy-bar-fill { background: linear-gradient(90deg, #2ee6c7, #f2b84b); height: 100%; width: 100%; transition: width 0.3s; }
+  .energy-label { font-size: 11px; color: #7fd8c9; margin-bottom: 4px; }
 
-  /* ---------- Wallet bar ---------- */
-  .wallet-bar {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 14px;
-  }
+  .toolbar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; justify-content: center; }
 
   button {
     background: linear-gradient(135deg, #2ee6c7, #14a98f);
     border: none;
     color: #04231d;
     font-weight: bold;
-    padding: 10px 18px;
+    padding: 9px 16px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 14px;
-  }
-
-  button:hover { filter: brightness(1.1); }
-
-  button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  #walletStatus {
     font-size: 13px;
-    color: #9fb8c2;
   }
+  button.secondary { background: rgba(255,255,255,0.1); color: #eaf6f6; border: 1px solid rgba(255,255,255,0.2); }
+  button:hover { filter: brightness(1.1); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
 
-  /* ---------- Pond ---------- */
   .pond-wrap {
     position: relative;
     width: 100%;
-    max-width: 700px;
+    max-width: 780px;
+    height: 460px;
     border-radius: 16px;
     overflow: hidden;
     border: 2px solid rgba(46, 230, 199, 0.3);
     box-shadow: 0 0 40px rgba(46, 230, 199, 0.15) inset;
   }
 
-  canvas {
-    display: block;
-    width: 100%;
-    background: linear-gradient(180deg, #0d3a52 0%, #062230 60%, #031017 100%);
+  #scene-canvas { display: block; width: 100%; height: 100%; }
+
+  .hint {
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    font-size: 12px; color: #cfeee6; background: rgba(4, 20, 28, 0.5);
+    padding: 4px 12px; border-radius: 20px; pointer-events: none;
   }
+
+  .catch-popup {
+    position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
+    background: rgba(4, 20, 28, 0.85); border: 1px solid rgba(242,184,75,0.5);
+    border-radius: 10px; padding: 8px 16px; font-size: 14px; color: #f2b84b;
+    display: none; pointer-events: none;
+  }
+
+  .panel-overlay {
+    position: absolute; inset: 0; background: rgba(4, 16, 24, 0.92);
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 24px; overflow-y: auto;
+  }
+  .panel-overlay.show { display: flex; }
+  .panel-overlay h2 { color: #f2b84b; font-size: 20px; margin-bottom: 12px; }
+  .panel-overlay p { color: #9fb8c2; font-size: 13px; margin-bottom: 6px; }
+
+  .list-row {
+    width: 100%; max-width: 420px; display: flex; justify-content: space-between;
+    align-items: center; background: rgba(255,255,255,0.05); border-radius: 8px;
+    padding: 8px 12px; margin-bottom: 6px; font-size: 13px;
+  }
+
+  .shop-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 420px; width: 100%; }
+  .shop-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; font-size: 12px; }
+  .shop-card b { color: #f2b84b; display: block; margin-bottom: 4px; font-size: 13px; }
+
+  .close-btn { position: absolute; top: 10px; right: 14px; }
 
   .footer-note {
-    font-size: 11px;
-    color: #5f7d84;
-    margin-top: 14px;
-    max-width: 600px;
-    text-align: center;
-    line-height: 1.5;
-  }
-
-  .overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(4, 16, 24, 0.88);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 20px;
-  }
-
-  .overlay.show { display: flex; }
-
-  .overlay h2 {
-    color: #f2b84b;
-    font-size: 22px;
-    margin-bottom: 8px;
-  }
-
-  .overlay p {
-    color: #9fb8c2;
-    font-size: 13px;
-    margin-bottom: 16px;
-  }
-
-  #withdrawNote {
-    font-size: 12px;
-    color: #7fd8c9;
-    margin-left: 4px;
+    font-size: 11px; color: #5f7d84; margin-top: 12px; max-width: 640px;
+    text-align: center; line-height: 1.5;
   }
 </style>
 </head>
 <body>
 
-<h1>LETHAL ORCA</h1>
-<p class="subtitle">Catch fish, collect $LORCA, watch for the whale bonus. Rewards are earned by how well you play — not a fixed guaranteed payout.</p>
+<h1>LORCA FISHING ADVENTURE</h1>
 
 <div class="hud">
-  <div class="hud-card">
-    <div class="hud-label">Session $LORCA</div>
-    <div class="hud-value" id="scoreValue">0</div>
-  </div>
-  <div class="hud-card">
-    <div class="hud-label">Fish caught</div>
-    <div class="hud-value" id="catchValue">0</div>
-  </div>
-  <div class="hud-card">
-    <div class="hud-label">Whale bonus</div>
-    <div class="hud-value" id="whaleValue">0</div>
-  </div>
-  <div class="hud-card">
-    <div class="hud-label">Time left</div>
-    <div class="hud-value" id="timerValue">20</div>
-  </div>
+  <div class="hud-card"><div class="hud-label">LORCA</div><div class="hud-value" id="balanceValue">0</div></div>
+  <div class="hud-card"><div class="hud-label">Fish caught</div><div class="hud-value" id="fishCaughtValue">0</div></div>
+  <div class="hud-card"><div class="hud-label">Level</div><div class="hud-value" id="levelValue">1</div></div>
+  <div class="hud-card"><div class="hud-label">Rank</div><div class="hud-value" id="rankValue">—</div></div>
+  <div class="hud-card"><div class="hud-label">Daily reward</div><div class="hud-value" id="dailyValue">—</div></div>
 </div>
 
-<div class="wallet-bar">
+<div class="energy-bar-wrap">
+  <div class="energy-label">Energy: <span id="energyText">100 / 100</span></div>
+  <div class="energy-bar-bg"><div class="energy-bar-fill" id="energyFill"></div></div>
+</div>
+
+<div class="toolbar">
   <button id="connectBtn">Connect Phantom wallet</button>
-  <span id="walletStatus">Not connected</span>
-  <button id="musicBtn">Music off</button>
-  <button id="withdrawBtn" disabled>Withdraw</button>
-  <span id="withdrawNote"></span>
+  <button id="withdrawBtn" class="secondary" disabled>Withdraw (min 500)</button>
+  <button id="missionsBtn" class="secondary">Missions</button>
+  <button id="leaderboardBtn" class="secondary">Leaderboard</button>
+  <button id="shopBtn" class="secondary">Shop</button>
+  <button id="musicBtn" class="secondary">Music off</button>
 </div>
 
 <div class="pond-wrap">
-  <canvas id="pond" width="700" height="420"></canvas>
-  <div class="overlay" id="gameOverOverlay">
-    <h2>Round over</h2>
-    <p id="finalScoreText">You collected 0 $LORCA</p>
-    <button id="playAgainBtn">Play again</button>
+  <canvas id="scene-canvas"></canvas>
+  <div class="hint">Tap the water to cast your hook</div>
+  <div class="catch-popup" id="catchPopup"></div>
+
+  <div class="panel-overlay" id="missionsPanel">
+    <button class="close-btn secondary" data-close="missionsPanel">Close</button>
+    <h2>Missions</h2>
+    <div id="missionsList"></div>
+  </div>
+
+  <div class="panel-overlay" id="leaderboardPanel">
+    <button class="close-btn secondary" data-close="leaderboardPanel">Close</button>
+    <h2>Leaderboard — top LORCA holders</h2>
+    <div id="leaderboardList"></div>
+  </div>
+
+  <div class="panel-overlay" id="shopPanel">
+    <button class="close-btn secondary" data-close="shopPanel">Close</button>
+    <h2>Shop</h2>
+    <p>Upgrade purchases connect to your own token-spend endpoint — this panel is the UI shell, wire it to a /api/shop route when ready.</p>
+    <div class="shop-grid">
+      <div class="shop-card"><b>Fishing rod</b>Faster hook swing</div>
+      <div class="shop-card"><b>Boat upgrade</b>More fish on screen</div>
+      <div class="shop-card"><b>Lucky hook</b>Better catch odds</div>
+      <div class="shop-card"><b>Golden bait</b>More golden fish</div>
+      <div class="shop-card"><b>Speed booster</b>Faster energy regen</div>
+    </div>
+  </div>
+
+  <div class="panel-overlay" id="welcomePanel">
+    <h2>Welcome captain!</h2>
+    <p id="welcomeText">You received 100 LORCA.</p>
+    <button data-close="welcomePanel">Start fishing</button>
   </div>
 </div>
 
 <p class="footer-note">
-  This page is the front-end game layer only. It shows session score locally in the browser.
-  Turning a session score into a real $LORCA payout requires a backend service that verifies play,
-  applies your tokenomics, and signs the Solana transfer — that logic is intentionally separate from
-  this file so rewards stay tied to actual gameplay instead of a fixed guaranteed return.
+  Fish type and reward are decided by the backend the moment you cast — the browser never picks
+  the reward itself, which is what keeps catches fair and stops console-based cheating.
 </p>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 // =====================================================
-// LETHAL ORCA — POND GAME ENGINE
-// Pure front-end. No guaranteed-return logic lives here.
+// LORCA FISHING ADVENTURE — FRONTEND
+// Three.js 3D scene: boat, rod, hook, water, fish.
+// All rewards come from the backend — this file only
+// requests a cast and renders whatever the server returns.
 // =====================================================
 
-const canvas = document.getElementById('pond');
-const ctx = canvas.getContext('2d');
-const W = canvas.width;
-const H = canvas.height;
-
-let sessionScore = 0;
-let catches = 0;
-let whaleBonusTotal = 0;
-let gameActive = true;
-
-const ROUND_SECONDS = 20;
-let timeLeft = ROUND_SECONDS;
-
-const scoreEl = document.getElementById('scoreValue');
-const catchEl = document.getElementById('catchValue');
-const whaleEl = document.getElementById('whaleValue');
-const timerEl = document.getElementById('timerValue');
-const overlay = document.getElementById('gameOverOverlay');
-const finalScoreText = document.getElementById('finalScoreText');
-const withdrawBtn = document.getElementById('withdrawBtn');
-
-function updateHud() {
-  scoreEl.textContent = sessionScore.toFixed(2);
-  catchEl.textContent = catches;
-  whaleEl.textContent = whaleBonusTotal.toFixed(2);
-  timerEl.textContent = timeLeft;
-}
-
-// ---------- Round timer ----------
-// Round runs for ROUND_SECONDS, then the game stops and the
-// player can withdraw the session's local score. The actual
-// withdraw is a request to your backend, not a client-side transfer.
-const timerInterval = setInterval(() => {
-  if (!gameActive) return;
-  timeLeft--;
-  updateHud();
-  if (timeLeft <= 0) {
-    endRound();
-  }
-}, 1000);
-
-function endRound() {
-  gameActive = false;
-  timeLeft = 0;
-  updateHud();
-  finalScoreText.textContent = 'You collected ' + sessionScore.toFixed(2) + ' $LORCA';
-  overlay.classList.add('show');
-  withdrawBtn.disabled = !walletAddress;
-}
-
-document.getElementById('playAgainBtn').addEventListener('click', () => {
-  sessionScore = 0;
-  catches = 0;
-  whaleBonusTotal = 0;
-  timeLeft = ROUND_SECONDS;
-  gameActive = true;
-  overlay.classList.remove('show');
-  withdrawBtn.disabled = true;
-  document.getElementById('withdrawNote').textContent = '';
-  updateHud();
-});
-
-// ---------- Coin particle (spills from a fish mouth) ----------
-class Coin {
-  constructor(x, y, vx, vy) {
-    this.x = x; this.y = y;
-    this.vx = vx; this.vy = vy;
-    this.life = 60;
-    this.r = 5;
-  }
-  update() {
-    this.x += this.vx;
-    this.y += this.vy;
-    this.vy += 0.05;
-    this.life--;
-  }
-  draw() {
-    ctx.save();
-    ctx.globalAlpha = Math.max(this.life / 60, 0);
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-    ctx.fillStyle = '#f2b84b';
-    ctx.fill();
-    ctx.strokeStyle = '#a86f18';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.font = '6px Arial';
-    ctx.fillStyle = '#3a2408';
-    ctx.textAlign = 'center';
-    ctx.fillText('L', this.x, this.y + 2);
-    ctx.restore();
-  }
-}
-
-let coins = [];
-
-// ---------- Fish ----------
-class Fish {
-  constructor() {
-    this.reset();
-    this.mouthTimer = Math.random() * 90;
-  }
-  reset() {
-    this.dir = Math.random() < 0.5 ? 1 : -1;
-    this.x = this.dir === 1 ? -30 : W + 30;
-    this.y = 60 + Math.random() * (H - 120);
-    this.speed = 0.8 + Math.random() * 1.2;
-    this.size = 14 + Math.random() * 10;
-    this.hue = 170 + Math.random() * 60;
-    this.wiggle = Math.random() * Math.PI * 2;
-    this.caught = false;
-  }
-  update() {
-    this.x += this.speed * this.dir;
-    this.wiggle += 0.15;
-    this.mouthTimer--;
-    if (this.mouthTimer <= 0) {
-      const mouthX = this.dir === 1 ? this.x + this.size : this.x - this.size;
-      coins.push(new Coin(mouthX, this.y, this.dir * 0.4, -0.6));
-      this.mouthTimer = 70 + Math.random() * 60;
-    }
-    if (this.x < -50 || this.x > W + 50) this.reset();
-  }
-  draw() {
-    ctx.save();
-    ctx.translate(this.x, this.y + Math.sin(this.wiggle) * 3);
-    ctx.scale(this.dir, 1);
-    ctx.fillStyle = `hsl(${this.hue}, 70%, 55%)`;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, this.size, this.size * 0.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(-this.size, 0);
-    ctx.lineTo(-this.size - 8, -6);
-    ctx.lineTo(-this.size - 8, 6);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = '#04231d';
-    ctx.beginPath();
-    ctx.arc(this.size * 0.5, -2, 2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-  hitTest(px, py) {
-    const dx = px - this.x;
-    const dy = py - this.y;
-    return Math.sqrt(dx * dx + dy * dy) < this.size + 6;
-  }
-}
-
-const fishes = Array.from({ length: 6 }, () => new Fish());
-
-// ---------- Whale (periodic bonus event) ----------
-class Whale {
-  constructor() { this.active = false; this.x = 0; this.y = 0; this.dir = 1; }
-  trigger() {
-    if (this.active) return;
-    this.active = true;
-    this.dir = Math.random() < 0.5 ? 1 : -1;
-    this.x = this.dir === 1 ? -120 : W + 120;
-    this.y = 90 + Math.random() * (H - 200);
-    this.spillTimer = 0;
-  }
-  update() {
-    if (!this.active) return;
-    this.x += this.dir * 1.6;
-    this.spillTimer--;
-    if (this.spillTimer <= 0) {
-      for (let i = 0; i < 3; i++) {
-        coins.push(new Coin(this.x, this.y, (Math.random() - 0.5) * 1.5, -1));
-      }
-      whaleBonusTotal += 0.15;
-      sessionScore += 0.15;
-      updateHud();
-      this.spillTimer = 12;
-    }
-    if (this.x < -150 || this.x > W + 150) this.active = false;
-  }
-  draw() {
-    if (!this.active) return;
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.scale(this.dir, 1);
-    ctx.fillStyle = '#1c3a4d';
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 70, 26, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(-70, 0);
-    ctx.lineTo(-95, -18);
-    ctx.lineTo(-95, 18);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = '#eaf6f6';
-    ctx.beginPath();
-    ctx.arc(45, 4, 3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-}
-
-const whale = new Whale();
-setInterval(() => whale.trigger(), 15000);
-
-// ---------- Bubbles (ambient) ----------
-class Bubble {
-  constructor() { this.reset(); }
-  reset() {
-    this.x = Math.random() * W;
-    this.y = H + 10;
-    this.r = 1 + Math.random() * 3;
-    this.speed = 0.4 + Math.random() * 0.6;
-  }
-  update() {
-    this.y -= this.speed;
-    if (this.y < -10) this.reset();
-  }
-  draw() {
-    ctx.save();
-    ctx.globalAlpha = 0.3;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-    ctx.strokeStyle = '#9fe1cb';
-    ctx.stroke();
-    ctx.restore();
-  }
-}
-const bubbles = Array.from({ length: 30 }, () => new Bubble());
-
-// ---------- Click to catch ----------
-canvas.addEventListener('click', (e) => {
-  if (!gameActive) return;
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  const px = (e.clientX - rect.left) * scaleX;
-  const py = (e.clientY - rect.top) * scaleY;
-
-  for (const fish of fishes) {
-    if (fish.hitTest(px, py)) {
-      // reward is proportional to fish size — skill/luck based catch, not fixed
-      const reward = +(0.02 + (fish.size / 24) * 0.08).toFixed(2);
-      sessionScore += reward;
-      catches++;
-      for (let i = 0; i < 8; i++) {
-        coins.push(new Coin(fish.x, fish.y, (Math.random() - 0.5) * 3, -2 - Math.random() * 2));
-      }
-      updateHud();
-      fish.reset();
-      break;
-    }
-  }
-});
-
-// ---------- Main loop ----------
-function loop() {
-  ctx.clearRect(0, 0, W, H);
-
-  if (gameActive) {
-    bubbles.forEach(b => { b.update(); b.draw(); });
-    fishes.forEach(f => { f.update(); f.draw(); });
-    whale.update();
-    whale.draw();
-    coins = coins.filter(c => c.life > 0);
-    coins.forEach(c => { c.update(); c.draw(); });
-  } else {
-    bubbles.forEach(b => b.draw());
-    fishes.forEach(f => f.draw());
-    whale.draw();
-    coins.forEach(c => c.draw());
-  }
-
-  requestAnimationFrame(loop);
-}
-loop();
-
-// =====================================================
-// WALLET CONNECT — Phantom (Solana)
-// This only reads the public wallet address for display.
-// It does NOT move funds, deposit, or promise any return.
-// Actual reward payout must be handled by a signed,
-// server-side transaction using your own tokenomics logic.
-// =====================================================
-
-const connectBtn = document.getElementById('connectBtn');
-const walletStatus = document.getElementById('walletStatus');
+const BACKEND_URL = 'http://localhost:3000';
+let authToken = null;
 let walletAddress = null;
 
-async function connectWallet() {
-  const provider = window.solana;
+// Minimal base58 encoder (Bitcoin/Solana alphabet) so we can send
+// the Phantom signature in the same base58 format the backend expects.
+function base58Encode(bytes) {
+  const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+  let digits = [0];
+  for (let i = 0; i < bytes.length; i++) {
+    let carry = bytes[i];
+    for (let j = 0; j < digits.length; j++) {
+      carry += digits[j] << 8;
+      digits[j] = carry % 58;
+      carry = (carry / 58) | 0;
+    }
+    while (carry > 0) { digits.push(carry % 58); carry = (carry / 58) | 0; }
+  }
+  let leadingZeros = 0;
+  for (let i = 0; i < bytes.length && bytes[i] === 0; i++) leadingZeros++;
+  return '1'.repeat(leadingZeros) + digits.reverse().map(d => ALPHABET[d]).join('');
+}
 
-  if (!provider || !provider.isPhantom) {
-    walletStatus.textContent = 'Phantom not found — install the Phantom extension';
+const wrap = document.querySelector('.pond-wrap');
+const canvas = document.getElementById('scene-canvas');
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x052a3a);
+scene.fog = new THREE.Fog(0x052a3a, 20, 70);
+
+const camera = new THREE.PerspectiveCamera(50, wrap.clientWidth / wrap.clientHeight, 0.1, 200);
+camera.position.set(0, 9, 14);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+window.addEventListener('resize', () => {
+  camera.aspect = wrap.clientWidth / wrap.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+});
+
+// ---------- Lighting: sunset ----------
+scene.add(new THREE.AmbientLight(0xffcf9e, 0.9));
+const sun = new THREE.DirectionalLight(0xffa552, 1.1);
+sun.position.set(-10, 12, 6);
+scene.add(sun);
+
+// ---------- Water ----------
+const waterGeo = new THREE.PlaneGeometry(40, 40, 60, 60);
+const waterMat = new THREE.MeshPhongMaterial({ color: 0x0d5a72, shininess: 100, specular: 0xffd9a0, transparent: true, opacity: 0.9 });
+const water = new THREE.Mesh(waterGeo, waterMat);
+water.rotation.x = -Math.PI / 2;
+scene.add(water);
+const waterPos = waterGeo.attributes.position;
+const waterBase = waterPos.array.slice();
+
+// ---------- Boat ----------
+const boat = new THREE.Group();
+const hullMat = new THREE.MeshPhongMaterial({ color: 0x6b3f1d });
+const hull = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.5, 2.6, 8), hullMat);
+hull.rotation.z = Math.PI / 2;
+hull.rotation.y = Math.PI / 2;
+boat.add(hull);
+const cabin = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1), new THREE.MeshPhongMaterial({ color: 0xeaf6f6 }));
+cabin.position.y = 0.5;
+boat.add(cabin);
+boat.position.set(0, 0.3, 4);
+scene.add(boat);
+
+// ---------- Fishing rod + hook ----------
+const rodGroup = new THREE.Group();
+const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.6, 6), new THREE.MeshPhongMaterial({ color: 0x3a2408 }));
+rod.position.set(0, 0.9, -1);
+rod.rotation.x = 0.6;
+rodGroup.add(rod);
+boat.add(rodGroup);
+
+const hookLine = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 1, 4), new THREE.MeshBasicMaterial({ color: 0xeaf6f6 }));
+scene.add(hookLine);
+const hook = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshPhongMaterial({ color: 0xf2b84b, emissive: 0x3a2408 }));
+scene.add(hook);
+
+let hookState = 'idle'; // idle | dropping | waiting | rising
+let hookTarget = new THREE.Vector3(0, 0.4, -2);
+let hookRestY = 0.4;
+
+function updateHookVisual() {
+  hook.position.copy(hookTarget);
+  const rodTipWorld = new THREE.Vector3();
+  rod.getWorldPosition(rodTipWorld);
+  hookLine.position.copy(hook.position.clone().lerp(rodTipWorld, 0.5));
+  const dist = hook.position.distanceTo(rodTipWorld);
+  hookLine.scale.y = dist;
+  hookLine.lookAt(rodTipWorld);
+  hookLine.rotateX(Math.PI / 2);
+}
+
+// ---------- Fish visuals (color per type) ----------
+const FISH_COLORS = {
+  small: 0x5dcaa5,
+  medium: 0x378add,
+  golden: 0xf2b84b,
+  treasure_chest: 0x8a5a2b,
+  rare_shark: 0x7c8a94
+};
+
+function buildFishMesh(type) {
+  const group = new THREE.Group();
+  const color = FISH_COLORS[type] || 0x5dcaa5;
+  const mat = new THREE.MeshPhongMaterial({ color, shininess: 60 });
+  const scaleUp = type === 'rare_shark' ? 2.2 : type === 'treasure_chest' ? 1.4 : 1;
+
+  if (type === 'treasure_chest') {
+    const box = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.6, 0.6), mat);
+    group.add(box);
+  } else {
+    const body = new THREE.Mesh(new THREE.ConeGeometry(0.4 * scaleUp, 1.3 * scaleUp, 8), mat);
+    body.rotation.z = Math.PI / 2;
+    group.add(body);
+    const tail = new THREE.Mesh(new THREE.ConeGeometry(0.35 * scaleUp, 0.5 * scaleUp, 6), mat);
+    tail.rotation.z = -Math.PI / 2;
+    tail.position.x = -0.8 * scaleUp;
+    group.add(tail);
+  }
+  return group;
+}
+
+class SwimmingFish {
+  constructor() {
+    this.type = 'small';
+    this.mesh = buildFishMesh(this.type);
+    scene.add(this.mesh);
+    this.reset();
+  }
+  reset() {
+    this.radius = 4 + Math.random() * 9;
+    this.angle = Math.random() * Math.PI * 2;
+    this.speed = (0.004 + Math.random() * 0.01) * (Math.random() < 0.5 ? 1 : -1);
+    this.y = -0.4;
+  }
+  update() {
+    this.angle += this.speed;
+    const x = Math.cos(this.angle) * this.radius;
+    const z = Math.sin(this.angle) * this.radius - 2;
+    this.mesh.position.set(x, this.y, z);
+    const dirAngle = this.angle + (this.speed > 0 ? Math.PI / 2 : -Math.PI / 2);
+    this.mesh.rotation.y = -dirAngle;
+  }
+}
+const decorativeFish = Array.from({ length: 8 }, () => new SwimmingFish());
+
+// ---------- Casting flow ----------
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let casting = false;
+
+renderer.domElement.addEventListener('click', async (e) => {
+  if (casting || hookState !== 'idle') return;
+  if (!authToken) { showCatchPopup('Connect your wallet first'); return; }
+
+  const rect = renderer.domElement.getBoundingClientRect();
+  pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObject(water);
+  if (hits.length === 0) return;
+
+  const targetPoint = hits[0].point.clone();
+  targetPoint.y = 0.2;
+  await castHook(targetPoint);
+});
+
+async function castHook(targetPoint) {
+  casting = true;
+  hookState = 'dropping';
+  hookTarget.copy(targetPoint);
+
+  // simple drop animation
+  await animateHook(new THREE.Vector3(targetPoint.x, 3, targetPoint.z), targetPoint, 400);
+  hookState = 'waiting';
+
+  let result;
+  try {
+    const resp = await fetch(BACKEND_URL + '/api/reward/cast', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + authToken },
+      body: JSON.stringify({})
+    });
+    result = await resp.json();
+    if (!resp.ok) {
+      showCatchPopup(result.error || 'Cast failed');
+      hookState = 'idle';
+      casting = false;
+      return;
+    }
+  } catch (err) {
+    showCatchPopup('Could not reach backend');
+    hookState = 'idle';
+    casting = false;
     return;
   }
 
+  // spawn the caught fish jumping out
+  const jumpFish = buildFishMesh(result.fishType);
+  jumpFish.position.copy(targetPoint);
+  scene.add(jumpFish);
+  await animateHook(targetPoint.clone().add(new THREE.Vector3(0, 2.2, 0)), targetPoint, 300, jumpFish);
+  scene.remove(jumpFish);
+
+  showCatchPopup('+' + result.reward + ' LORCA — ' + result.fishType.replace('_', ' '));
+  applyCastResult(result);
+
+  hookState = 'rising';
+  await animateHook(new THREE.Vector3(0, 0.9, 3.2), new THREE.Vector3(0, 0.9, 3.2), 350);
+  hookState = 'idle';
+  casting = false;
+}
+
+function animateHook(from, to, durationMs, jumpFish) {
+  return new Promise(resolve => {
+    const start = performance.now();
+    function step(now) {
+      const t = Math.min(1, (now - start) / durationMs);
+      hookTarget.lerpVectors(from, to, t);
+      if (jumpFish) jumpFish.position.y = from.y + (to.y - from.y) * t + Math.sin(t * Math.PI) * 1.2;
+      if (t < 1) requestAnimationFrame(step); else resolve();
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+// ---------- HUD ----------
+const balanceValue = document.getElementById('balanceValue');
+const fishCaughtValue = document.getElementById('fishCaughtValue');
+const levelValue = document.getElementById('levelValue');
+const rankValue = document.getElementById('rankValue');
+const dailyValue = document.getElementById('dailyValue');
+const energyText = document.getElementById('energyText');
+const energyFill = document.getElementById('energyFill');
+const withdrawBtn = document.getElementById('withdrawBtn');
+const catchPopup = document.getElementById('catchPopup');
+
+function showCatchPopup(text) {
+  catchPopup.textContent = text;
+  catchPopup.style.display = 'block';
+  clearTimeout(showCatchPopup._t);
+  showCatchPopup._t = setTimeout(() => catchPopup.style.display = 'none', 1800);
+}
+
+function applyCastResult(result) {
+  balanceValue.textContent = result.balance;
+  fishCaughtValue.textContent = result.totalFishCaught;
+  levelValue.textContent = result.level;
+  updateEnergy(result.energy);
+  withdrawBtn.disabled = result.balance < 500;
+  if (result.leveledUp) showCatchPopup('Level up! +' + result.leveledUp.reward + ' LORCA');
+}
+
+function updateEnergy(energy) {
+  energyText.textContent = energy + ' / 100';
+  energyFill.style.width = energy + '%';
+}
+
+// =====================================================
+// WALLET CONNECT + BACKEND LOGIN
+// =====================================================
+const connectBtn = document.getElementById('connectBtn');
+const welcomePanel = document.getElementById('welcomePanel');
+const welcomeText = document.getElementById('welcomeText');
+
+async function connectWallet() {
+  const provider = window.solana;
+  if (!provider || !provider.isPhantom) {
+    showCatchPopup('Install Phantom wallet to play');
+    return;
+  }
   try {
     const resp = await provider.connect();
     walletAddress = resp.publicKey.toString();
-    const short = walletAddress.slice(0, 4) + '...' + walletAddress.slice(-4);
-    walletStatus.textContent = 'Connected: ' + short;
-    connectBtn.textContent = 'Wallet connected';
+
+    const message = 'Sign in to LORCA Fishing Adventure';
+    const encoded = new TextEncoder().encode(message);
+    const signed = await provider.signMessage(encoded, 'utf8');
+    const signatureBase58 = base58Encode(signed.signature);
+
+    const loginResp = await fetch(BACKEND_URL + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ wallet: walletAddress, message, signature: signatureBase58 })
+    });
+    const data = await loginResp.json();
+    if (!loginResp.ok) {
+      showCatchPopup(data.error || 'Login failed');
+      return;
+    }
+
+    authToken = data.token;
+    connectBtn.textContent = walletAddress.slice(0, 4) + '...' + walletAddress.slice(-4);
     connectBtn.disabled = true;
+
+    applyPlayerState(data.player);
+
+    if (data.isNewPlayer) {
+      welcomeText.textContent = 'You received ' + data.loginBonus + ' LORCA.';
+      welcomePanel.classList.add('show');
+    }
+
+    refreshDailyStatus();
+    refreshLeaderboardRank();
   } catch (err) {
-    walletStatus.textContent = 'Connection rejected';
+    showCatchPopup('Wallet connection failed');
   }
 }
-
 connectBtn.addEventListener('click', connectWallet);
 
-// =====================================================
-// AMBIENT MUSIC
-// A licensed audio file can't be embedded here since real
-// tracks (including any specific artist's music) are copyrighted.
-// This generates a calm, original ambient pad + soft blips in the
-// browser itself using the Web Audio API, so it's copyright-safe
-// and needs no external file. Swap in your own royalty-free MP3
-// later by replacing this block with an <audio> tag if you prefer.
-// =====================================================
-
-let audioCtx = null;
-let musicPlaying = false;
-let musicNodes = [];
-const musicBtn = document.getElementById('musicBtn');
-
-function startMusic() {
-  audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-
-  const masterGain = audioCtx.createGain();
-  masterGain.gain.value = 0.05;
-  masterGain.connect(audioCtx.destination);
-
-  const notes = [110, 146.83, 164.81, 220];
-  notes.forEach((freq, i) => {
-    const osc = audioCtx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-
-    const gain = audioCtx.createGain();
-    gain.gain.value = 0;
-    gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 3 + i);
-
-    osc.connect(gain);
-    gain.connect(masterGain);
-    osc.start();
-    musicNodes.push(osc, gain);
-  });
-
-  musicNodes.push(masterGain);
-  musicPlaying = true;
-  musicBtn.textContent = 'Music on';
+function applyPlayerState(player) {
+  balanceValue.textContent = player.balance;
+  fishCaughtValue.textContent = player.totalFishCaught;
+  levelValue.textContent = player.level;
+  updateEnergy(player.energy);
+  withdrawBtn.disabled = player.balance < 500;
 }
 
-function stopMusic() {
-  musicNodes.forEach(node => {
-    if (node.stop) node.stop();
-    if (node.disconnect) node.disconnect();
-  });
-  musicNodes = [];
-  musicPlaying = false;
-  musicBtn.textContent = 'Music off';
-}
-
-musicBtn.addEventListener('click', () => {
-  if (musicPlaying) {
-    stopMusic();
+// =====================================================
+// DAILY AIRDROP
+// =====================================================
+async function refreshDailyStatus() {
+  if (!authToken) return;
+  const resp = await fetch(BACKEND_URL + '/api/daily/status', { headers: { Authorization: 'Bearer ' + authToken } });
+  const data = await resp.json();
+  if (data.ready) {
+    dailyValue.textContent = 'Ready';
+    dailyValue.style.cursor = 'pointer';
+    dailyValue.onclick = claimDaily;
   } else {
-    startMusic();
+    const hrs = Math.ceil(data.msRemaining / 3600000);
+    dailyValue.textContent = hrs + 'h';
   }
+}
+
+async function claimDaily() {
+  const resp = await fetch(BACKEND_URL + '/api/daily/claim', {
+    method: 'POST', headers: { Authorization: 'Bearer ' + authToken }
+  });
+  const data = await resp.json();
+  if (resp.ok) {
+    showCatchPopup('Daily airdrop claimed! +' + data.claimed + ' LORCA');
+    balanceValue.textContent = data.balance;
+    refreshDailyStatus();
+  }
+}
+
+// =====================================================
+// MISSIONS
+// =====================================================
+const missionsBtn = document.getElementById('missionsBtn');
+const missionsList = document.getElementById('missionsList');
+
+missionsBtn.addEventListener('click', async () => {
+  if (!authToken) { showCatchPopup('Connect your wallet first'); return; }
+  const resp = await fetch(BACKEND_URL + '/api/missions', { headers: { Authorization: 'Bearer ' + authToken } });
+  const data = await resp.json();
+  missionsList.innerHTML = '';
+  data.missions.forEach(m => {
+    const row = document.createElement('div');
+    row.className = 'list-row';
+    const label = m.id.replace('_', ' ') + ' (' + m.progress + '/' + m.target + ')';
+    row.innerHTML = '<span>' + label + '</span>';
+    const btn = document.createElement('button');
+    btn.textContent = m.claimed ? 'Claimed' : (m.completed ? 'Claim +' + m.reward : m.reward + ' LORCA');
+    btn.disabled = !m.completed || m.claimed;
+    btn.addEventListener('click', () => claimMission(m.id));
+    row.appendChild(btn);
+    missionsList.appendChild(row);
+  });
+  document.getElementById('missionsPanel').classList.add('show');
+});
+
+async function claimMission(missionId) {
+  const resp = await fetch(BACKEND_URL + '/api/missions/claim', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + authToken },
+    body: JSON.stringify({ missionId })
+  });
+  const data = await resp.json();
+  if (resp.ok) {
+    showCatchPopup('Mission reward +' + data.claimed + ' LORCA');
+    balanceValue.textContent = data.balance;
+    missionsBtn.click();
+  }
+}
+
+// =====================================================
+// LEADERBOARD
+// =====================================================
+const leaderboardBtn = document.getElementById('leaderboardBtn');
+const leaderboardList = document.getElementById('leaderboardList');
+
+leaderboardBtn.addEventListener('click', async () => {
+  const resp = await fetch(BACKEND_URL + '/api/leaderboard?by=coins');
+  const data = await resp.json();
+  leaderboardList.innerHTML = '';
+  data.players.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'list-row';
+    const short = p.wallet.slice(0, 4) + '...' + p.wallet.slice(-4);
+    row.innerHTML = '<span>#' + (i + 1) + ' ' + short + '</span><span>' + p.balance + ' LORCA</span>';
+    leaderboardList.appendChild(row);
+  });
+  document.getElementById('leaderboardPanel').classList.add('show');
+});
+
+async function refreshLeaderboardRank() {
+  const resp = await fetch(BACKEND_URL + '/api/leaderboard?by=coins');
+  const data = await resp.json();
+  const idx = data.players.findIndex(p => p.wallet === walletAddress);
+  rankValue.textContent = idx === -1 ? 'Unranked' : '#' + (idx + 1);
+}
+
+// ---------- Panel open/close wiring ----------
+document.getElementById('shopBtn').addEventListener('click', () => document.getElementById('shopPanel').classList.add('show'));
+document.querySelectorAll('[data-close]').forEach(btn => {
+  btn.addEventListener('click', () => document.getElementById(btn.dataset.close).classList.remove('show'));
 });
 
 // =====================================================
 // WITHDRAW
-// This button does not move real funds. It packages the
-// session result and shows what a real withdraw request would
-// send to your backend. Your Node.js/Express server is where
-// you would verify this session, apply your tokenomics, and
-// sign the actual Solana transfer to the player's wallet.
 // =====================================================
-
-const withdrawNote = document.getElementById('withdrawNote');
-
-withdrawBtn.addEventListener('click', () => {
-  if (!walletAddress) {
-    withdrawNote.textContent = 'Connect your wallet first';
-    return;
-  }
-  const payload = {
-    wallet: walletAddress,
-    amount: sessionScore,
-    catches: catches,
-    whaleBonus: whaleBonusTotal,
-    timestamp: Date.now()
-  };
-  console.log('Withdraw request payload (send this to your backend):', payload);
-  withdrawNote.textContent = 'Requested ' + sessionScore.toFixed(2) + ' $LORCA — pending backend verification';
+withdrawBtn.addEventListener('click', async () => {
   withdrawBtn.disabled = true;
+  showCatchPopup('Sending withdraw request...');
+  try {
+    const resp = await fetch(BACKEND_URL + '/api/withdraw', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + authToken }
+    });
+    const data = await resp.json();
+    if (resp.ok && data.success) {
+      showCatchPopup(data.amountSent + ' LORCA sent — tx: ' + data.signature.slice(0, 8) + '...');
+      balanceValue.textContent = data.balance;
+    } else {
+      showCatchPopup(data.error || 'Withdraw failed');
+    }
+  } catch (err) {
+    showCatchPopup('Could not reach backend');
+  }
+  withdrawBtn.disabled = balanceValue.textContent < 500;
 });
 
-updateHud();
+// =====================================================
+// AMBIENT OCEAN MUSIC — synthesized, copyright-safe
+// =====================================================
+let audioCtx = null, musicPlaying = false, musicNodes = [];
+const musicBtn = document.getElementById('musicBtn');
+
+function startMusic() {
+  audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+  const master = audioCtx.createGain();
+  master.gain.value = 0.04;
+  master.connect(audioCtx.destination);
+  [98, 130.81, 146.83, 196].forEach((freq, i) => {
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    const g = audioCtx.createGain();
+    g.gain.value = 0;
+    g.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 3 + i);
+    osc.connect(g); g.connect(master); osc.start();
+    musicNodes.push(osc, g);
+  });
+  musicNodes.push(master);
+  musicPlaying = true;
+  musicBtn.textContent = 'Music on';
+}
+function stopMusic() {
+  musicNodes.forEach(n => { if (n.stop) n.stop(); if (n.disconnect) n.disconnect(); });
+  musicNodes = []; musicPlaying = false; musicBtn.textContent = 'Music off';
+}
+musicBtn.addEventListener('click', () => musicPlaying ? stopMusic() : startMusic());
+
+// ---------- Main render loop ----------
+function animate() {
+  requestAnimationFrame(animate);
+  decorativeFish.forEach(f => f.update());
+  updateHookVisual();
+
+  const t = Date.now() * 0.0006;
+  const arr = waterPos.array;
+  for (let i = 0; i < arr.length; i += 3) {
+    arr[i + 2] = Math.sin(waterBase[i] * 0.3 + t * 3) * 0.12 + Math.cos(waterBase[i + 1] * 0.3 + t * 3) * 0.12;
+  }
+  waterPos.needsUpdate = true;
+  waterGeo.computeVertexNormals();
+
+  boat.position.y = 0.3 + Math.sin(Date.now() * 0.001) * 0.08;
+  boat.rotation.z = Math.sin(Date.now() * 0.0007) * 0.03;
+
+  renderer.render(scene, camera);
+}
+animate();
 </script>
 
 </body>
