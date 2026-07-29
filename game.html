@@ -1,174 +1,3 @@
-<!DOCTYPE html>
-<html lang="en"> 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LethalOrca - Play & Earn</title>
-
-    <!-- Solana Web3 SDK (CDN) -->
-    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 16px; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0a3d5c, #1b9eb8); height: 100vh; overflow: hidden; color: white; }
-        
-        .container { width: 100%; height: 100vh; position: relative; }
-        
-        /* Top Bar */
-        .top-bar { position: absolute; top: 0; left: 0; right: 0; padding: 20px; background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        .top-bar-left { display: flex; gap: 30px; align-items: center; color: white; font-size: 18px; font-weight: bold; }
-        .logo-box { width: 36px; height: 36px; border: 2px solid cyan; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,212,255,0.1); flex-shrink: 0; }
-        
-        .timer { color: white; font-size: 20px; font-weight: 700; }
-        
-        .wallet-btn { background: linear-gradient(135deg, cyan, #00a8cc); color: black; border: 2px solid cyan; padding: 12px 24px; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s; box-shadow: 0 0 10px rgba(0,212,255,0.3); }
-        .wallet-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,212,255,0.6); }
-        .wallet-btn.connected { background: linear-gradient(135deg, lime, #00cc00); border-color: lime; box-shadow: 0 0 10px rgba(0,255,0,0.4); color: black; }
-        
-        /* Start Screen */
-        #startScreen { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 200; text-align: center; }
-        #startScreen h1 { font-size: 50px; margin-bottom: 20px; font-weight: 700; }
-        #startScreen p { font-size: 18px; margin-bottom: 30px; max-width: 400px; font-weight: 500; }
-        .start-btn { background: cyan; color: black; border: none; padding: 15px 40px; font-size: 18px; font-weight: 700; cursor: pointer; border-radius: 10px; }
-        .start-btn:hover { opacity: 0.9; }
-        
-        /* Game Area */
-        .game-area { position: absolute; top: 70px; left: 0; right: 0; bottom: 0; background: inherit; overflow: hidden; }
-        
-        /* Fish */
-        .fish { position: absolute; font-size: 45px; cursor: pointer; user-select: none; }
-        .catch-text { position: absolute; font-size: 24px; font-weight: 700; color: gold; pointer-events: none; }
-        
-        /* End Screen */
-        #endScreen { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 200; text-align: center; }
-        #endScreen.show { display: flex; }
-        #endScreen h2 { font-size: 40px; margin-bottom: 20px; font-weight: 700; }
-        
-        /* Congratulations Pop-up Overlay */
-        .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(8px); }
-        .congrats-bubble.show { display: flex; animation: fadeIn 0.3s ease-out; }
-        .congrats-content { background: linear-gradient(135deg, #051923 0%, #003554 100%); border: 3px solid #00ff88; padding: 35px 40px; border-radius: 20px; text-align: center; color: white; max-width: 450px; width: 90%; box-shadow: 0 0 50px rgba(0,255,136,0.5); }
-        .congrats-content h2 { font-size: 32px; color: #00ff88; font-weight: 700; margin-bottom: 10px; }
-        .congrats-content .coins-amount { font-size: 36px; font-weight: 700; color: #ffd700; margin: 15px 0; }
-        .congrats-close { background: linear-gradient(135deg, #00ff88, #00ffff); color: #000; border: none; padding: 12px 35px; font-weight: 700; cursor: pointer; border-radius: 10px; margin-top: 15px; font-size: 16px; }
-
-        /* Wallet Panel */
-        #walletPanel { position: fixed; right: -360px; top: 0; width: 360px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 25px; overflow-y: auto; transition: right 0.3s; color: white; }
-        #walletPanel.open { right: 0; }
-        .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: cyan; font-size: 24px; cursor: pointer; }
-        .panel-title { font-size: 22px; color: cyan; margin-bottom: 15px; font-weight: 700; }
-        .panel-btn { width: 100%; padding: 12px; margin-bottom: 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
-        .connect-btn { background: cyan; color: black; font-size: 14px; }
-        .reward-btn { background: linear-gradient(135deg, #ffd700, #ffed4e); color: black; font-weight: 700; }
-        .reward-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #555; color: #aaa; }
-        .withdraw-btn { background: lime; color: black; font-weight: 700; font-size: 15px; margin-top: 10px; }
-        .disconnect-btn { background: none; border: 1px solid red; color: red; }
-        .wallet-info { background: rgba(0,212,255,0.1); padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; }
-        .info-label { color: #888; text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
-        .info-value { color: cyan; font-family: monospace; word-break: break-all; }
-        #walletConnected { display: none; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Start Screen -->
-        <div id="startScreen">
-            <h1>🐋 LethalOrca</h1>
-            <p>Tap fish to earn LORCA tokens! Each fish = 20 LORCA.</p>
-            <button class="start-btn" onclick="startGame()">Start Fishing</button>
-        </div>
-
-        <!-- Congratulations Pop-up -->
-        <div id="congratsBubble" class="congrats-bubble">
-            <div class="congrats-content">
-                <h2>🎉 CONGRATULATIONS! 🎉</h2>
-                <div class="coins-amount" id="congratsAmount">+500</div>
-                <p id="congratsText" style="font-size: 16px; color: #e0e0e0;">You claimed 500 LORCA coins!</p>
-                <button class="congrats-close" onclick="closeCongrats()">✓ AWESOME!</button>
-            </div>
-        </div>
-
-        <!-- End Screen -->
-        <div id="endScreen">
-            <h2>Time's Up!</h2>
-            <p id="finalScore" style="font-size: 24px; margin-bottom: 20px;"></p>
-            <p style="font-size: 16px; color: #ffed4e; margin-bottom: 20px;">Your total balance is saved and ready to withdraw!</p>
-            <button class="start-btn" onclick="startGame()">Play Again</button>
-        </div>
-
-        <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="top-bar-left">
-                <div class="logo-box">🐋</div>
-                <span id="tokenCount">0</span> LORCA
-            </div>
-            <div class="timer" id="timer">20</div>
-            <button class="wallet-btn" id="walletBtn" onclick="togglePanel()">Connect Wallet</button>
-        </div>
-
-        <!-- Game Area -->
-        <div class="game-area" id="gameArea"></div>
-
-        <!-- Wallet Panel -->
-        <div id="walletPanel">
-            <button class="close-btn" onclick="togglePanel()">✕</button>
-            <div class="panel-title">Wallet & Rewards</div>
-
-            <div id="walletDisconnected">
-                <p style="font-size: 13px; margin-bottom: 15px; color: #aaa;">Connect Phantom wallet to claim rewards & withdraw</p>
-                <button class="panel-btn connect-btn" onclick="connectPhantom()">Connect Phantom</button>
-            </div>
-
-            <div id="walletConnected">
-                <div class="wallet-info">
-                    <div class="info-label">Wallet Address</div>
-                    <div class="info-value" id="walletAddr">—</div>
-                </div>
-                <div class="wallet-info">
-                    <div class="info-label">Available Balance</div>
-                    <div class="info-value" style="font-size: 18px; color: lime;"><span id="walletBal">0</span> LORCA</div>
-                </div>
-                
-                <!-- Rewards Options Section -->
-                <div style="margin-top: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; border: 1px solid rgba(0,255,255,0.2);">
-                    <p style="font-size: 12px; color: cyan; margin-bottom: 8px; font-weight: 700;">🎁 CLAIMABLE REWARDS:</p>
-                    
-                    <button class="panel-btn reward-btn" id="loginBtn" onclick="claimLoginBonus()">
-                        🔑 Login Bonus (500 LORCA)
-                    </button>
-
-                    <button class="panel-btn reward-btn" id="airdropBtn" onclick="claimAirdrop()">
-                        🎁 Free Airdrop (500 LORCA)
-                    </button>
-
-                    <button class="panel-btn reward-btn" id="hourlyBtn" onclick="claimHourly()">
-                        ⏱️ Hourly Reward (500 LORCA)
-                    </button>
-
-                    <button class="panel-btn reward-btn" id="dailyBtn" onclick="claimDaily()">
-                        📅 Daily Reward (500 LORCA)
-                    </button>
-                </div>
-                
-                <!-- Withdraw Button -->
-                <button class="panel-btn withdraw-btn" id="withdrawBtn" onclick="withdraw()">
-                    💰 Withdraw LORCA
-                </button>
-                
-                <button class="panel-btn disconnect-btn" onclick="disconnect()" style="margin-top: 10px;">
-                    Disconnect Wallet
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
         // -------------------------------------------------------------
         // SOLANA RPC & WEB3 CONFIGURATION
         // -------------------------------------------------------------
@@ -450,3 +279,174 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LethalOrca - Play & Earn</title>
+
+    <!-- Solana Web3 SDK (CDN) -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0a3d5c, #1b9eb8); height: 100vh; overflow: hidden; color: white; }
+        
+        .container { width: 100%; height: 100vh; position: relative; }
+        
+        /* Top Bar */
+        .top-bar { position: absolute; top: 0; left: 0; right: 0; padding: 20px; background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .top-bar-left { display: flex; gap: 30px; align-items: center; color: white; font-size: 18px; font-weight: bold; }
+        .logo-box { width: 36px; height: 36px; border: 2px solid cyan; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,212,255,0.1); flex-shrink: 0; }
+        
+        .timer { color: white; font-size: 20px; font-weight: 700; }
+        
+        .wallet-btn { background: linear-gradient(135deg, cyan, #00a8cc); color: black; border: 2px solid cyan; padding: 12px 24px; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s; box-shadow: 0 0 10px rgba(0,212,255,0.3); }
+        .wallet-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,212,255,0.6); }
+        .wallet-btn.connected { background: linear-gradient(135deg, lime, #00cc00); border-color: lime; box-shadow: 0 0 10px rgba(0,255,0,0.4); color: black; }
+        
+        /* Start Screen */
+        #startScreen { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 200; text-align: center; }
+        #startScreen h1 { font-size: 50px; margin-bottom: 20px; font-weight: 700; }
+        #startScreen p { font-size: 18px; margin-bottom: 30px; max-width: 400px; font-weight: 500; }
+        .start-btn { background: cyan; color: black; border: none; padding: 15px 40px; font-size: 18px; font-weight: 700; cursor: pointer; border-radius: 10px; }
+        .start-btn:hover { opacity: 0.9; }
+        
+        /* Game Area */
+        .game-area { position: absolute; top: 70px; left: 0; right: 0; bottom: 0; background: inherit; overflow: hidden; }
+        
+        /* Fish */
+        .fish { position: absolute; font-size: 45px; cursor: pointer; user-select: none; }
+        .catch-text { position: absolute; font-size: 24px; font-weight: 700; color: gold; pointer-events: none; }
+        
+        /* End Screen */
+        #endScreen { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 200; text-align: center; }
+        #endScreen.show { display: flex; }
+        #endScreen h2 { font-size: 40px; margin-bottom: 20px; font-weight: 700; }
+        
+        /* Congratulations Pop-up Overlay */
+        .congrats-bubble { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(8px); }
+        .congrats-bubble.show { display: flex; animation: fadeIn 0.3s ease-out; }
+        .congrats-content { background: linear-gradient(135deg, #051923 0%, #003554 100%); border: 3px solid #00ff88; padding: 35px 40px; border-radius: 20px; text-align: center; color: white; max-width: 450px; width: 90%; box-shadow: 0 0 50px rgba(0,255,136,0.5); }
+        .congrats-content h2 { font-size: 32px; color: #00ff88; font-weight: 700; margin-bottom: 10px; }
+        .congrats-content .coins-amount { font-size: 36px; font-weight: 700; color: #ffd700; margin: 15px 0; }
+        .congrats-close { background: linear-gradient(135deg, #00ff88, #00ffff); color: #000; border: none; padding: 12px 35px; font-weight: 700; cursor: pointer; border-radius: 10px; margin-top: 15px; font-size: 16px; }
+
+        /* Wallet Panel */
+        #walletPanel { position: fixed; right: -360px; top: 0; width: 360px; height: 100vh; background: rgba(0,20,40,0.95); border-left: 2px solid cyan; z-index: 150; padding: 25px; overflow-y: auto; transition: right 0.3s; color: white; }
+        #walletPanel.open { right: 0; }
+        .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: cyan; font-size: 24px; cursor: pointer; }
+        .panel-title { font-size: 22px; color: cyan; margin-bottom: 15px; font-weight: 700; }
+        .panel-btn { width: 100%; padding: 12px; margin-bottom: 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .connect-btn { background: cyan; color: black; font-size: 14px; }
+        .reward-btn { background: linear-gradient(135deg, #ffd700, #ffed4e); color: black; font-weight: 700; }
+        .reward-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #555; color: #aaa; }
+        .withdraw-btn { background: lime; color: black; font-weight: 700; font-size: 15px; margin-top: 10px; }
+        .disconnect-btn { background: none; border: 1px solid red; color: red; }
+        .wallet-info { background: rgba(0,212,255,0.1); padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; }
+        .info-label { color: #888; text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
+        .info-value { color: cyan; font-family: monospace; word-break: break-all; }
+        #walletConnected { display: none; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Start Screen -->
+        <div id="startScreen">
+            <h1>🐋 LethalOrca</h1>
+            <p>Tap fish to earn LORCA tokens! Each fish = 20 LORCA.</p>
+            <button class="start-btn" onclick="startGame()">Start Fishing</button>
+        </div>
+
+        <!-- Congratulations Pop-up -->
+        <div id="congratsBubble" class="congrats-bubble">
+            <div class="congrats-content">
+                <h2>🎉 CONGRATULATIONS! 🎉</h2>
+                <div class="coins-amount" id="congratsAmount">+500</div>
+                <p id="congratsText" style="font-size: 16px; color: #e0e0e0;">You claimed 500 LORCA coins!</p>
+                <button class="congrats-close" onclick="closeCongrats()">✓ AWESOME!</button>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="endScreen">
+            <h2>Time's Up!</h2>
+            <p id="finalScore" style="font-size: 24px; margin-bottom: 20px;"></p>
+            <p style="font-size: 16px; color: #ffed4e; margin-bottom: 20px;">Your total balance is saved and ready to withdraw!</p>
+            <button class="start-btn" onclick="startGame()">Play Again</button>
+        </div>
+
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <div class="logo-box">🐋</div>
+                <span id="tokenCount">0</span> LORCA
+            </div>
+            <div class="timer" id="timer">20</div>
+            <button class="wallet-btn" id="walletBtn" onclick="togglePanel()">Connect Wallet</button>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-area" id="gameArea"></div>
+
+        <!-- Wallet Panel -->
+        <div id="walletPanel">
+            <button class="close-btn" onclick="togglePanel()">✕</button>
+            <div class="panel-title">Wallet & Rewards</div>
+
+            <div id="walletDisconnected">
+                <p style="font-size: 13px; margin-bottom: 15px; color: #aaa;">Connect Phantom wallet to claim rewards & withdraw</p>
+                <button class="panel-btn connect-btn" onclick="connectPhantom()">Connect Phantom</button>
+            </div>
+
+            <div id="walletConnected">
+                <div class="wallet-info">
+                    <div class="info-label">Wallet Address</div>
+                    <div class="info-value" id="walletAddr">—</div>
+                </div>
+                <div class="wallet-info">
+                    <div class="info-label">Available Balance</div>
+                    <div class="info-value" style="font-size: 18px; color: lime;"><span id="walletBal">0</span> LORCA</div>
+                </div>
+                
+                <!-- Rewards Options Section -->
+                <div style="margin-top: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; border: 1px solid rgba(0,255,255,0.2);">
+                    <p style="font-size: 12px; color: cyan; margin-bottom: 8px; font-weight: 700;">🎁 CLAIMABLE REWARDS:</p>
+                    
+                    <button class="panel-btn reward-btn" id="loginBtn" onclick="claimLoginBonus()">
+                        🔑 Login Bonus (500 LORCA)
+                    </button>
+
+                    <button class="panel-btn reward-btn" id="airdropBtn" onclick="claimAirdrop()">
+                        🎁 Free Airdrop (500 LORCA)
+                    </button>
+
+                    <button class="panel-btn reward-btn" id="hourlyBtn" onclick="claimHourly()">
+                        ⏱️ Hourly Reward (500 LORCA)
+                    </button>
+
+                    <button class="panel-btn reward-btn" id="dailyBtn" onclick="claimDaily()">
+                        📅 Daily Reward (500 LORCA)
+                    </button>
+                </div>
+                
+                <!-- Withdraw Button -->
+                <button class="panel-btn withdraw-btn" id="withdrawBtn" onclick="withdraw()">
+                    💰 Withdraw LORCA
+                </button>
+                
+                <button class="panel-btn disconnect-btn" onclick="disconnect()" style="margin-top: 10px;">
+                    Disconnect Wallet
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
