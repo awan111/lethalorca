@@ -163,7 +163,7 @@
                     <div class="info-value" style="font-size: 18px; color: lime;"><span id="walletBal">0</span> LORCA</div>
                 </div>
                 
-                <!-- 4 Rewards Options Section -->
+                <!-- Rewards Options -->
                 <div style="margin-top: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; border: 1px solid rgba(0,255,255,0.2);">
                     <p style="font-size: 12px; color: cyan; margin-bottom: 8px; font-weight: 700;">🎁 CLAIMABLE REWARDS:</p>
                     
@@ -217,6 +217,31 @@
 
         const fishList = ['🐠', '🐟', '🐡'];
 
+        // Get Phantom Provider Helper
+        function getPhantomProvider() {
+            if ('phantom' in window) {
+                const provider = window.phantom?.solana;
+                if (provider?.isPhantom) return provider;
+            }
+            if ('solana' in window && window.solana?.isPhantom) {
+                return window.solana;
+            }
+            return null;
+        }
+
+        // Auto Connect on Load if already trusted
+        window.addEventListener('load', async () => {
+            const provider = getPhantomProvider();
+            if (provider) {
+                try {
+                    const res = await provider.connect({ onlyIfTrusted: true });
+                    if (res.publicKey) {
+                        setWalletConnected(res.publicKey.toString());
+                    }
+                } catch(e) {}
+            }
+        });
+
         function playBeep(freq = 800, dur = 100) {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -230,21 +255,49 @@
             } catch(e) {}
         }
 
+        async function connectPhantom() {
+            const provider = getPhantomProvider();
+            if (!provider) {
+                alert('Phantom Wallet not detected! Please install Phantom browser extension or open this site inside Phantom Mobile App.');
+                return false;
+            }
+            try {
+                const res = await provider.connect();
+                setWalletConnected(res.publicKey.toString());
+                return true;
+            } catch (e) {
+                console.error('Wallet connection error:', e);
+                return false;
+            }
+        }
+
+        function setWalletConnected(pubKey) {
+            userAddr = pubKey;
+            walletOk = true;
+            document.getElementById('walletDisconnected').style.display = 'none';
+            document.getElementById('walletConnected').style.display = 'block';
+            document.getElementById('walletAddr').textContent = userAddr.slice(0, 8) + '...' + userAddr.slice(-8);
+            document.getElementById('walletBtn').classList.add('connected');
+            document.getElementById('walletBtn').textContent = '✓ Connected';
+            checkRewardTimers();
+        }
+
         async function payEntryAndStart() {
+            // Auto prompt wallet connection if not connected
             if (!walletOk) {
-                alert('Please connect Phantom Wallet first!');
-                togglePanel();
-                return;
+                const connected = await connectPhantom();
+                if (!connected) return; 
             }
 
-            // Deduct entry fee from local session or require wallet tx
+            // Check for entry fee balance
             if (walletBalance < entryFee) {
-                alert(`Insufficient LORCA! You need ${entryFee} LORCA entry fee to play.`);
+                alert(`Insufficient LORCA! You need ${entryFee} LORCA entry fee to play. Please claim free rewards from Wallet side menu!`);
+                togglePanel(); // Open panel automatically so user can claim bonus
                 return;
             }
 
             walletBalance -= entryFee;
-            totalPrizePool += Math.floor(entryFee * 0.80); // 80% to prize pool
+            totalPrizePool += Math.floor(entryFee * 0.80); // 80% added to prize pool
             
             document.getElementById('startPrizePool').textContent = `${totalPrizePool.toLocaleString()} LORCA`;
             updateBalanceDisplay();
@@ -313,7 +366,6 @@
             clearInterval(gameTimer);
             clearInterval(spawnTimer);
 
-            // Add user score to leaderboard
             let shortAddr = userAddr ? userAddr.slice(0, 4) + '...' + userAddr.slice(-4) : "You";
             leaderboard.push({ wallet: shortAddr, score: roundScore });
             leaderboard.sort((a, b) => b.score - a.score);
@@ -363,22 +415,6 @@
         function togglePanel() {
             document.getElementById('walletPanel').classList.toggle('open');
             checkRewardTimers();
-        }
-
-        async function connectPhantom() {
-            try {
-                const provider = window.phantom?.solana;
-                if (!provider) { alert('Install Phantom from phantom.app'); return; }
-                const res = await provider.connect();
-                userAddr = res.publicKey.toString();
-                document.getElementById('walletDisconnected').style.display = 'none';
-                document.getElementById('walletConnected').style.display = 'block';
-                document.getElementById('walletAddr').textContent = userAddr.slice(0, 8) + '...' + userAddr.slice(-8);
-                document.getElementById('walletBtn').classList.add('connected');
-                document.getElementById('walletBtn').textContent = '✓ Connected';
-                walletOk = true;
-                checkRewardTimers();
-            } catch (e) { alert('Error: ' + e.message); }
         }
 
         function disconnect() {
