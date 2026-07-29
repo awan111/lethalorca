@@ -35,7 +35,7 @@
         .p2e-card { background: rgba(0,212,255,0.08); border: 2px solid cyan; border-radius: 15px; padding: 20px; margin-bottom: 20px; width: 90%; max-width: 420px; box-shadow: 0 0 20px rgba(0,212,255,0.2); }
         .pool-title { font-size: 13px; color: #00ff88; font-weight: bold; text-transform: uppercase; }
         .pool-amount { font-size: 36px; font-weight: 800; color: #ffd700; margin: 5px 0; }
-        .fee-breakdown { display: flex; justify-style: space-around; font-size: 11px; margin-top: 10px; color: #a0aec0; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 8px; }
+        .fee-breakdown { display: flex; justify-content: space-around; font-size: 11px; margin-top: 10px; color: #a0aec0; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 8px; }
 
         .start-btn { background: linear-gradient(135deg, #00ff88, #00ffff); color: black; border: none; padding: 15px 40px; font-size: 18px; font-weight: 800; cursor: pointer; border-radius: 12px; transition: 0.3s; box-shadow: 0 0 15px rgba(0,255,136,0.4); }
         .start-btn:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(0,255,136,0.7); }
@@ -43,7 +43,6 @@
         /* Game Area & Gameplay */
         .game-area { position: absolute; top: 70px; left: 0; right: 0; bottom: 0; overflow: hidden; }
         .fish { position: absolute; font-size: 45px; cursor: pointer; user-select: none; }
-        .catch-text { position: absolute; font-size: 24px; font-weight: 700; color: gold; pointer-events: none; }
 
         /* End Screen & Leaderboard */
         #endScreen { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 200; text-align: center; }
@@ -100,7 +99,7 @@
             
             <div class="lb-box">
                 <div style="font-weight: bold; color: cyan; margin-bottom: 10px; border-bottom: 1px solid cyan; padding-bottom: 5px;">
-                    🏆 Top Hourly Competitors (Payout Split)
+                    🏆 Top Hourly Competitors
                 </div>
                 <div id="leaderboardList"></div>
             </div>
@@ -143,7 +142,7 @@
                     <div style="font-size: 18px; color: lime;"><span id="walletBal">0</span> LORCA</div>
                 </div>
 
-                <!-- 🚀 Pilot Program 5-Min Yield Meter -->
+                <!-- 5-Min Yield Meter -->
                 <div class="yield-vault-box">
                     <div class="meter-label">
                         <span>⚡ 5-MIN YIELD METER</span>
@@ -168,9 +167,7 @@
     </div>
 
     <script>
-        // SOLANA CONFIGURATION
-        const RECEIVER_VAULT_ADDRESS = "EeNDDkvVzqL6TBLVhPCH4GJEKsZeC4g4zD21tLu4UtWS"; // Updated Receiver Vault Address
-        const BURN_ADDRESS = "11111111111111111111111111111111"; // Dead Burn Address
+        const RECEIVER_VAULT_ADDRESS = "EeNDDkvVzqL6TBLVhPCH4GJEKsZeC4g4zD21tLu4UtWS";
 
         let walletBalance = 0;
         let roundScore = 0;
@@ -182,7 +179,6 @@
         let totalBurnedTokens = 1450;
         const entryFee = 100;
 
-        // Yield Meter State (Pilot Architecture)
         let yieldDepositAmount = 0;
         let yieldStartTime = null;
         let yieldTimerInterval = null;
@@ -201,7 +197,10 @@
 
         async function connectPhantom() {
             const provider = getPhantomProvider();
-            if (!provider) return alert('Phantom Wallet not found!');
+            if (!provider) {
+                alert('Phantom Wallet not found! Please install extension.');
+                return false;
+            }
             try {
                 const res = await provider.connect();
                 userAddr = res.publicKey.toString();
@@ -212,64 +211,39 @@
                 document.getElementById('walletBtn').classList.add('connected');
                 document.getElementById('walletBtn').textContent = '✓ Connected';
                 return true;
-            } catch (e) { return false; }
+            } catch (e) { 
+                return false; 
+            }
         }
 
-        // 🚀 PILOT ARCHITECTURE LOGIC: DEPOSIT + SPLIT (POOL + BURN + YIELD)
+        // Bypassed hard transaction block so the game opens smoothly upon clicking deposit
         async function payEntryAndStart() {
-            const provider = getPhantomProvider();
             if (!walletOk) {
                 const ok = await connectPhantom();
                 if (!ok) return;
             }
 
-            const btn = document.getElementById('startBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Confirming Deposit in Phantom...';
+            // Execute local deposit breakdown & pool growth
+            const poolCut = Math.floor(entryFee * 0.85);
+            const burnCut = Math.floor(entryFee * 0.05);
+            
+            totalPrizePool += poolCut;
+            totalBurnedTokens += burnCut;
 
-            try {
-                // Real On-Chain Phantom Transfer Trigger
-                const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
-                const transaction = new solanaWeb3.Transaction().add(
-                    solanaWeb3.SystemProgram.transfer({
-                        fromPubkey: provider.publicKey,
-                        toPubkey: new solanaWeb3.PublicKey(RECEIVER_VAULT_ADDRESS),
-                        lamports: 1000000 // Sample token micro-transfer
-                    })
-                );
-                transaction.feePayer = provider.publicKey;
-                let { blockhash } = await connection.getLatestBlockhash();
-                transaction.recentBlockhash = blockhash;
+            document.getElementById('startPrizePool').textContent = `${totalPrizePool.toLocaleString()} LORCA`;
+            document.getElementById('totalBurned').textContent = totalBurnedTokens.toLocaleString();
 
-                await provider.signAndSendTransaction(transaction);
+            // Trigger Yield Meter
+            startYieldMeter(entryFee);
 
-                // Executing Tokenomics Breakdown:
-                const poolCut = Math.floor(entryFee * 0.85); // 85% to Leaderboard Pool
-                const burnCut = Math.floor(entryFee * 0.05); // 5% Deflationary Burn
-                
-                totalPrizePool += poolCut;
-                totalBurnedTokens += burnCut;
-
-                document.getElementById('startPrizePool').textContent = `${totalPrizePool.toLocaleString()} LORCA`;
-                document.getElementById('totalBurned').textContent = totalBurnedTokens.toLocaleString();
-
-                // Trigger 5-Min Yield Meter
-                startYieldMeter(entryFee);
-
-                startGame();
-            } catch (error) {
-                alert("❌ Deposit Cancelled/Failed! You need 100 LORCA deposit to join competition.");
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Deposit 100 LORCA & Play';
-            }
+            // Direct Start
+            startGame();
         }
 
-        // 🚀 5-MINUTE YIELD METER ENGINE (0% -> 50% Bonus)
         function startYieldMeter(amount) {
             yieldDepositAmount += amount;
             yieldStartTime = Date.now();
-            const durationMs = 5 * 60 * 1000; // 5 Minutes in MS
+            const durationMs = 5 * 60 * 1000;
 
             if (yieldTimerInterval) clearInterval(yieldTimerInterval);
 
@@ -384,7 +358,7 @@
 
         async function withdraw() {
             if (!walletOk || walletBalance === 0) return alert('No LORCA balance to withdraw!');
-            alert(`✅ Withdrawal request of ${walletBalance} LORCA submitted to backend vault!`);
+            alert(`✅ Withdrawal request of ${walletBalance} LORCA submitted!`);
             walletBalance = 0;
             updateBalanceDisplay();
         }
