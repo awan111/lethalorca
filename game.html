@@ -5,106 +5,142 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LethalOrca - Play & Earn</title>
 
-    <!-- Solana Web3 SDK (CDN) -->
+    <!-- Solana Web3 SDK -->
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
 
-    <!-- 1. CSS STYLES (Game Modal & Responsive Fixes) -->
     <style>
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
             background-color: #0d1b2a;
             color: #ffffff;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Simulated Game Canvas Area */
+        #gameCanvasArea {
+            width: 100vw;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
+            background: radial-gradient(circle, #1b263b 0%, #0d1b2a 100%);
+            transition: filter 0.3s ease;
         }
 
-        /* Modal Overlay for Game Integration */
+        /* Blur game while modal is active */
+        .game-locked {
+            filter: blur(8px);
+            pointer-events: none;
+        }
+
+        /* Modal Popup Overlay */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(13, 27, 42, 0.85);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9999; /* Game Canvas ke upar show karne ke liye */
+            z-index: 9999;
         }
 
         .container {
             width: 90%;
-            max-width: 480px;
+            max-width: 440px;
             background: #1b263b;
-            padding: 25px;
+            padding: 30px;
             border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
             border: 1px solid #415a77;
+            text-align: center;
         }
 
         h1 {
-            font-size: 22px;
+            font-size: 24px;
             margin-bottom: 20px;
             color: #e0e1dd;
         }
 
-        button {
+        .status-box {
+            background: #0d1b2a;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #415a77;
+            text-align: left;
+        }
+
+        .status-box p {
+            margin: 8px 0;
+            font-size: 14px;
+            color: #778da9;
+        }
+
+        .status-val {
+            font-weight: bold;
+            color: #00b4d8;
+            word-break: break-all;
+        }
+
+        .btn {
             background-color: #00b4d8;
-            color: #fff;
+            color: #ffffff;
             border: none;
-            padding: 12px 20px;
+            padding: 14px 20px;
             margin: 8px 0;
             width: 100%;
             font-size: 16px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.2s ease;
+            transition: background 0.2s ease, transform 0.1s ease;
         }
 
-        button:hover {
+        .btn:hover {
             background-color: #90e0ef;
-            color: #000;
+            color: #0d1b2a;
         }
 
-        button:disabled {
-            background-color: #555555;
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            background-color: #415a77;
+            color: #778da9;
             cursor: not-allowed;
-            opacity: 0.7;
+            transform: none;
         }
 
-        .status-box {
-            background: #415a77;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-size: 14px;
-            text-align: left;
+        .btn-start {
+            background-color: #2ec4b6;
         }
 
-        .status-box p {
-            margin: 6px 0;
-            word-break: break-all;
-        }
-
-        .status-val {
-            font-weight: bold;
-            color: #90e0ef;
+        .btn-start:hover {
+            background-color: #cbf3f0;
+            color: #0d1b2a;
         }
     </style>
 </head>
 <body>
 
-    <!-- Pop-up Wrapper for Game Integration -->
+    <!-- Game Screen (Put your game Canvas or iFrame inside this container) -->
+    <div id="gameCanvasArea" class="game-locked">
+        <h2 id="gameStatusText">Game Paused - Connect Wallet to Play</h2>
+    </div>
+
+    <!-- Web3 Control Panel Popup -->
     <div class="modal-overlay" id="web3Modal">
         <div class="container">
             <h1>🐋 LethalOrca Web3 Panel</h1>
@@ -114,12 +150,12 @@
                 <p>LORCA Balance: <span id="balance" class="status-val">0</span> LORCA</p>
             </div>
 
-            <button id="connectBtn" onclick="connectPhantom()">Connect Phantom Wallet</button>
-            <button id="claimBtn" onclick="claimGeneratedLorca()">Sign Tx & Transfer LORCA</button>
+            <button id="connectBtn" class="btn" onclick="connectPhantom()">Connect Phantom Wallet</button>
+            <button id="startBtn" class="btn btn-start" onclick="startGame()" disabled>Start Game</button>
+            <button id="claimBtn" class="btn" onclick="claimGeneratedLorca()" disabled>Sign Tx & Transfer LORCA</button>
         </div>
     </div>
 
-    <!-- 2. JAVASCRIPT & FIXED WEB3 LOGIC -->
     <script>
         // RPC Setup
         const RPC_URL = "https://api.devnet.solana.com"; 
@@ -127,7 +163,7 @@
 
         let userWalletAddress = null;
 
-        // Safe Phantom Provider Fetch (Game loop safe)
+        // Get Phantom Provider safely
         function getPhantomProvider() {
             if ("solana" in window) {
                 const provider = window.solana;
@@ -139,13 +175,13 @@
         }
 
         // -------------------------------------------------------------
-        // PHANTOM CONNECT FUNCTION
+        // PHANTOM CONNECT
         // -------------------------------------------------------------
         async function connectPhantom() {
             const provider = getPhantomProvider();
 
             if (!provider) {
-                alert("Phantom Wallet install nahi hai! Pehle Extension install karein.");
+                alert("Phantom Wallet is not installed. Please install the extension first.");
                 window.open("https://phantom.app/", "_blank");
                 return;
             }
@@ -154,58 +190,85 @@
                 const response = await provider.connect();
                 userWalletAddress = response.publicKey.toString();
                 
-                // UI Label Update
+                // Update UI state
                 document.getElementById("walletStatus").innerText = 
                     userWalletAddress.slice(0, 6) + "..." + userWalletAddress.slice(-4);
                 
-                console.log("Connected Wallet:", userWalletAddress);
+                document.getElementById("connectBtn").innerText = "Wallet Connected";
+                document.getElementById("connectBtn").disabled = true;
+                
+                // Enable Game Start and Claim buttons
+                document.getElementById("startBtn").disabled = false;
+                document.getElementById("claimBtn").disabled = false;
 
             } catch (err) {
                 console.error("Connection Error:", err);
-                alert("Wallet Connect nahi ho saka!");
+                alert("Failed to connect wallet.");
             }
         }
 
         // -------------------------------------------------------------
-        // CLAIM / TRANSFER FUNCTION (FIXED INSTRUCTION & BLOCKHASH)
+        // START GAME FUNCTION
+        // -------------------------------------------------------------
+        function startGame() {
+            if (!userWalletAddress) {
+                alert("Please connect your wallet first!");
+                return;
+            }
+
+            // Hide the Web3 popup
+            document.getElementById("web3Modal").style.display = "none";
+            
+            // Unlock game screen blur
+            document.getElementById("gameCanvasArea").classList.remove("game-locked");
+            document.getElementById("gameStatusText").innerText = "🎮 Game Started! Enjoy Playing.";
+
+            // Trigger your core Game Init logic here
+            if (typeof onGameStart === "function") {
+                onGameStart(userWalletAddress);
+            }
+        }
+
+        // Custom hook function to integrate with your existing game logic
+        function onGameStart(walletAddress) {
+            console.log("Game successfully initialized for wallet:", walletAddress);
+            // Example: MyGameEngine.start();
+        }
+
+        // -------------------------------------------------------------
+        // CLAIM / TRANSACTION FUNCTION
         // -------------------------------------------------------------
         async function claimGeneratedLorca() {
             const provider = getPhantomProvider();
 
             if (!userWalletAddress || !provider) {
-                alert("Pehle Wallet Connect Karein!");
+                alert("Please connect your wallet first!");
                 return;
             }
 
             const claimBtn = document.getElementById("claimBtn");
             claimBtn.disabled = true;
-            claimBtn.innerText = "Processing Transaction...";
+            claimBtn.innerText = "Processing...";
 
             try {
-                console.log("Fetching Blockhash from RPC...");
                 const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
 
-                // 1. Create Transaction
                 const transaction = new solanaWeb3.Transaction({
                     recentBlockhash: blockhash,
                     feePayer: provider.publicKey
                 });
 
-                // 2. Add Valid Instruction (Phantom prompt tabhi open hota hai jab instruction maujood ho)
+                // Test Transfer Instruction
                 transaction.add(
                     solanaWeb3.SystemProgram.transfer({
                         fromPubkey: provider.publicKey,
-                        toPubkey: provider.publicKey, // Testing ke liye Self-transfer
-                        lamports: 1000 // 0.000001 SOL
+                        toPubkey: provider.publicKey,
+                        lamports: 1000
                     })
                 );
 
-                console.log("Sending Transaction to Phantom for Signature...");
-
-                // 3. Request Signature from Wallet
                 const { signature } = await provider.signAndSendTransaction(transaction);
                 
-                console.log("Waiting for network confirmation:", signature);
                 await connection.confirmTransaction({
                     blockhash: blockhash,
                     lastValidBlockHeight: lastValidBlockHeight,
@@ -215,21 +278,26 @@
                 alert("Transaction Successful!\nHash: " + signature);
 
             } catch (error) {
-                console.error("Transfer Error Details:", error);
-                alert("Transaction Cancel ya Fail ho gayi! Console dekhein.");
+                console.error("Transaction Error:", error);
+                alert("Transaction canceled or failed.");
             } finally {
                 claimBtn.disabled = false;
                 claimBtn.innerText = "Sign Tx & Transfer LORCA";
             }
         }
 
-        // Auto-detect existing wallet connection on load
+        // Auto-detect connected wallet on page load
         window.addEventListener('load', () => {
             const provider = getPhantomProvider();
             if (provider && provider.isConnected && provider.publicKey) {
                 userWalletAddress = provider.publicKey.toString();
                 document.getElementById("walletStatus").innerText = 
                     userWalletAddress.slice(0, 6) + "..." + userWalletAddress.slice(-4);
+                
+                document.getElementById("connectBtn").innerText = "Wallet Connected";
+                document.getElementById("connectBtn").disabled = true;
+                document.getElementById("startBtn").disabled = false;
+                document.getElementById("claimBtn").disabled = false;
             }
         });
     </script>
