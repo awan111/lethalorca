@@ -580,7 +580,7 @@
             document.getElementById("claimCard").scrollIntoView({ behavior: 'smooth' });
         }
 
-        // 🟢 UPDATED DIRECT GET REQUEST SUBMISSION FUNCTION
+        // 🟢 UPDATED WEBHOOK URL FUNCTION
         function submitAirdropClaim(e) {
             e.preventDefault();
             const wallet = document.getElementById("solWallet").value.trim();
@@ -590,9 +590,9 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "⏳ Saving Claim...";
 
-            const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzt9FX7km3EuLJFbYddWXXMP-D1TOV-8HRb2jptLC-Ru2tjXVF6vhGFnW2WB4YyC1iV/exec";
+            // Updated Webhook URL
+            const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxP-hEIpZYSYVLOKciOLiOrBdRzVvLlpdbasVDJ9TrQGRp-Fr3URrrmWthWkYBcDGlsiA/exec";
 
-            // Data ko Direct URL parameters mein bhejna (No CORS Blockage)
             const finalUrl = `${GOOGLE_WEBHOOK_URL}?wallet=${encodeURIComponent(wallet)}&social=${encodeURIComponent(social)}`;
 
             fetch(finalUrl, {
