@@ -30,7 +30,7 @@
             overflow-x: hidden;
         }
 
-        /* Expanded Horizontal Glass Container for PC / Windows */
+        /* Container */
         .container {
             max-width: 680px;
             width: 95%;
@@ -44,14 +44,12 @@
             position: relative;
         }
 
-        /* Top Bar for Extra Small Audio Button */
         .top-bar {
             display: flex;
             justify-content: flex-end;
             margin-bottom: 2px;
         }
 
-        /* Extra Small Sound Button */
         .audio-btn {
             background: rgba(0, 242, 254, 0.08);
             border: 1px solid rgba(0, 242, 254, 0.5);
@@ -71,7 +69,6 @@
             box-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
         }
 
-        /* Title */
         h1 {
             font-size: clamp(1.2rem, 4.5vw, 1.6rem);
             font-weight: 800;
@@ -90,7 +87,6 @@
             margin-bottom: 12px;
         }
 
-        /* CA Box */
         .ca-box {
             background: rgba(4, 8, 18, 0.8);
             border: 1px dashed rgba(0, 242, 254, 0.5);
@@ -130,7 +126,6 @@
             box-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
         }
 
-        /* Micro Disclaimer Box */
         .disclaimer-box {
             background: rgba(234, 179, 8, 0.06);
             border: 1px solid rgba(234, 179, 8, 0.4);
@@ -143,7 +138,6 @@
             text-align: center;
         }
 
-        /* Generator Stage */
         .generator-box {
             background: rgba(2, 6, 16, 0.6);
             border: 1px solid rgba(0, 242, 254, 0.2);
@@ -165,7 +159,7 @@
 
         .orca-avatar {
             font-size: 48px;
-            animation: floatOrca 3s ease-in-out infinite;
+            animation: floatOrca 1.8s ease-in-out infinite;
             position: relative;
             z-index: 2;
             filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.4));
@@ -173,12 +167,12 @@
 
         @keyframes floatOrca {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-6px) rotate(-2deg); }
+            50% { transform: translateY(-8px) rotate(-3deg); }
         }
 
         .coin-particle {
             position: absolute;
-            font-size: 16px;
+            font-size: 18px;
             top: 25px;
             left: 50%;
             z-index: 1;
@@ -187,8 +181,8 @@
         }
 
         @keyframes emitCoin {
-            0% { opacity: 1; transform: translate(-50%, 0) scale(0.5); }
-            100% { opacity: 0; transform: translate(calc(-50% + var(--translateX)), 50px) scale(1.1); }
+            0% { opacity: 1; transform: translate(-50%, 0) scale(0.6); }
+            100% { opacity: 0; transform: translate(calc(-50% + var(--translateX)), 55px) scale(1.2); }
         }
 
         .counter-grid {
@@ -248,7 +242,6 @@
             transform: none;
         }
 
-        /* Claim Airdrop Applet */
         .claim-card {
             background: rgba(16, 185, 129, 0.08);
             border: 1px solid #10b981;
@@ -319,7 +312,6 @@
             box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
         }
 
-        /* Social CTAs Section */
         .social-section {
             margin-top: 14px;
         }
@@ -410,14 +402,14 @@
 <body>
 
     <div class="container">
-        <!-- Top Bar with Extra Small Audio Button -->
+        <!-- Top Bar -->
         <div class="top-bar">
             <button class="audio-btn" id="audioToggle" onclick="toggleAudio()">🔊 Sound: ON</button>
         </div>
 
         <!-- Main Title -->
         <h1>🐋 LETHAL ORCA $LORCA</h1>
-        <p class="subtitle">Official 3-Minute 100,000 $LORCA Token Mint Generator!</p>
+        <p class="subtitle">Official 1-Minute 100,000 $LORCA Token Mint Generator!</p>
 
         <!-- CA Box -->
         <div class="ca-box">
@@ -440,15 +432,15 @@
             <div class="counter-grid">
                 <div class="stat-card">
                     <div class="stat-label">TIME REMAINING</div>
-                    <div class="stat-value" id="timerDisplay">03:00</div>
+                    <div class="stat-value" id="timerDisplay">01:00.0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">MINTED $LORCA</div>
-                    <div class="stat-value" id="tokenDisplay">0</div>
+                    <div class="stat-value" id="tokenDisplay">0 $LORCA</div>
                 </div>
             </div>
 
-            <button class="start-btn" id="startBtn" onclick="startMintingProcess()">⚡ START 3-MIN MINT GENERATOR ⚡</button>
+            <button class="start-btn" id="startBtn" onclick="startMintingProcess()">⚡ START 1-MIN FAST MINT GENERATOR ⚡</button>
         </div>
 
         <!-- Airdrop Claim Applet -->
@@ -500,12 +492,14 @@
     </div>
 
     <script>
-        const TOTAL_TIME = 180; 
+        // 60 seconds (1 minute) with 100,000 $LORCA target reward
+        const TOTAL_TIME = 60; 
         const TARGET_TOKENS = 100000;
         let soundEnabled = true;
         let isMinting = false;
-        let timerInterval = null;
+        let animFrameId = null;
         let coinInterval = null;
+        let lastSoundTime = 0;
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -531,8 +525,8 @@
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.005, audioCtx.currentTime + duration);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
@@ -551,12 +545,12 @@
             coin.className = "coin-particle";
             coin.innerText = Math.random() > 0.5 ? "🪙" : "💎";
             
-            const randomX = (Math.random() - 0.5) * 120;
+            const randomX = (Math.random() - 0.5) * 140;
             coin.style.setProperty('--translateX', `${randomX}px`);
-            coin.style.animation = `emitCoin 0.8s ease-out forwards`;
+            coin.style.animation = `emitCoin 0.6s ease-out forwards`;
             
             stage.appendChild(coin);
-            setTimeout(() => coin.remove(), 800);
+            setTimeout(() => coin.remove(), 600);
         }
 
         function startMintingProcess() {
@@ -565,42 +559,64 @@
 
             isMinting = true;
             document.getElementById("startBtn").disabled = true;
-            document.getElementById("startBtn").innerText = "⚙️ GENERATING $LORCA TOKENS...";
+            document.getElementById("startBtn").innerText = "⚡ MINTING $LORCA CONTINUOUSLY...";
 
-            let secondsLeft = TOTAL_TIME;
-            let currentTokens = 0;
-            const tokenPerSecond = TARGET_TOKENS / TOTAL_TIME;
+            const startTime = performance.now();
+            const durationMs = TOTAL_TIME * 1000;
 
-            timerInterval = setInterval(() => {
-                secondsLeft--;
-                currentTokens = Math.min(TARGET_TOKENS, Math.floor((TOTAL_TIME - secondsLeft) * tokenPerSecond));
+            // Continuous running meter loop using requestAnimationFrame for zero jitter
+            function updateLoop(currentTime) {
+                const elapsedMs = currentTime - startTime;
+                const progress = Math.min(1, elapsedMs / durationMs);
 
-                const mins = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
-                const secs = String(secondsLeft % 60).padStart(2, '0');
-                document.getElementById("timerDisplay").innerText = `${mins}:${secs}`;
+                // Smooth easing curve (easeOutCubic) for a natural continuous rolling speed meter feel
+                const easedProgress = 1 - Math.pow(1 - progress, 3);
+
+                // Time remaining calculations
+                const remainingMs = Math.max(0, durationMs - elapsedMs);
+                const currentMins = Math.floor(remainingMs / 60000);
+                const currentSecs = Math.floor((remainingMs % 60000) / 1000);
+                const currentTenths = Math.floor((remainingMs % 1000) / 100);
+
+                const formattedMins = String(currentMins).padStart(2, '0');
+                const formattedSecs = String(currentSecs).padStart(2, '0');
+
+                // Continuous running meter token calculation
+                const currentTokens = Math.floor(easedProgress * TARGET_TOKENS);
+
+                document.getElementById("timerDisplay").innerText = `${formattedMins}:${formattedSecs}.${currentTenths}`;
                 document.getElementById("tokenDisplay").innerText = currentTokens.toLocaleString() + " $LORCA";
 
-                playSound(400 + (secondsLeft % 5) * 40, 0.04);
+                // Audio ticker pulse
+                if (currentTime - lastSoundTime > 90) {
+                    playSound(450 + (currentTokens % 400), 0.02);
+                    lastSoundTime = currentTime;
+                }
 
-                if (secondsLeft <= 0) {
+                if (progress < 1) {
+                    animFrameId = requestAnimationFrame(updateLoop);
+                } else {
                     finishMinting();
                 }
-            }, 1000);
+            }
 
+            animFrameId = requestAnimationFrame(updateLoop);
+
+            // Fast particle generator for vibrant visual motion
             coinInterval = setInterval(() => {
                 spawnCoinParticle();
-            }, 260);
+            }, 80);
         }
 
         function finishMinting() {
-            clearInterval(timerInterval);
+            cancelAnimationFrame(animFrameId);
             clearInterval(coinInterval);
             isMinting = false;
 
-            document.getElementById("timerDisplay").innerText = "00:00";
+            document.getElementById("timerDisplay").innerText = "00:00.0";
             document.getElementById("tokenDisplay").innerText = "100,000 $LORCA";
-            document.getElementById("startBtn").innerText = "🎉 MINT COMPLETED!";
-            playSound(750, 0.35);
+            document.getElementById("startBtn").innerText = "🎉 100,000 $LORCA MINT COMPLETED!";
+            playSound(800, 0.4);
 
             document.getElementById("claimCard").style.display = "block";
             document.getElementById("claimCard").scrollIntoView({ behavior: 'smooth' });
@@ -624,7 +640,6 @@
                     ]);
 
                 if (error) {
-                    // Unique constraint error code (Wallet duplicate rejection)
                     if (error.code === '23505') {
                         alert("⚠️ Yeh Solana Wallet pehle se claim kar chuka hai!");
                     } else {
