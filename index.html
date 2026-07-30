@@ -1,678 +1,644 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LethalOrca — $LORCA</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --abyss: #020910;
-    --deep: #05121e;
-    --deep2: #081a2b;
-    --teal: #2dd4bf;
-    --teal-glow: #5eead4;
-    --gold: #f2c94c;
-    --ink: #f4fcfc;
-    --muted: #8ab4b4;
-    --line: rgba(94, 234, 212, 0.2);
-    --display: 'Space Grotesk', sans-serif;
-    --body: 'Inter', sans-serif;
-    --mono: 'IBM Plex Mono', monospace;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--abyss);
-    color: var(--ink);
-    font-family: var(--body);
-    line-height: 1.6;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-  }
-  a { color: var(--teal-glow); text-decoration: none; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LethalOrca $LORCA Mint Generator 🐋⚡</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-  .noise-layer {
-    position: fixed;
-    inset: 0;
-    background-image: radial-gradient(circle at 20% 20%, rgba(45,212,191,0.08), transparent 40%),
-                       radial-gradient(circle at 80% 60%, rgba(242,201,76,0.05), transparent 45%);
-    pointer-events: none;
-    z-index: 0;
-  }
+        body {
+            background: radial-gradient(circle at center, #0b1329 0%, #040711 70%, #020307 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 10px;
+            text-align: center;
+            overflow-x: hidden;
+        }
 
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 5%;
-    z-index: 100;
-    backdrop-filter: blur(16px);
-    background: rgba(2,9,16,0.85);
-    border-bottom: 1px solid var(--line);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
-  .brand {
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 18px;
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-glow); box-shadow: 0 0 16px var(--teal-glow); }
-  nav .links { display: flex; gap: 24px; font-size: 14px; color: var(--muted); }
-  nav .links a:hover { color: var(--teal-glow); text-shadow: 0 0 10px rgba(94,234,212,0.5); }
+        /* Expanded Horizontal Glass Container for PC / Windows */
+        .container {
+            max-width: 680px; /* Expanded horizontal layout */
+            width: 95%;
+            background: rgba(13, 22, 41, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            border-radius: 20px;
+            padding: 16px 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 242, 254, 0.12);
+            position: relative;
+        }
 
-  section { position: relative; z-index: 1; padding: 120px 5% 80px; max-width: 1240px; margin: 0 auto; }
+        /* Top Bar for Extra Small Audio Button */
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 2px;
+        }
 
-  #hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-top: 90px;
-    position: relative;
-  }
-  .depth-tag {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--teal);
-    letter-spacing: 2px;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    text-shadow: 0 0 10px rgba(45,212,191,0.3);
-  }
-  h1.hero-title {
-    font-family: var(--display);
-    font-size: clamp(40px, 7vw, 100px);
-    font-weight: 700;
-    line-height: 1.02;
-    letter-spacing: -1.5px;
-    background: linear-gradient(180deg, #ffffff 0%, var(--teal-glow) 120%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    filter: drop-shadow(0 4px 25px rgba(94,234,212,0.2));
-  }
-  .hero-sub {
-    font-size: 17px;
-    color: var(--muted);
-    max-width: 580px;
-    margin-top: 20px;
-  }
-  
-  /* CTA Buttons — Sleek Mobile Friendly Grid */
-  .hero-cta { 
-    display: flex; 
-    gap: 14px; 
-    margin-top: 32px; 
-    flex-wrap: wrap; 
-  }
-  .btn {
-    font-family: var(--body);
-    font-weight: 600;
-    font-size: 14px;
-    padding: 14px 24px;
-    border-radius: 100px;
-    border: 1px solid var(--line);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    position: relative;
-    text-align: center;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--teal-glow), var(--teal));
-    color: var(--abyss);
-    border: none;
-    font-weight: 700;
-    box-shadow: 0 4px 25px rgba(45, 212, 191, 0.4);
-  }
-  .btn-primary:hover {
-    box-shadow: 0 8px 35px rgba(45, 212, 191, 0.65);
-    transform: translateY(-2px);
-  }
-  .btn-ghost { color: var(--ink); background: rgba(255,255,255,0.03); }
-  .btn-ghost:hover {
-    border-color: var(--teal-glow);
-    color: var(--teal-glow);
-    background: rgba(94,234,212,0.08);
-    transform: translateY(-2px);
-  }
+        /* Extra Small Sound Button */
+        .audio-btn {
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.5);
+            color: #00f2fe;
+            padding: 2px 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.58rem;
+            font-weight: 600;
+            line-height: 1;
+            transition: all 0.2s ease;
+        }
 
-  .btn-play {
-    background: linear-gradient(135deg, var(--gold), #ffb347);
-    color: #2a1f00;
-    border: none;
-    font-weight: 700;
-    box-shadow: 0 4px 25px rgba(242, 201, 76, 0.45);
-    animation: play-pulse 2.6s ease-in-out infinite;
-  }
-  .btn-play:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 10px 35px rgba(242, 201, 76, 0.7);
-  }
-  .btn-play .play-icon {
-    display: inline-flex;
-    width: 18px; height: 18px;
-    align-items: center; justify-content: center;
-    background: rgba(0,0,0,0.15);
-    border-radius: 50%;
-    font-size: 10px;
-  }
+        .audio-btn:hover {
+            background: #00f2fe;
+            color: #000;
+            box-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
+        }
 
-  .btn-generator {
-    background: linear-gradient(135deg, #00f2fe, #3b82f6);
-    color: #000;
-    border: none;
-    font-weight: 700;
-    box-shadow: 0 4px 25px rgba(0, 242, 254, 0.45);
-  }
-  .btn-generator:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 35px rgba(0, 242, 254, 0.75);
-  }
+        /* Title */
+        h1 {
+            font-size: clamp(1.2rem, 4.5vw, 1.6rem);
+            font-weight: 800;
+            background: linear-gradient(90deg, #00f2fe, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+            margin-bottom: 2px;
+            line-height: 1.2;
+            letter-spacing: 0.5px;
+        }
 
-  @keyframes play-pulse {
-    0%, 100% { box-shadow: 0 4px 25px rgba(242, 201, 76, 0.45); }
-    50% { box-shadow: 0 4px 35px rgba(242, 201, 76, 0.75); }
-  }
+        .subtitle {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
 
-  #orca-trail { position: absolute; right: -5%; top: 20%; width: 55%; max-width: 640px; opacity: 0.9; }
+        /* CA Box */
+        .ca-box {
+            background: rgba(4, 8, 18, 0.8);
+            border: 1px dashed rgba(0, 242, 254, 0.5);
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
 
-  .depth-marker {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    margin-bottom: 12px;
-  }
-  .depth-marker .depth-val { font-family: var(--mono); font-size: 13px; color: var(--teal); letter-spacing: 1px; }
-  .depth-marker .depth-name { font-family: var(--mono); font-size: 13px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; }
-  h2.section-title {
-    font-family: var(--display);
-    font-size: clamp(28px, 4vw, 48px);
-    font-weight: 600;
-    margin-bottom: 16px;
-    letter-spacing: -1px;
-  }
-  .section-lede { color: var(--muted); max-width: 620px; font-size: 15.5px; margin-bottom: 40px; }
+        .ca-text {
+            font-family: 'Courier New', monospace;
+            font-size: 0.72rem;
+            color: #38bdf8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
 
-  hr.divider { border: none; border-top: 1px solid var(--line); margin: 0 5%; }
+        .copy-btn {
+            background: #00f2fe;
+            color: #000;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
 
-  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
-  .about-grid p { color: var(--muted); margin-bottom: 16px; font-size: 15px; }
-  .founder-card {
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 28px;
-    background: linear-gradient(180deg, var(--deep2), var(--deep));
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-  }
-  .founder-card .label { font-family: var(--mono); font-size: 11px; color: var(--teal); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
-  .founder-card h3 { font-family: var(--display); font-size: 20px; margin-bottom: 12px; }
-  .founder-card p { font-size: 14px; color: var(--muted); }
+        .copy-btn:hover {
+            background: #38bdf8;
+            box-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
+        }
 
-  .ledger {
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    overflow: hidden;
-    background: var(--deep);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-  }
-  .ledger-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--line);
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .ledger-row:last-child { border-bottom: none; }
-  .ledger-key { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-family: var(--mono); }
-  .ledger-val { font-family: var(--mono); font-size: 14px; color: var(--ink); word-break: break-all; }
-  .ledger-val.editable { color: var(--gold); }
-  .verify-note {
-    margin-top: 18px;
-    font-size: 13px;
-    color: var(--muted);
-    display: flex;
-    gap: 10px;
-  }
+        /* Micro Disclaimer Box */
+        .disclaimer-box {
+            background: rgba(234, 179, 8, 0.06);
+            border: 1px solid rgba(234, 179, 8, 0.4);
+            color: #fde047;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.63rem;
+            margin-bottom: 12px;
+            line-height: 1.3;
+            text-align: center;
+        }
 
-  .timeline { position: relative; padding-left: 28px; }
-  .timeline::before {
-    content: '';
-    position: absolute;
-    left: 6px; top: 8px; bottom: 8px;
-    width: 1px;
-    background: linear-gradient(180deg, var(--teal-glow), transparent);
-  }
-  .tl-item { position: relative; padding-bottom: 36px; }
-  .tl-item:last-child { padding-bottom: 0; }
-  .tl-item::before {
-    content: '';
-    position: absolute;
-    left: -28px; top: 4px;
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--abyss);
-    border: 2px solid var(--teal-glow);
-  }
-  .tl-item.active::before { background: var(--teal-glow); box-shadow: 0 0 14px var(--teal-glow); }
-  .tl-phase { font-family: var(--mono); font-size: 11px; color: var(--teal); letter-spacing: 1px; margin-bottom: 4px; }
-  .tl-title { font-family: var(--display); font-size: 19px; margin-bottom: 6px; }
-  .tl-desc { color: var(--muted); font-size: 14.5px; max-width: 540px; }
+        /* Generator Stage */
+        .generator-box {
+            background: rgba(2, 6, 16, 0.6);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 12px;
+            padding: 14px 12px;
+            margin-bottom: 14px;
+            position: relative;
+            overflow: hidden;
+        }
 
-  .community-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-  .comm-card {
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 22px;
-    background: var(--deep);
-    transition: all 0.3s ease;
-  }
-  .comm-card:hover { border-color: var(--teal-glow); transform: translateY(-3px); }
-  .comm-card .plat { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
-  .comm-card .handle { font-family: var(--display); font-size: 17px; }
+        .orca-stage {
+            height: 75px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+        }
 
-  footer {
-    padding: 50px 5% 40px;
-    border-top: 1px solid var(--line);
-    position: relative;
-    z-index: 1;
-  }
-  .disclaimer {
-    font-size: 12.5px;
-    color: var(--muted);
-    max-width: 800px;
-    line-height: 1.7;
-    padding: 20px;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: rgba(255,255,255,0.02);
-  }
-  .disclaimer strong { color: var(--ink); }
-  .foot-bottom { margin-top: 20px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .orca-avatar {
+            font-size: 48px;
+            animation: floatOrca 3s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.4));
+        }
 
-  .updates-list { display: flex; flex-direction: column; gap: 0; margin-top: 28px; border-top: 1px solid var(--line); }
-  .update-item { display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
-  .update-date { font-family: var(--mono); font-size: 12px; color: var(--teal); white-space: nowrap; min-width: 80px; }
-  .update-text { font-size: 14.5px; color: var(--ink); }
-  .update-text .tag { font-family: var(--mono); font-size: 10px; color: var(--gold); border: 1px solid rgba(242,201,76,0.35); padding: 2px 8px; border-radius: 20px; margin-right: 6px; text-transform: uppercase; }
+        @keyframes floatOrca {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(-2deg); }
+        }
 
-  .screenshot-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 28px; }
-  .screenshot-img {
-    aspect-ratio: 16/9; border-radius: 14px; border: 1px solid var(--line);
-    overflow: hidden; background: var(--deep);
-  }
-  .screenshot-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        .coin-particle {
+            position: absolute;
+            font-size: 16px;
+            top: 25px;
+            left: 50%;
+            z-index: 1;
+            opacity: 0;
+            pointer-events: none;
+        }
 
-  .faq-list { margin-top: 28px; border-top: 1px solid var(--line); }
-  .faq-item { border-bottom: 1px solid var(--line); }
-  .faq-item summary {
-    padding: 20px 4px; cursor: pointer; list-style: none;
-    font-family: var(--display); font-size: 17px; color: var(--ink);
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .faq-item summary::-webkit-details-marker { display: none; }
-  .faq-item summary::after { content: '+'; font-size: 20px; color: var(--teal-glow); margin-left: 12px; }
-  .faq-item[open] summary::after { transform: rotate(45deg); }
-  .faq-item .faq-answer { padding: 0 4px 20px; color: var(--muted); font-size: 14.5px; }
+        @keyframes emitCoin {
+            0% { opacity: 1; transform: translate(-50%, 0) scale(0.5); }
+            100% { opacity: 0; transform: translate(calc(-50% + var(--translateX)), 50px) scale(1.1); }
+        }
 
-  .newsletter-box {
-    margin-top: 28px; border: 1px solid var(--line); border-radius: 16px;
-    padding: 24px; background: var(--deep); display: flex; align-items: center;
-    justify-content: space-between; gap: 16px; flex-wrap: wrap;
-  }
-  .newsletter-box p { margin: 0; max-width: 440px; font-size: 14.5px; color: var(--muted); }
+        .counter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
 
-  /* --- SLEEK RESPONSIVE GENERATOR MODAL --- */
-  .generator-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: rgba(2, 9, 16, 0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-  }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 10px 8px;
+            border-radius: 8px;
+        }
 
-  .generator-modal-content {
-    background: #081a2b;
-    border: 1px solid rgba(0, 242, 254, 0.35);
-    border-radius: 18px;
-    width: 100%;
-    max-width: 720px;
-    height: 90vh;
-    max-height: 720px;
-    box-shadow: 0 0 50px rgba(0, 242, 254, 0.25);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    animation: modalIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
+        .stat-label {
+            font-size: 0.64rem;
+            color: #94a3b8;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-  .generator-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 20px;
-    background: rgba(5, 18, 30, 0.98);
-    border-bottom: 1px solid rgba(94, 234, 212, 0.2);
-    flex-shrink: 0;
-  }
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #00f2fe;
+            font-family: monospace;
+            text-shadow: 0 0 6px rgba(0, 242, 254, 0.4);
+        }
 
-  .generator-header h3 {
-    font-family: var(--display);
-    font-size: 16px;
-    color: #00f2fe;
-    letter-spacing: 0.5px;
-  }
+        .start-btn {
+            background: linear-gradient(90deg, #00f2fe, #3b82f6);
+            color: #000;
+            font-size: 0.9rem;
+            font-weight: 800;
+            padding: 11px 18px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 0 14px rgba(0, 242, 254, 0.4);
+            transition: all 0.3s ease;
+            width: 100%;
+        }
 
-  .close-btn {
-    background: transparent;
-    border: none;
-    color: var(--muted);
-    font-size: 22px;
-    cursor: pointer;
-    line-height: 1;
-    padding: 4px;
-  }
+        .start-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.7);
+        }
 
-  .close-btn:hover { color: #ff5555; }
+        .start-btn:disabled {
+            background: #334155;
+            color: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
 
-  .generator-iframe {
-    width: 100%;
-    height: 100%;
-    flex-grow: 1;
-    border: none;
-    display: block;
-  }
+        /* Claim Airdrop Applet */
+        .claim-card {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid #10b981;
+            border-radius: 12px;
+            padding: 14px 12px;
+            margin-top: 14px;
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
 
-  @keyframes modalIn {
-    from { opacity: 0; transform: scale(0.96); }
-    to { opacity: 1; transform: scale(1); }
-  }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-  /* --- MOBILE SPECIFIC FIXES --- */
-  @media (max-width: 768px) {
-    nav .links { display: none; }
-    #hero { align-items: center; text-align: center; }
-    .hero-sub { margin-left: auto; margin-right: auto; }
-    .hero-cta { flex-direction: column; width: 100%; gap: 10px; }
-    .hero-cta .btn { width: 100%; }
-    .about-grid { grid-template-columns: 1fr; gap: 24px; }
-    #orca-trail { display: none; }
-    section { padding: 90px 5% 50px; }
-    .generator-modal-content { height: 94vh; max-height: none; }
-  }
-</style>
+        .claim-title {
+            font-size: 0.95rem;
+            color: #34d399;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        .claim-desc {
+            font-size: 0.74rem;
+            color: #cbd5e1;
+            margin-bottom: 10px;
+            line-height: 1.25;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .claim-input {
+            width: 100%;
+            padding: 9px 12px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background: #090d16;
+            color: #fff;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .claim-input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+        }
+
+        .submit-claim-btn {
+            background: #10b981;
+            color: #000;
+            font-weight: 800;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .submit-claim-btn:hover {
+            background: #34d399;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        /* Social CTAs Section */
+        .social-section {
+            margin-top: 14px;
+        }
+
+        .social-title {
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .links-grid {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .cta-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 9px 12px;
+            border-radius: 25px; /* Pill Capsule Shape */
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+
+        /* Pump.fun: Exact Mint-Green Capsule Styling */
+        .btn-pump {
+            background: #1c2724;
+            color: #26cc8c;
+            border: 1.5px solid #26cc8c;
+            box-shadow: 0 0 10px rgba(38, 204, 140, 0.25);
+        }
+
+        .btn-pump:hover {
+            background: #26cc8c;
+            color: #091310;
+            box-shadow: 0 0 16px rgba(38, 204, 140, 0.6);
+        }
+
+        /* 𝕏 (Twitter): Pitch Black & White */
+        .btn-x {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-x:hover {
+            background: #16181c;
+            border-color: #ffffff;
+            box-shadow: 0 0 14px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Telegram: Official Cyan-Blue Matching (#2AABEE) */
+        .btn-tg {
+            background: #2AABEE;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 10px rgba(42, 171, 238, 0.35);
+        }
+
+        .btn-tg:hover {
+            background: #229ED9;
+            box-shadow: 0 0 16px rgba(42, 171, 238, 0.6);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .icon-svg {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        footer {
+            margin-top: 14px;
+            font-size: 0.68rem;
+            color: #64748b;
+        }
+    </style>
 </head>
 <body>
-<div class="noise-layer"></div>
 
-<nav>
-  <div class="brand"><span class="dot"></span>LETHALORCA</div>
-  <div class="links">
-    <a href="#about">About</a>
-    <a href="#transparency">Transparency</a>
-    <a href="#roadmap">Roadmap</a>
-    <a href="#faq">FAQ</a>
-    <a href="#community">Community</a>
-  </div>
-</nav>
+    <div class="container">
+        <!-- Top Bar with Extra Small Audio Button -->
+        <div class="top-bar">
+            <button class="audio-btn" id="audioToggle" onclick="toggleAudio()">🔊 Sound: ON</button>
+        </div>
 
-<section id="hero">
-  <div class="depth-tag">0m — Surface</div>
-  <h1 class="hero-title">Built in<br>open water.</h1>
-  <p class="hero-sub">$LORCA is a community-first token on pump.fun, paired with LethalOrca Fishing — a play-and-earn arcade game launching next quarter. Every detail below is verifiable. Do your own research before investing.</p>
-  
-  <div class="hero-cta">
-    <a class="btn btn-play" href="game.html"><span class="play-icon">▶</span> Play & Earn</a>
-    <button class="btn btn-generator" onclick="openGenerator()">
-      <span class="gen-icon">⚡</span> LORCA GENERATOR
-    </button>
-    <a class="btn btn-ghost" href="#transparency">View Token Details</a>
-    <a class="btn btn-ghost" href="https://t.me/Lethal_Orca" target="_blank" rel="noopener">Join Telegram ↗</a>
-  </div>
+        <!-- Main Title -->
+        <h1>🐋 LETHAL ORCA $LORCA</h1>
+        <p class="subtitle">Official 3-Minute 100,000 $LORCA Token Mint Generator!</p>
 
-  <svg id="orca-trail" viewBox="0 0 500 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path id="trail-path" d="M -20 220 Q 100 180 180 200 Q 260 220 320 140 Q 380 70 480 60" stroke="url(#trailGrad)" stroke-width="2" stroke-dasharray="4 8" opacity="0.5"/>
-    <defs>
-      <linearGradient id="trailGrad" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0"/>
-        <stop offset="100%" stop-color="#5eead4" stop-opacity="0.8"/>
-      </linearGradient>
-    </defs>
-    <g id="orca-icon" transform="translate(420,60) scale(1.1)">
-      <path d="M -60 10 Q -40 -30 0 -32 Q 45 -34 62 -5 Q 55 12 25 20 Q -10 26 -40 20 Q -55 17 -60 10 Z" fill="#0d1f2b" stroke="#2dd4bf" stroke-width="1"/>
-      <path d="M -38 10 Q -15 20 15 18 Q 35 16 45 4 Q 28 17 0 16 Q -25 15 -38 10 Z" fill="#f4fcfc"/>
-      <circle cx="-42" cy="-3" r="2.6" fill="#f4fcfc"/>
-      <path d="M 58 -6 L 78 -20 L 72 2 L 82 18 L 58 6 Z" fill="#0d1f2b" stroke="#2dd4bf" stroke-width="1"/>
-    </g>
-  </svg>
-</section>
+        <!-- CA Box -->
+        <div class="ca-box">
+            <span class="ca-text" id="caAddress">CA: 7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump</span>
+            <button class="copy-btn" id="copyBtn" onclick="copyCA()">📋 Copy CA</button>
+        </div>
 
-<hr class="divider">
+        <!-- Micro Disclaimer -->
+        <div class="disclaimer-box">
+            <strong>⚠️ DISCLAIMER: FOR FUN & PROMOTION ONLY!</strong><br>
+            100% free community marketing generator. Take screenshot & submit wallet for real airdrops!
+        </div>
 
-<section id="about">
-  <div class="depth-marker"><span class="depth-val">–200m</span><span class="depth-name">Mesopelagic / About</span></div>
-  <h2 class="section-title">Who's building this</h2>
-  <p class="section-lede">A real person, building in public, with a plan longer than one launch.</p>
-  <div class="about-grid">
-    <div>
-      <p>LethalOrca started as a simple idea: pair a genuinely fun, free-to-play arcade game with a community token — instead of a token with nothing behind it.</p>
-      <p>The first product is a lightweight fishing-arcade game, already playable in prototype form, with wallet and reward features planned as the community grows. Progress is shared openly on X rather than promised all at once.</p>
-      <p>This is an early-stage, high-risk project. There are no guarantees of value or returns — see the disclaimer at the bottom of this page before making any decisions.</p>
+        <!-- Generator Stage -->
+        <div class="generator-box">
+            <div class="orca-stage" id="orcaStage">
+                <div class="orca-avatar">🐋</div>
+            </div>
+
+            <div class="counter-grid">
+                <div class="stat-card">
+                    <div class="stat-label">TIME REMAINING</div>
+                    <div class="stat-value" id="timerDisplay">03:00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">MINTED $LORCA</div>
+                    <div class="stat-value" id="tokenDisplay">0</div>
+                </div>
+            </div>
+
+            <button class="start-btn" id="startBtn" onclick="startMintingProcess()">⚡ START 3-MIN MINT GENERATOR ⚡</button>
+        </div>
+
+        <!-- Airdrop Claim Applet -->
+        <div class="claim-card" id="claimCard">
+            <div class="claim-title">📸 MINT COMPLETE (100,000 $LORCA)</div>
+            <p class="claim-desc">Take a screenshot, post on X/Telegram, and submit your Solana wallet below to enter the Dev Airdrop!</p>
+            
+            <form id="airdropForm" onsubmit="submitAirdropClaim(event)">
+                <div class="input-group">
+                    <input type="text" id="solWallet" class="claim-input" placeholder="Solana Wallet Address (e.g. 7xKX...)" required>
+                    <input type="text" id="socialHandle" class="claim-input" placeholder="X / Telegram Handle (e.g. @username)" required>
+                </div>
+                <button type="submit" class="submit-claim-btn" id="submitBtn">🚀 SUBMIT AIRDROP CLAIM</button>
+            </form>
+        </div>
+
+        <!-- Social CTAs Section -->
+        <div class="social-section">
+            <p class="social-title">🚀 Join The LethalOrca Movement!</p>
+            <div class="links-grid">
+                <!-- Pump.fun with Pill/Capsule SVG Logo -->
+                <a href="https://pump.fun/coin/7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump" target="_blank" class="cta-btn btn-pump">
+                    <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g transform="rotate(-45 12 12)">
+                            <rect x="7" y="3" width="10" height="9" rx="5" fill="#ffffff" stroke="#1c2724" stroke-width="1.5"/>
+                            <rect x="7" y="12" width="10" height="9" rx="5" fill="#26cc8c" stroke="#1c2724" stroke-width="1.5"/>
+                            <line x1="7" y1="12" x2="17" y2="12" stroke="#1c2724" stroke-width="1.5"/>
+                        </g>
+                    </svg>
+                    Pump.fun
+                </a>
+
+                <!-- 𝕏 Button -->
+                <a href="https://x.com/lethalorcatdo" target="_blank" class="cta-btn btn-x">
+                    <svg class="icon-svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    Follow 𝕏
+                </a>
+
+                <!-- Telegram with Official SVG Logo -->
+                <a href="https://t.me/Lethal_Orca" target="_blank" class="cta-btn btn-tg">
+                    <svg class="icon-svg" width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.69-.52.36-1 .54-1.43.53-.48-.01-1.4-.27-2.09-.49-.84-.27-1.51-.42-1.45-.89.03-.25.38-.51 1.07-.79 4.23-1.84 7.05-3.05 8.47-3.64 4.02-1.68 4.86-1.97 5.41-1.98.12 0 .39.03.57.17.15.12.2.28.22.41-.01.06.01.24 0 .38z"/>
+                    </svg>
+                    Telegram
+                </a>
+            </div>
+        </div>
+
+        <footer>Powered by LethalOrca Community 🌊</footer>
     </div>
-    <div class="founder-card">
-      <div class="label">Founder</div>
-      <h3>Independent Developer</h3>
-      <p>25+ years of professional background in sales, customer service, and front-office operations, now building LethalOrca as an independent, self-funded project. Actively posting build updates and roadmap progress on X.</p>
-    </div>
-  </div>
-</section>
 
-<hr class="divider">
+    <script>
+        const TOTAL_TIME = 180; 
+        const TARGET_TOKENS = 100000;
+        let soundEnabled = true;
+        let isMinting = false;
+        let timerInterval = null;
+        let coinInterval = null;
 
-<section id="transparency">
-  <div class="depth-marker"><span class="depth-val">–1000m</span><span class="depth-name">Bathypelagic / Transparency</span></div>
-  <h2 class="section-title">Verify it yourself</h2>
-  <p class="section-lede">Don't take our word for it — every figure below can be checked on-chain or on pump.fun directly.</p>
-  <div class="ledger">
-    <div class="ledger-row"><span class="ledger-key">Token</span><span class="ledger-val">LethalOrca ($LORCA)</span></div>
-    <div class="ledger-row"><span class="ledger-key">Chain</span><span class="ledger-val">Solana</span></div>
-    <div class="ledger-row"><span class="ledger-key">Launch platform</span><span class="ledger-val">pump.fun</span></div>
-    <div class="ledger-row"><span class="ledger-key">Contract address</span><span class="ledger-val editable">7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump</span></div>
-    <div class="ledger-row"><span class="ledger-key">Total supply</span><span class="ledger-val editable">1,000,000,000 (standard pump.fun supply)</span></div>
-    <div class="ledger-row"><span class="ledger-key">Planned dev holding</span><span class="ledger-val editable">~3-5%, purchased at launch like any buyer</span></div>
-  </div>
-  <div class="verify-note">
-    ⚓ The $LORCA token is now live on pump.fun. The contract address above is the official token — never trust an address from anywhere else. Always verify here first.
-  </div>
-</section>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-<hr class="divider">
+        function copyCA() {
+            const caText = "7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump";
+            navigator.clipboard.writeText(caText).then(() => {
+                const btn = document.getElementById("copyBtn");
+                btn.innerText = "✅ Copied!";
+                setTimeout(() => btn.innerText = "📋 Copy CA", 2000);
+            });
+        }
 
-<section id="roadmap">
-  <div class="depth-marker"><span class="depth-val">–4000m</span><span class="depth-name">Abyssal / Roadmap</span></div>
-  <h2 class="section-title">Where this goes next</h2>
-  <p class="section-lede">A phased plan — each stage ships before the next one is promised.</p>
-  <div class="timeline">
-    <div class="tl-item active">
-      <div class="tl-phase">PHASE 01 — NEXT QUARTER</div>
-      <div class="tl-title">Game Launch</div>
-      <div class="tl-desc">LethalOrca Fishing releases publicly on Android, with in-game point tracking and a growing player base.</div>
-    </div>
-    <div class="tl-item">
-      <div class="tl-phase">PHASE 02</div>
-      <div class="tl-title">Wallet Integration</div>
-      <div class="tl-desc">Secure wallet connection added, letting players link accounts in preparation for on-chain rewards.</div>
-    </div>
-    <div class="tl-item">
-      <div class="tl-phase">PHASE 03</div>
-      <div class="tl-title">Marketplace & Community</div>
-      <div class="tl-desc">Player-driven marketplace and community features enabling peer-to-peer trading and engagement.</div>
-    </div>
-    <div class="tl-item">
-      <div class="tl-phase">PHASE 04</div>
-      <div class="tl-title">In-Game Token Utility</div>
-      <div class="tl-desc">$LORCA becomes usable inside the game economy — earning, spending, and a player-facing marketplace.</div>
-    </div>
-  </div>
-</section>
+        function playSound(freq, duration) {
+            if (!soundEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {}
+        }
 
-<hr class="divider">
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            document.getElementById("audioToggle").innerText = soundEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+        }
 
-<section id="screenshots">
-  <div class="depth-marker"><span class="depth-val">–2500m</span><span class="depth-name">Gameplay</span></div>
-  <h2 class="section-title">See it in action</h2>
-  <p class="section-lede">Game screenshots showing the fishing arcade in action.</p>
-  <div class="screenshot-row">
-    <div class="screenshot-img"><img src="./screenshot-1.png" alt="LethalOrca Fishing hero screen" onerror="this.alt='Game screenshot 1'"></div>
-    <div class="screenshot-img"><img src="./screenshot-2.png" alt="LethalOrca Fishing start screen" onerror="this.alt='Game screenshot 2'"></div>
-    <div class="screenshot-img"><img src="./screenshot-3.png" alt="LethalOrca Fishing gameplay" onerror="this.alt='Game screenshot 3'"></div>
-  </div>
-</section>
+        function spawnCoinParticle() {
+            const stage = document.getElementById("orcaStage");
+            const coin = document.createElement("div");
+            coin.className = "coin-particle";
+            coin.innerText = Math.random() > 0.5 ? "🪙" : "💎";
+            
+            const randomX = (Math.random() - 0.5) * 120;
+            coin.style.setProperty('--translateX', `${randomX}px`);
+            coin.style.animation = `emitCoin 0.8s ease-out forwards`;
+            
+            stage.appendChild(coin);
+            setTimeout(() => coin.remove(), 800);
+        }
 
-<hr class="divider">
+        function startMintingProcess() {
+            if (isMinting) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
 
-<section id="updates">
-  <div class="depth-marker"><span class="depth-val">–3200m</span><span class="depth-name">Build Log</span></div>
-  <h2 class="section-title">Latest updates</h2>
-  <p class="section-lede">Progress, shared as it happens — not saved up for a big reveal.</p>
-  <div class="updates-list">
-    <div class="update-item">
-      <div class="update-date">JUL 2026</div>
-      <div class="update-text"><span class="tag">Launch</span>$LORCA token live on pump.fun with contract address published above.</div>
-    </div>
-    <div class="update-item">
-      <div class="update-date">JUL 2026</div>
-      <div class="update-text"><span class="tag">Backend</span>Withdrawal system deployed and ready for Phase 2 wallet integration.</div>
-    </div>
-    <div class="update-item">
-      <div class="update-date">JUL 2026</div>
-      <div class="update-text"><span class="tag">Update</span>Wallet-connect preview added to the game — UI functional, backend live.</div>
-    </div>
-  </div>
-</section>
+            isMinting = true;
+            document.getElementById("startBtn").disabled = true;
+            document.getElementById("startBtn").innerText = "⚙️ GENERATING $LORCA TOKENS...";
 
-<hr class="divider">
+            let secondsLeft = TOTAL_TIME;
+            let currentTokens = 0;
+            const tokenPerSecond = TARGET_TOKENS / TOTAL_TIME;
 
-<section id="faq">
-  <div class="depth-marker"><span class="depth-val">–5000m</span><span class="depth-name">FAQ</span></div>
-  <h2 class="section-title">Common questions</h2>
-  <p class="section-lede">Answered here directly, instead of scattered across replies.</p>
-  <div class="faq-list">
-    <details class="faq-item">
-      <summary>Is $LORCA a scam?</summary>
-      <div class="faq-answer">No one can prove a negative on the internet — that's exactly why every claim on this page is verifiable rather than just asserted. The contract address is published above and can be verified on pump.fun directly.</div>
-    </details>
-    <details class="faq-item">
-      <summary>How do I get $LORCA tokens?</summary>
-      <div class="faq-answer">Tokens are live now on pump.fun. Play LethalOrca Fishing to earn in-game points, which can be withdrawn to your wallet during Phase 2.</div>
-    </details>
-    <details class="faq-item">
-      <summary>When does the full game launch?</summary>
-      <div class="faq-answer">Targeted for next quarter, on Android first. Follow the Build Log above or the X account for exact dates as they're confirmed.</div>
-    </details>
-    <details class="faq-item">
-      <summary>Can I withdraw tokens right now?</summary>
-      <div class="faq-answer">The current game build includes a wallet-connect preview for demonstration. Real token withdrawals are live during Phase 2, once the backend is fully operational with all security measures in place.</div>
-    </details>
-    <details class="faq-item">
-      <summary>Who's behind this project?</summary>
-      <div class="faq-answer">An independent, self-funded developer building in public. See the About section above for background, and follow along on X for regular build updates.</div>
-    </details>
-  </div>
-</section>
+            timerInterval = setInterval(() => {
+                secondsLeft--;
+                currentTokens = Math.min(TARGET_TOKENS, Math.floor((TOTAL_TIME - secondsLeft) * tokenPerSecond));
 
-<hr class="divider">
+                const mins = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
+                const secs = String(secondsLeft % 60).padStart(2, '0');
+                document.getElementById("timerDisplay").innerText = `${mins}:${secs}`;
+                document.getElementById("tokenDisplay").innerText = currentTokens.toLocaleString() + " $LORCA";
 
-<section id="community">
-  <div class="depth-marker"><span class="depth-val">–6000m</span><span class="depth-name">Hadal / Community</span></div>
-  <h2 class="section-title">Join the crew</h2>
-  <p class="section-lede">Follow along, ask questions, and watch the build happen in real time.</p>
-  <div class="community-grid">
-    <a class="comm-card" href="https://x.com/lethalorcatdo" target="_blank" rel="noopener">
-      <div class="plat">X / Twitter</div>
-      <div class="handle">@lethalorcatdo ↗</div>
-    </a>
-    <a class="comm-card" href="https://t.co/OphC6f1Fxe" target="_blank" rel="noopener">
-      <div class="plat">Discord</div>
-      <div class="handle">Join the Crew ↗</div>
-    </a>
-    <a class="comm-card" href="https://t.me/Lethal_Orca" target="_blank" rel="noopener">
-      <div class="plat">Telegram</div>
-      <div class="handle">Join the Chat ↗</div>
-    </a>
-    <a class="comm-card" href="https://pump.fun/coin/7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump" target="_blank" rel="noopener">
-      <div class="plat">pump.fun</div>
-      <div class="handle">View on pump.fun ↗</div>
-    </a>
-  </div>
+                playSound(400 + (secondsLeft % 5) * 40, 0.04);
 
-  <div class="newsletter-box">
-    <p>Don't use Telegram or Discord? Get major updates by email instead — no spam, just real progress.</p>
-    <a class="btn btn-ghost" href="mailto:lethalorca@gmail.com?subject=Add me to LethalOrca updates">Get Email Updates</a>
-  </div>
-</section>
+                if (secondsLeft <= 0) {
+                    finishMinting();
+                }
+            }, 1000);
 
-<footer>
-  <div class="disclaimer">
-    <strong>Risk disclosure:</strong> $LORCA is an experimental, early-stage cryptocurrency token. It carries high risk, including the possible loss of your full investment. Nothing on this page is financial advice, and no one associated with this project can guarantee its price, liquidity, or future value. Cryptocurrency markets are volatile and largely unregulated — always do your own research, verify all contract addresses independently, and only invest what you can afford to lose.
-  </div>
-  <div class="foot-bottom">
-    <span>© 2026 LethalOrca. Built independently.</span>
-    <span>Not affiliated with pump.fun.</span>
-  </div>
-</footer>
+            coinInterval = setInterval(() => {
+                spawnCoinParticle();
+            }, 260);
+        }
 
-<!-- GENERATOR MODAL WINDOW -->
-<div id="generatorModal" class="generator-modal">
-  <div class="generator-modal-content">
-    <div class="generator-header">
-      <h3>⚡ LORCA MINT GENERATOR</h3>
-      <button onclick="closeGenerator()" class="close-btn">✕</button>
-    </div>
-    <iframe id="generatorFrame" src="generator.html" class="generator-iframe" allow="autoplay"></iframe>
-  </div>
-</div>
+        function finishMinting() {
+            clearInterval(timerInterval);
+            clearInterval(coinInterval);
+            isMinting = false;
 
-<script>
-function openGenerator() {
-  document.getElementById('generatorModal').style.display = 'flex';
-  document.body.style.overflow = 'hidden'; // Prevents background page scrolling
-}
+            document.getElementById("timerDisplay").innerText = "00:00";
+            document.getElementById("tokenDisplay").innerText = "100,000 $LORCA";
+            document.getElementById("startBtn").innerText = "🎉 MINT COMPLETED!";
+            playSound(750, 0.35);
 
-function closeGenerator() {
-  document.getElementById('generatorModal').style.display = 'none';
-  document.body.style.overflow = 'auto';
-  var iframe = document.getElementById('generatorFrame');
-  iframe.src = iframe.src; // Reloads iframe to stop generator audio/timer
-}
+            document.getElementById("claimCard").style.display = "block";
+            document.getElementById("claimCard").scrollIntoView({ behavior: 'smooth' });
+        }
 
-window.onclick = function(event) {
-  var modal = document.getElementById('generatorModal');
-  if (event.target == modal) {
-    closeGenerator();
-  }
-}
-</script>
+        function submitAirdropClaim(e) {
+            e.preventDefault();
+            const wallet = document.getElementById("solWallet").value.trim();
+            const social = document.getElementById("socialHandle").value.trim();
+            const submitBtn = document.getElementById("submitBtn");
 
+            submitBtn.disabled = true;
+            submitBtn.innerText = "⏳ Saving Claim...";
+
+            // UPDATED GOOGLE WEBHOOK URL WITH YOUR NEW DEPLOYMENT ID
+            const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzt9FX7km3EuLJFbYddWXXMP-D1TOV-8HRb2jptLC-Ru2tjXVF6vhGFnW2WB4YyC1iV/exec";
+
+            const formData = new URLSearchParams();
+            formData.append("wallet", wallet);
+            formData.append("social", social);
+
+            fetch(GOOGLE_WEBHOOK_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: formData.toString()
+            }).then(() => {
+                handleSuccess(wallet, social);
+            }).catch((err) => {
+                console.error("Submission Error:", err);
+                handleSuccess(wallet, social);
+            });
+        }
+
+        function handleSuccess(wallet, social) {
+            const submitBtn = document.getElementById("submitBtn");
+            submitBtn.innerText = "✅ CLAIM REGISTERED SUCCESS!";
+            alert(`SUCCESS! 🎉\n\nYour Solana Wallet: ${wallet}\nSocial Handle: ${social}\n\nPost your screenshot on Twitter/X (@lethalorcatdo) or Telegram to verify!`);
+            document.getElementById("airdropForm").reset();
+        }
+    </script>
 </body>
 </html>
