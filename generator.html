@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LethalOrca $LORCA Mint Generator 🐋⚡</title>
+    
+    <!-- Supabase JS Library CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -28,7 +32,7 @@
 
         /* Expanded Horizontal Glass Container for PC / Windows */
         .container {
-            max-width: 680px; /* Expanded horizontal layout */
+            max-width: 680px;
             width: 95%;
             background: rgba(13, 22, 41, 0.85);
             backdrop-filter: blur(24px);
@@ -338,7 +342,7 @@
             flex: 1;
             min-width: 140px;
             padding: 9px 12px;
-            border-radius: 25px; /* Pill Capsule Shape */
+            border-radius: 25px;
             text-decoration: none;
             font-weight: 700;
             transition: all 0.25s ease;
@@ -349,7 +353,6 @@
             font-size: 0.8rem;
         }
 
-        /* Pump.fun: Exact Mint-Green Capsule Styling */
         .btn-pump {
             background: #1c2724;
             color: #26cc8c;
@@ -363,7 +366,6 @@
             box-shadow: 0 0 16px rgba(38, 204, 140, 0.6);
         }
 
-        /* 𝕏 (Twitter): Pitch Black & White */
         .btn-x {
             background: #000000;
             color: #ffffff;
@@ -377,7 +379,6 @@
             box-shadow: 0 0 14px rgba(255, 255, 255, 0.3);
         }
 
-        /* Telegram: Official Cyan-Blue Matching (#2AABEE) */
         .btn-tg {
             background: #2AABEE;
             color: #ffffff;
@@ -468,7 +469,6 @@
         <div class="social-section">
             <p class="social-title">🚀 Join The LethalOrca Movement!</p>
             <div class="links-grid">
-                <!-- Pump.fun with Pill/Capsule SVG Logo -->
                 <a href="https://pump.fun/coin/7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump" target="_blank" class="cta-btn btn-pump">
                     <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g transform="rotate(-45 12 12)">
@@ -480,7 +480,6 @@
                     Pump.fun
                 </a>
 
-                <!-- 𝕏 Button -->
                 <a href="https://x.com/lethalorcatdo" target="_blank" class="cta-btn btn-x">
                     <svg class="icon-svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
@@ -488,7 +487,6 @@
                     Follow 𝕏
                 </a>
 
-                <!-- Telegram with Official SVG Logo -->
                 <a href="https://t.me/Lethal_Orca" target="_blank" class="cta-btn btn-tg">
                     <svg class="icon-svg" width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.69-.52.36-1 .54-1.43.53-.48-.01-1.4-.27-2.09-.49-.84-.27-1.51-.42-1.45-.89.03-.25.38-.51 1.07-.79 4.23-1.84 7.05-3.05 8.47-3.64 4.02-1.68 4.86-1.97 5.41-1.98.12 0 .39.03.57.17.15.12.2.28.22.41-.01.06.01.24 0 .38z"/>
@@ -510,6 +508,12 @@
         let coinInterval = null;
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // --- SUPABASE CONFIGURATION ---
+        const SUPABASE_URL = "https://obzyiecwhfdanzjtuhiq.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_gUT3ac6tLxZWn5w7_CPxqw_MVUQQMd-"; 
+
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         function copyCA() {
             const caText = "7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump";
@@ -602,8 +606,8 @@
             document.getElementById("claimCard").scrollIntoView({ behavior: 'smooth' });
         }
 
-        // --- UPDATED & FIXED FUNCTION FOR GOOGLE SHEETS ---
-        function submitAirdropClaim(e) {
+        // --- SUPABASE AIRDROP SUBMISSION FUNCTION ---
+        async function submitAirdropClaim(e) {
             e.preventDefault();
             const wallet = document.getElementById("solWallet").value.trim();
             const social = document.getElementById("socialHandle").value.trim();
@@ -612,26 +616,33 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "⏳ Saving Claim...";
 
-            const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzD4TiTNV7gy1Mxol8TBVE9BeoWZTZjZIV2vI2OTYUq0I-0cAh9XHh7qVDqOv03Oxpx/exec";
+            try {
+                const { data, error } = await _supabase
+                    .from('airdrop_claims')
+                    .insert([
+                        { wallet_address: wallet, social_handle: social }
+                    ]);
 
-            // Form data ko URLSearchParams ke zaraye encode kar ke bhejna
-            const formData = new URLSearchParams();
-            formData.append("wallet", wallet);
-            formData.append("social", social);
+                if (error) {
+                    // Unique constraint error code (Wallet duplicate rejection)
+                    if (error.code === '23505') {
+                        alert("⚠️ Yeh Solana Wallet pehle se claim kar chuka hai!");
+                    } else {
+                        alert("⚠️ Error: " + error.message);
+                    }
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "🚀 SUBMIT AIRDROP CLAIM";
+                    return;
+                }
 
-            fetch(GOOGLE_WEBHOOK_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: formData.toString()
-            }).then(() => {
                 handleSuccess(wallet, social);
-            }).catch((err) => {
+
+            } catch (err) {
                 console.error("Submission Error:", err);
-                handleSuccess(wallet, social);
-            });
+                alert("⚠️ Connection error! Dubara try karein.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "🚀 SUBMIT AIRDROP CLAIM";
+            }
         }
 
         function handleSuccess(wallet, social) {
