@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LethalOrca $LORCA Mint Generator 🐋⚡</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #060913, #0f172a, #032030);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.25);
+            position: relative;
+        }
+
+        .audio-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #00f2fe;
+            color: #00f2fe;
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .audio-btn:hover {
+            background: #00f2fe;
+            color: #000;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #00f2fe;
+            text-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        /* CA Box */
+        .ca-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px dashed #00f2fe;
+            padding: 10px 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .ca-text {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #38bdf8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .copy-btn {
+            background: #00f2fe;
+            color: #000;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #38bdf8;
+        }
+
+        /* Disclaimer */
+        .disclaimer-box {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid #eab308;
+            color: #fde047;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        /* Animation & Generator Box */
+        .generator-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 242, 254, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .orca-stage {
+            height: 140px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .orca-avatar {
+            font-size: 80px;
+            animation: floatOrca 3s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes floatOrca {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(-3deg); }
+        }
+
+        /* Flying Coin Animation */
+        .coin-particle {
+            position: absolute;
+            font-size: 24px;
+            top: 40px;
+            left: 50%;
+            z-index: 1;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes emitCoin {
+            0% {
+                opacity: 1;
+                transform: translate(-10px, -10px) scale(0.5);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--translateX), 80px) scale(1.2);
+            }
+        }
+
+        .counter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #00f2fe;
+            font-family: monospace;
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #00f2fe, #3b82f6);
+            color: #000;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.8);
+        }
+
+        .start-btn:disabled {
+            background: #475569;
+            color: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Claim Airdrop Applet */
+        .claim-card {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid #10b981;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 25px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .claim-title {
+            font-size: 1.3rem;
+            color: #34d399;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .claim-desc {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .claim-input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .claim-input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .submit-claim-btn {
+            background: #10b981;
+            color: #000;
+            font-weight: bold;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .submit-claim-btn:hover {
+            background: #34d399;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+
+        /* Social CTAs */
+        .social-section {
+            margin-top: 25px;
+        }
+
+        .social-title {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #94a3b8;
+        }
+
+        .links-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .cta-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            color: #fff;
+            transition: 0.3s;
+            display: inline-block;
+            font-size: 0.95rem;
+        }
+
+        .btn-pump {
+            background: #00c853;
+            box-shadow: 0 0 12px rgba(0, 200, 83, 0.4);
+        }
+
+        .btn-x {
+            background: #1da1f2;
+            box-shadow: 0 0 12px rgba(29, 161, 242, 0.4);
+        }
+
+        .btn-tg {
+            background: #0088cc;
+            box-shadow: 0 0 12px rgba(0, 136, 204, 0.4);
+        }
+
+        .cta-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            margin-top: 25px;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Audio Control -->
+        <button class="audio-btn" id="audioToggle" onclick="toggleAudio()">🔊 Sound: ON</button>
+
+        <!-- Title -->
+        <h1>🐋 LETHAL ORCA $LORCA</h1>
+        <p class="subtitle">Official 3-Minute 100,000 $LORCA Token Mint Generator!</p>
+
+        <!-- CA Box -->
+        <div class="ca-box">
+            <span class="ca-text" id="caAddress">CA: 7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump</span>
+            <button class="copy-btn" id="copyBtn" onclick="copyCA()">📋 Copy CA</button>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer-box">
+            <strong>⚠️ DISCLAIMER: FOR FUN & PROMOTION ONLY!</strong><br>
+            This interactive generator is 100% free for community marketing. Minting virtual tokens does not guarantee on-chain SOL value. Take a screenshot, post on X/TG, and submit your wallet for real airdrop rounds!
+        </div>
+
+        <!-- Generator Stage -->
+        <div class="generator-box">
+            <div class="orca-stage" id="orcaStage">
+                <div class="orca-avatar">🐋</div>
+            </div>
+
+            <div class="counter-grid">
+                <div class="stat-card">
+                    <div class="stat-label">TIME REMAINING</div>
+                    <div class="stat-value" id="timerDisplay">03:00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">MINTED $LORCA</div>
+                    <div class="stat-value" id="tokenDisplay">0</div>
+                </div>
+            </div>
+
+            <button class="start-btn" id="startBtn" onclick="startMintingProcess()">⚡ START 3-MIN MINT GENERATOR ⚡</button>
+        </div>
+
+        <!-- Airdrop Claim Applet -->
+        <div class="claim-card" id="claimCard">
+            <div class="claim-title">📸 100,000 $LORCA MINT COMPLETE!</div>
+            <p class="claim-desc">Take a screenshot of your 100,000 $LORCA result, post it on Twitter/X or Telegram, and paste your Solana wallet below to register for the Dev Airdrop!</p>
+            
+            <form id="airdropForm" onsubmit="submitAirdropClaim(event)">
+                <div class="input-group">
+                    <input type="text" id="solWallet" class="claim-input" placeholder="Enter Solana Wallet Address (e.g. 7xKX...)" required>
+                    <input type="text" id="socialHandle" class="claim-input" placeholder="Your X / Telegram Handle (e.g. @yourname)" required>
+                </div>
+                <button type="submit" class="submit-claim-btn" id="submitBtn">🚀 SUBMIT AIRDROP CLAIM</button>
+            </form>
+        </div>
+
+        <!-- Social CTAs -->
+        <div class="social-section">
+            <p class="social-title">🚀 Join The LethalOrca Movement!</p>
+            <div class="links-grid">
+                <a href="https://pump.fun/coin/7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump" target="_blank" class="cta-btn btn-pump">💊 Buy on Pump.fun</a>
+                <a href="https://x.com/lethalorcatdo" target="_blank" class="cta-btn btn-x">𝕏 Follow X</a>
+                <a href="https://t.me/Lethal_Orca" target="_blank" class="cta-btn btn-tg">✈️ Join Telegram</a>
+            </div>
+        </div>
+
+        <footer>Powered by LethalOrca Community 🌊</footer>
+    </div>
+
+    <script>
+        const TOTAL_TIME = 180; // 3 minutes in seconds
+        const TARGET_TOKENS = 100000;
+        let soundEnabled = true;
+        let isMinting = false;
+        let timerInterval = null;
+        let coinInterval = null;
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Copy CA
+        function copyCA() {
+            const caText = "7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump";
+            navigator.clipboard.writeText(caText).then(() => {
+                const btn = document.getElementById("copyBtn");
+                btn.innerText = "✅ Copied!";
+                setTimeout(() => btn.innerText = "📋 Copy CA", 2000);
+            });
+        }
+
+        // Sound Generator
+        function playSound(freq, duration) {
+            if (!soundEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {}
+        }
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            document.getElementById("audioToggle").innerText = soundEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+        }
+
+        // Spawn Flying Coins from Orca Mouth
+        function spawnCoinParticle() {
+            const stage = document.getElementById("orcaStage");
+            const coin = document.createElement("div");
+            coin.className = "coin-particle";
+            coin.innerText = Math.random() > 0.5 ? "🪙" : "💎";
+            
+            const randomX = (Math.random() - 0.5) * 160;
+            coin.style.setProperty('--translateX', `${randomX}px`);
+            coin.style.animation = `emitCoin 0.8s ease-out forwards`;
+            
+            stage.appendChild(coin);
+            setTimeout(() => coin.remove(), 800);
+        }
+
+        // Main Minting Logic
+        function startMintingProcess() {
+            if (isMinting) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            isMinting = true;
+            document.getElementById("startBtn").disabled = true;
+            document.getElementById("startBtn").innerText = "⚙️ GENERATING $LORCA TOKENS...";
+
+            let secondsLeft = TOTAL_TIME;
+            let currentTokens = 0;
+            const tokenPerSecond = TARGET_TOKENS / TOTAL_TIME;
+
+            // Timer Loop
+            timerInterval = setInterval(() => {
+                secondsLeft--;
+                currentTokens = Math.min(TARGET_TOKENS, Math.floor((TOTAL_TIME - secondsLeft) * tokenPerSecond));
+
+                // Update UI
+                const mins = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
+                const secs = String(secondsLeft % 60).padStart(2, '0');
+                document.getElementById("timerDisplay").innerText = `${mins}:${secs}`;
+                document.getElementById("tokenDisplay").innerText = currentTokens.toLocaleString() + " $LORCA";
+
+                playSound(400 + (secondsLeft % 5) * 50, 0.05);
+
+                if (secondsLeft <= 0) {
+                    finishMinting();
+                }
+            }, 1000);
+
+            // Coin Particle Loop
+            coinInterval = setInterval(() => {
+                spawnCoinParticle();
+            }, 250);
+        }
+
+        function finishMinting() {
+            clearInterval(timerInterval);
+            clearInterval(coinInterval);
+            isMinting = false;
+
+            document.getElementById("timerDisplay").innerText = "00:00";
+            document.getElementById("tokenDisplay").innerText = "100,000 $LORCA";
+            document.getElementById("startBtn").innerText = "🎉 MINT COMPLETED!";
+            playSound(800, 0.4);
+
+            // Show Airdrop Applet
+            document.getElementById("claimCard").style.display = "block";
+            document.getElementById("claimCard").scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Submit Claim to Google Sheets
+        function submitAirdropClaim(e) {
+            e.preventDefault();
+            const wallet = document.getElementById("solWallet").value.trim();
+            const social = document.getElementById("socialHandle").value.trim();
+            const submitBtn = document.getElementById("submitBtn");
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "⏳ Saving Claim...";
+
+            // Connected to your Google Apps Script Web App
+            const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzD4TiTNV7gy1Mxol8TBVE9BeoWZTZjZIV2vI2OTYUq0I-0cAh9XHh7qVDqOv03Oxpx/exec";
+
+            fetch(GOOGLE_WEBHOOK_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ wallet: wallet, social: social })
+            }).then(() => {
+                handleSuccess(wallet, social);
+            }).catch(() => {
+                handleSuccess(wallet, social);
+            });
+        }
+
+        function handleSuccess(wallet, social) {
+            const submitBtn = document.getElementById("submitBtn");
+            submitBtn.innerText = "✅ CLAIM REGISTERED SUCCESS!";
+            alert(`SUCCESS! 🎉\n\nYour Solana Wallet: ${wallet}\nSocial Handle: ${social}\n\nPost your 100,000 $LORCA screenshot on Twitter/X (@lethalorcatdo) or Telegram to verify!`);
+            document.getElementById("airdropForm").reset();
+        }
+    </script>
+</body>
+</html>
