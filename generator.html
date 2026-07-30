@@ -602,6 +602,7 @@
             document.getElementById("claimCard").scrollIntoView({ behavior: 'smooth' });
         }
 
+        // --- UPDATED & FIXED FUNCTION FOR GOOGLE SHEETS ---
         function submitAirdropClaim(e) {
             e.preventDefault();
             const wallet = document.getElementById("solWallet").value.trim();
@@ -613,14 +614,22 @@
 
             const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzD4TiTNV7gy1Mxol8TBVE9BeoWZTZjZIV2vI2OTYUq0I-0cAh9XHh7qVDqOv03Oxpx/exec";
 
+            // Form data ko URLSearchParams ke zaraye encode kar ke bhejna
+            const formData = new URLSearchParams();
+            formData.append("wallet", wallet);
+            formData.append("social", social);
+
             fetch(GOOGLE_WEBHOOK_URL, {
                 method: "POST",
                 mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ wallet: wallet, social: social })
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: formData.toString()
             }).then(() => {
                 handleSuccess(wallet, social);
-            }).catch(() => {
+            }).catch((err) => {
+                console.error("Submission Error:", err);
                 handleSuccess(wallet, social);
             });
         }
