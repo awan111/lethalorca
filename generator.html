@@ -21,53 +21,55 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            padding: 15px 10px;
             text-align: center;
             overflow-x: hidden;
         }
 
-        /* 3D Glass Container */
+        /* Expanded Horizontal Glass Container for PC / Windows */
         .container {
-            max-width: 460px;
-            width: 100%;
-            background: rgba(13, 22, 41, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            max-width: 680px; /* Expanded horizontal layout */
+            width: 95%;
+            background: rgba(13, 22, 41, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(0, 242, 254, 0.25);
             border-radius: 20px;
-            padding: 14px 12px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 242, 254, 0.12);
+            padding: 16px 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 242, 254, 0.12);
             position: relative;
         }
 
-        /* Top Bar for Audio Button */
+        /* Top Bar for Extra Small Audio Button */
         .top-bar {
             display: flex;
             justify-content: flex-end;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
+        /* Extra Small Sound Button */
         .audio-btn {
             background: rgba(0, 242, 254, 0.08);
-            border: 1px solid rgba(0, 242, 254, 0.6);
+            border: 1px solid rgba(0, 242, 254, 0.5);
             color: #00f2fe;
-            padding: 3px 8px;
-            border-radius: 12px;
+            padding: 2px 6px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 0.68rem;
+            font-size: 0.58rem;
             font-weight: 600;
+            line-height: 1;
             transition: all 0.2s ease;
         }
 
         .audio-btn:hover {
             background: #00f2fe;
             color: #000;
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
+            box-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
         }
 
-        /* Scalable Small Title */
+        /* Title */
         h1 {
-            font-size: clamp(1.1rem, 4vw, 1.35rem);
+            font-size: clamp(1.2rem, 4.5vw, 1.6rem);
             font-weight: 800;
             background: linear-gradient(90deg, #00f2fe, #4facfe, #00f2fe);
             -webkit-background-clip: text;
@@ -79,27 +81,27 @@
         }
 
         .subtitle {
-            font-size: 0.73rem;
+            font-size: 0.75rem;
             color: #94a3b8;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         /* CA Box */
         .ca-box {
             background: rgba(4, 8, 18, 0.8);
             border: 1px dashed rgba(0, 242, 254, 0.5);
-            padding: 5px 8px;
+            padding: 6px 10px;
             border-radius: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 6px;
+            gap: 8px;
         }
 
         .ca-text {
             font-family: 'Courier New', monospace;
-            font-size: 0.68rem;
+            font-size: 0.72rem;
             color: #38bdf8;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -110,11 +112,11 @@
             background: #00f2fe;
             color: #000;
             border: none;
-            padding: 4px 8px;
+            padding: 4px 10px;
             border-radius: 6px;
             font-weight: 700;
             cursor: pointer;
-            font-size: 0.68rem;
+            font-size: 0.7rem;
             white-space: nowrap;
             transition: all 0.2s ease;
         }
@@ -129,11 +131,11 @@
             background: rgba(234, 179, 8, 0.06);
             border: 1px solid rgba(234, 179, 8, 0.4);
             color: #fde047;
-            padding: 4px 6px;
+            padding: 4px 8px;
             border-radius: 6px;
             font-size: 0.63rem;
-            margin-bottom: 10px;
-            line-height: 1.25;
+            margin-bottom: 12px;
+            line-height: 1.3;
             text-align: center;
         }
 
@@ -142,8 +144,8 @@
             background: rgba(2, 6, 16, 0.6);
             border: 1px solid rgba(0, 242, 254, 0.2);
             border-radius: 12px;
-            padding: 12px 10px;
-            margin-bottom: 12px;
+            padding: 14px 12px;
+            margin-bottom: 14px;
             position: relative;
             overflow: hidden;
         }
@@ -158,7 +160,7 @@
         }
 
         .orca-avatar {
-            font-size: 46px;
+            font-size: 48px;
             animation: floatOrca 3s ease-in-out infinite;
             position: relative;
             z-index: 2;
@@ -170,7 +172,6 @@
             50% { transform: translateY(-6px) rotate(-2deg); }
         }
 
-        /* Flying Coin Animation */
         .coin-particle {
             position: absolute;
             font-size: 16px;
@@ -182,32 +183,26 @@
         }
 
         @keyframes emitCoin {
-            0% {
-                opacity: 1;
-                transform: translate(-50%, 0) scale(0.5);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(calc(-50% + var(--translateX)), 50px) scale(1.1);
-            }
+            0% { opacity: 1; transform: translate(-50%, 0) scale(0.5); }
+            100% { opacity: 0; transform: translate(calc(-50% + var(--translateX)), 50px) scale(1.1); }
         }
 
         .counter-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .stat-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 8px 6px;
+            padding: 10px 8px;
             border-radius: 8px;
         }
 
         .stat-label {
-            font-size: 0.62rem;
+            font-size: 0.64rem;
             color: #94a3b8;
             margin-bottom: 2px;
             text-transform: uppercase;
@@ -215,7 +210,7 @@
         }
 
         .stat-value {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: #00f2fe;
             font-family: monospace;
@@ -225,9 +220,9 @@
         .start-btn {
             background: linear-gradient(90deg, #00f2fe, #3b82f6);
             color: #000;
-            font-size: 0.88rem;
+            font-size: 0.9rem;
             font-weight: 800;
-            padding: 10px 16px;
+            padding: 11px 18px;
             border: none;
             border-radius: 20px;
             cursor: pointer;
@@ -254,8 +249,8 @@
             background: rgba(16, 185, 129, 0.08);
             border: 1px solid #10b981;
             border-radius: 12px;
-            padding: 12px 10px;
-            margin-top: 12px;
+            padding: 14px 12px;
+            margin-top: 14px;
             display: none;
             animation: fadeIn 0.4s ease;
         }
@@ -273,7 +268,7 @@
         }
 
         .claim-desc {
-            font-size: 0.72rem;
+            font-size: 0.74rem;
             color: #cbd5e1;
             margin-bottom: 10px;
             line-height: 1.25;
@@ -282,18 +277,18 @@
         .input-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
             margin-bottom: 10px;
         }
 
         .claim-input {
             width: 100%;
-            padding: 8px 10px;
+            padding: 9px 12px;
             border-radius: 6px;
             border: 1px solid #334155;
             background: #090d16;
             color: #fff;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             outline: none;
         }
 
@@ -306,7 +301,7 @@
             background: #10b981;
             color: #000;
             font-weight: 800;
-            padding: 9px;
+            padding: 10px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
@@ -322,85 +317,90 @@
 
         /* Social CTAs Section */
         .social-section {
-            margin-top: 12px;
+            margin-top: 14px;
         }
 
         .social-title {
-            font-size: 0.78rem;
-            margin-bottom: 8px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
             color: #94a3b8;
             font-weight: 600;
         }
 
         .links-grid {
             display: flex;
-            gap: 6px;
+            gap: 10px;
             flex-wrap: wrap;
             justify-content: center;
         }
 
         .cta-btn {
             flex: 1;
-            min-width: 95px;
-            padding: 8px 6px;
-            border-radius: 25px; /* Capsule Shape */
+            min-width: 140px;
+            padding: 9px 12px;
+            border-radius: 25px; /* Pill Capsule Shape */
             text-decoration: none;
             font-weight: 700;
             transition: all 0.25s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            font-size: 0.76rem;
+            gap: 8px;
+            font-size: 0.8rem;
         }
 
-        /* Pump.fun: White & Green Capsule */
+        /* Pump.fun: Exact Mint-Green Capsule Styling */
         .btn-pump {
-            background: #ffffff;
-            color: #00c853;
-            border: 2px solid #00c853;
-            box-shadow: 0 0 10px rgba(0, 200, 83, 0.3);
+            background: #1c2724;
+            color: #26cc8c;
+            border: 1.5px solid #26cc8c;
+            box-shadow: 0 0 10px rgba(38, 204, 140, 0.25);
         }
 
         .btn-pump:hover {
-            background: #00c853;
-            color: #ffffff;
-            box-shadow: 0 0 15px rgba(0, 200, 83, 0.6);
+            background: #26cc8c;
+            color: #091310;
+            box-shadow: 0 0 16px rgba(38, 204, 140, 0.6);
         }
 
-        /* 𝕏 (Twitter): Pitch Black & Silver White */
+        /* 𝕏 (Twitter): Pitch Black & White */
         .btn-x {
             background: #000000;
             color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.12);
         }
 
         .btn-x:hover {
             background: #16181c;
             border-color: #ffffff;
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 14px rgba(255, 255, 255, 0.3);
         }
 
-        /* Telegram: Genuine Telegram Cyan/Blue */
+        /* Telegram: Official Cyan-Blue Matching (#2AABEE) */
         .btn-tg {
-            background: linear-gradient(135deg, #2AABEE, #229ED9);
+            background: #2AABEE;
             color: #ffffff;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 10px rgba(34, 158, 217, 0.4);
+            box-shadow: 0 0 10px rgba(42, 171, 238, 0.35);
         }
 
         .btn-tg:hover {
-            background: linear-gradient(135deg, #229ED9, #0088cc);
-            box-shadow: 0 0 15px rgba(34, 158, 217, 0.7);
+            background: #229ED9;
+            box-shadow: 0 0 16px rgba(42, 171, 238, 0.6);
         }
 
         .cta-btn:hover {
             transform: translateY(-2px);
         }
 
+        .icon-svg {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
         footer {
-            margin-top: 12px;
+            margin-top: 14px;
             font-size: 0.68rem;
             color: #64748b;
         }
@@ -409,12 +409,12 @@
 <body>
 
     <div class="container">
-        <!-- Top Bar for Audio Toggle -->
+        <!-- Top Bar with Extra Small Audio Button -->
         <div class="top-bar">
             <button class="audio-btn" id="audioToggle" onclick="toggleAudio()">🔊 Sound: ON</button>
         </div>
 
-        <!-- Title -->
+        <!-- Main Title -->
         <h1>🐋 LETHAL ORCA $LORCA</h1>
         <p class="subtitle">Official 3-Minute 100,000 $LORCA Token Mint Generator!</p>
 
@@ -464,13 +464,37 @@
             </form>
         </div>
 
-        <!-- Social CTAs -->
+        <!-- Social CTAs Section -->
         <div class="social-section">
             <p class="social-title">🚀 Join The LethalOrca Movement!</p>
             <div class="links-grid">
-                <a href="https://pump.fun/coin/7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump" target="_blank" class="cta-btn btn-pump">💊 Buy Pump.fun</a>
-                <a href="https://x.com/lethalorcatdo" target="_blank" class="cta-btn btn-x">𝕏 Follow X</a>
-                <a href="https://t.me/Lethal_Orca" target="_blank" class="cta-btn btn-tg">✈️ Join Telegram</a>
+                <!-- Pump.fun with Pill/Capsule SVG Logo -->
+                <a href="https://pump.fun/coin/7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump" target="_blank" class="cta-btn btn-pump">
+                    <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g transform="rotate(-45 12 12)">
+                            <rect x="7" y="3" width="10" height="9" rx="5" fill="#ffffff" stroke="#1c2724" stroke-width="1.5"/>
+                            <rect x="7" y="12" width="10" height="9" rx="5" fill="#26cc8c" stroke="#1c2724" stroke-width="1.5"/>
+                            <line x1="7" y1="12" x2="17" y2="12" stroke="#1c2724" stroke-width="1.5"/>
+                        </g>
+                    </svg>
+                    Pump.fun
+                </a>
+
+                <!-- 𝕏 Button -->
+                <a href="https://x.com/lethalorcatdo" target="_blank" class="cta-btn btn-x">
+                    <svg class="icon-svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    Follow 𝕏
+                </a>
+
+                <!-- Telegram with Official SVG Logo -->
+                <a href="https://t.me/Lethal_Orca" target="_blank" class="cta-btn btn-tg">
+                    <svg class="icon-svg" width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.69-.52.36-1 .54-1.43.53-.48-.01-1.4-.27-2.09-.49-.84-.27-1.51-.42-1.45-.89.03-.25.38-.51 1.07-.79 4.23-1.84 7.05-3.05 8.47-3.64 4.02-1.68 4.86-1.97 5.41-1.98.12 0 .39.03.57.17.15.12.2.28.22.41-.01.06.01.24 0 .38z"/>
+                    </svg>
+                    Telegram
+                </a>
             </div>
         </div>
 
@@ -478,7 +502,7 @@
     </div>
 
     <script>
-        const TOTAL_TIME = 180; // 3 minutes in seconds
+        const TOTAL_TIME = 180; 
         const TARGET_TOKENS = 100000;
         let soundEnabled = true;
         let isMinting = false;
@@ -487,7 +511,6 @@
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        // Copy CA function
         function copyCA() {
             const caText = "7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump";
             navigator.clipboard.writeText(caText).then(() => {
@@ -497,7 +520,6 @@
             });
         }
 
-        // Web Audio Synthesizer Sound
         function playSound(freq, duration) {
             if (!soundEnabled) return;
             try {
@@ -519,14 +541,13 @@
             document.getElementById("audioToggle").innerText = soundEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
         }
 
-        // Particle FX
         function spawnCoinParticle() {
             const stage = document.getElementById("orcaStage");
             const coin = document.createElement("div");
             coin.className = "coin-particle";
             coin.innerText = Math.random() > 0.5 ? "🪙" : "💎";
             
-            const randomX = (Math.random() - 0.5) * 100;
+            const randomX = (Math.random() - 0.5) * 120;
             coin.style.setProperty('--translateX', `${randomX}px`);
             coin.style.animation = `emitCoin 0.8s ease-out forwards`;
             
@@ -534,7 +555,6 @@
             setTimeout(() => coin.remove(), 800);
         }
 
-        // Minting Timer Sequence
         function startMintingProcess() {
             if (isMinting) return;
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -582,7 +602,6 @@
             document.getElementById("claimCard").scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Webhook Submission Handler
         function submitAirdropClaim(e) {
             e.preventDefault();
             const wallet = document.getElementById("solWallet").value.trim();
