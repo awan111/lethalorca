@@ -5,92 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LORCA Staking Pool</title>
   <style>
-    .lorca-stake-section{
-      --ink:#eaf6ff;
-      --bg-deep:#04141f;
-      --bg-panel:#0b2536;
-      --line:#123b52;
-      --teal:#2dd6c4;
-      --gold:#f5b942;
-      --danger:#ff6b6b;
-      font-family:'Segoe UI', Roboto, sans-serif;
-      background:radial-gradient(circle at 20% -10%, #0f3b52 0%, var(--bg-deep) 60%);
-      color:var(--ink);
-      padding:48px 16px;
-      min-height:100vh;
+    .lorca-stake-section {
+      --ink: #eaf6ff;
+      --bg-deep: #04141f;
+      --bg-panel: #0b2536;
+      --line: #123b52;
+      --teal: #2dd6c4;
+      --gold: #f5b942;
+      --danger: #ff6b6b;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background: radial-gradient(circle at 20% -10%, #0f3b52 0%, var(--bg-deep) 60%);
+      color: var(--ink);
+      padding: 48px 16px;
+      min-height: 100vh;
     }
-    .stake-wrap{ max-width:760px; margin:0 auto; }
-    .stake-head h2{
-      margin:0; font-size:28px; letter-spacing:.5px;
-      color:var(--gold);
+    .stake-wrap { max-width: 760px; margin: 0 auto; }
+    .stake-head h2 {
+      margin: 0; font-size: 28px; letter-spacing: .5px;
+      color: var(--gold);
     }
-    .stake-sub{ margin:6px 0 24px; color:#9fc8d8; font-size:14px; }
+    .stake-sub { margin: 6px 0 24px; color: #9fc8d8; font-size: 14px; }
 
-    .wallet-bar{
-      display:flex; justify-content:space-between; align-items:center;
-      background:var(--bg-panel); border:1px solid var(--line);
-      border-radius:10px; padding:12px 16px; margin-bottom:20px;
+    .wallet-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--bg-panel); border: 1px solid var(--line);
+      border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;
     }
-    .wallet-status{ font-size:13px; color:#8fb9c9; }
+    .wallet-status { font-size: 13px; color: #8fb9c9; }
 
-    .btn{ cursor:pointer; border:none; border-radius:8px; padding:10px 18px;
-      font-weight:600; font-size:14px; transition:.15s transform, .15s opacity; }
-    .btn:hover{ transform:translateY(-1px); }
-    .btn-outline{ background:transparent; border:1px solid var(--teal); color:var(--teal); }
-    .btn-primary{ background:linear-gradient(135deg,var(--teal),#1a9c8e); color:#02201c; }
-    .btn-ghost{ background:transparent; color:#9fc8d8; border:1px solid var(--line); }
-    .btn:disabled{ opacity:.4; cursor:not-allowed; transform:none; }
+    .btn { cursor: pointer; border: none; border-radius: 8px; padding: 10px 18px;
+      font-weight: 600; font-size: 14px; transition: .15s transform, .15s opacity; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-outline { background: transparent; border: 1px solid var(--teal); color: var(--teal); }
+    .btn-primary { background: linear-gradient(135deg, var(--teal), #1a9c8e); color: #02201c; }
+    .btn-ghost { background: transparent; color: #9fc8d8; border: 1px solid var(--line); }
+    .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
 
-    .balance-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:26px; }
-    .balance-card{
-      background:var(--bg-panel); border:1px solid var(--line); border-radius:10px;
-      padding:14px; display:flex; flex-direction:column; gap:6px;
+    .balance-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 26px; }
+    .balance-card {
+      background: var(--bg-panel); border: 1px solid var(--line); border-radius: 10px;
+      padding: 14px; display: flex; flex-direction: column; gap: 6px;
     }
-    .balance-label{ font-size:12px; color:#7fa6b8; text-transform:uppercase; letter-spacing:.5px; }
-    .balance-value{ font-size:20px; font-weight:700; }
-    .balance-value.glow{ color:var(--gold); text-shadow:0 0 12px rgba(245,185,66,.4); }
+    .balance-label { font-size: 12px; color: #7fa6b8; text-transform: uppercase; letter-spacing: .5px; }
+    .balance-value { font-size: 20px; font-weight: 700; }
+    .balance-value.glow { color: var(--gold); text-shadow: 0 0 12px rgba(245,185,66,.4); }
 
-    .block-label{ display:block; font-size:13px; color:#9fc8d8; margin-bottom:10px; text-transform:uppercase; letter-spacing:.5px; }
+    .block-label { display: block; font-size: 13px; color: #9fc8d8; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .5px; }
 
-    .speed-block{ margin-bottom:22px; }
-    .speed-options{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-    .speed-btn{
-      background:var(--bg-panel); border:1px solid var(--line); border-radius:10px;
-      padding:14px 10px; color:var(--ink); cursor:pointer; text-align:left;
-      display:flex; flex-direction:column; gap:4px; transition:.15s;
+    .speed-block { margin-bottom: 22px; }
+    .speed-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .speed-btn {
+      background: var(--bg-panel); border: 1px solid var(--line); border-radius: 10px;
+      padding: 14px 10px; color: var(--ink); cursor: pointer; text-align: left;
+      display: flex; flex-direction: column; gap: 4px; transition: .15s;
     }
-    .speed-btn small{ color:#7fa6b8; }
-    .speed-btn.active{ border-color:var(--teal); box-shadow:0 0 0 1px var(--teal) inset; }
-    .speed-btn:hover{ border-color:var(--teal); }
+    .speed-btn small { color: #7fa6b8; }
+    .speed-btn.active { border-color: var(--teal); box-shadow: 0 0 0 1px var(--teal) inset; }
+    .speed-btn:hover { border-color: var(--teal); }
 
-    .stake-input-row{ display:flex; gap:10px; margin-bottom:10px; }
-    .stake-input-row input{
-      flex:1; background:var(--bg-panel); border:1px solid var(--line); border-radius:8px;
-      padding:12px 14px; color:var(--ink); font-size:15px; outline:none;
+    .stake-input-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .stake-input-row input {
+      flex: 1; background: var(--bg-panel); border: 1px solid var(--line); border-radius: 8px;
+      padding: 12px 14px; color: var(--ink); font-size: 15px; outline: none;
     }
-    .stake-input-row input:focus{ border-color:var(--teal); }
+    .stake-input-row input:focus { border-color: var(--teal); }
 
-    .est-row{ font-size:13px; color:#7fa6b8; margin-bottom:28px; }
-    .est-row span{ color:var(--gold); font-weight:600; }
+    .est-row { font-size: 13px; color: #7fa6b8; margin-bottom: 28px; }
+    .est-row span { color: var(--gold); font-weight: 600; }
 
-    .stake-list{ display:flex; flex-direction:column; gap:10px; }
-    .empty-msg{ color:#5f8494; font-size:13px; }
-    .stake-item{
-      background:var(--bg-panel); border:1px solid var(--line); border-radius:10px;
-      padding:12px 16px; display:flex; justify-content:space-between; align-items:center; gap:10px;
-      flex-wrap:wrap;
+    .stake-list { display: flex; flex-direction: column; gap: 10px; }
+    .empty-msg { color: #5f8494; font-size: 13px; }
+    .stake-item {
+      background: var(--bg-panel); border: 1px solid var(--line); border-radius: 10px;
+      padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      flex-wrap: wrap;
     }
-    .stake-item .meta{ font-size:12px; color:#7fa6b8; }
-    .stake-item .amt{ font-weight:700; color:var(--gold); }
-    .unstake-btn{
-      background:transparent; border:1px solid var(--danger); color:var(--danger);
-      border-radius:6px; padding:6px 12px; font-size:12px; cursor:pointer;
+    .stake-item .meta { font-size: 12px; color: #7fa6b8; }
+    .stake-item .amt { font-weight: 700; color: var(--gold); }
+    .unstake-btn {
+      background: transparent; border: 1px solid var(--danger); color: var(--danger);
+      border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer;
     }
-    .unstake-btn:disabled{ opacity:.4; cursor:not-allowed; border-color:#5f8494; color:#5f8494; }
+    .unstake-btn:disabled { opacity: .4; cursor: not-allowed; border-color: #5f8494; color: #5f8494; }
 
-    @media(max-width:560px){
-      .balance-row, .speed-options{ grid-template-columns:1fr; }
-      .stake-input-row{ flex-direction:column; }
+    @media(max-width: 560px) {
+      .balance-row, .speed-options { grid-template-columns: 1fr; }
+      .stake-input-row { flex-direction: column; }
     }
   </style>
 </head>
