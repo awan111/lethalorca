@@ -67,7 +67,7 @@
     gap: 10px;
   }
   .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-glow); box-shadow: 0 0 16px var(--teal-glow); }
-  nav .links { display: flex; gap: 24px; font-size: 14px; color: var(--muted); }
+  nav .links { display: flex; gap: 24px; font-size: 14px; color: var(--muted); align-items: center; }
   nav .links a:hover { color: var(--teal-glow); text-shadow: 0 0 10px rgba(94,234,212,0.5); }
 
   section { position: relative; z-index: 1; padding: 120px 5% 80px; max-width: 1240px; margin: 0 auto; }
@@ -181,6 +181,19 @@
   .btn-generator:hover {
     transform: translateY(-2px) scale(1.02);
     box-shadow: 0 8px 35px rgba(0, 242, 254, 0.75);
+  }
+
+  /* Staking Button Style */
+  .btn-staking {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    border: none;
+    font-weight: 700;
+    box-shadow: 0 4px 25px rgba(16, 185, 129, 0.45);
+  }
+  .btn-staking:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 35px rgba(16, 185, 129, 0.75);
   }
 
   @keyframes play-pulse {
@@ -433,6 +446,7 @@
     <a href="#roadmap">Roadmap</a>
     <a href="#faq">FAQ</a>
     <a href="#community">Community</a>
+    <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
   </div>
 </nav>
 
@@ -446,6 +460,9 @@
     <button class="btn btn-generator" onclick="openGenerator()">
       <span class="gen-icon">⚡</span> LORCA GENERATOR
     </button>
+    <a class="btn btn-staking" href="stake.html">
+      <span class="stake-icon">⚓</span> STAKING POOL
+    </a>
     <a class="btn btn-ghost" href="#transparency">View Token Details</a>
     <a class="btn btn-ghost" href="https://t.me/Lethal_Orca" target="_blank" rel="noopener">Join Telegram ↗</a>
   </div>
