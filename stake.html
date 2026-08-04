@@ -125,7 +125,7 @@
     <div class="balance-row">
       <div class="balance-card">
         <span class="balance-label">Available LORCA</span>
-        <span id="availableBalance" class="balance-value">15000.00</span>
+        <span id="availableBalance" class="balance-value">100000.00</span>
       </div>
       <div class="balance-card">
         <span class="balance-label">Currently Staked</span>
@@ -192,7 +192,8 @@
 
     let state = {
       wallet: null,
-      available: 15000,
+      // Default available balance set to 100000, persisted in localStorage
+      available: localStorage.getItem('lorca_available') !== null ? Number(localStorage.getItem('lorca_available')) : 100000,
       staked: 0,
       pending: 0,
       selected: { mult: 1, lock: 1, apr: 20 },
@@ -225,8 +226,12 @@
         const res = await fetch(`${CONFIG.apiBase}?action=list&wallet=${state.wallet}`);
         const data = await res.json();
         if (data.success && data.stakes) {
+          if (data.availableBalance !== undefined) {
+            state.available = data.availableBalance;
+            localStorage.setItem('lorca_available', state.available);
+          }
           state.stakes = data.stakes.map(s => ({
-            id: s._id,
+            id: s._id || s.id,
             amount: s.amount,
             mult: s.mult || 1,
             apr: s.apr || 20,
@@ -292,6 +297,7 @@
         if (!res.ok) throw new Error(data.error || "Stake failed");
         
         state.available -= amt;
+        localStorage.setItem('lorca_available', state.available);
         state.staked += amt;
         el("stakeAmount").value = "";
         fetchUserStakes();
@@ -301,24 +307,35 @@
       }
     });
 
+    // Claim with 7-day restriction validation check
     async function claimStake(stakeId) {
       if (!state.wallet) return;
+      
+      const lastClaimKey = `lorca_last_claim_${state.wallet}`;
+      const lastClaimTime = Number(localStorage.getItem(lastClaimKey)) || 0;
+      const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+      if (Date.now() - lastClaimTime < SEVEN_DAYS_MS) {
+        alert("Security Check: You are only eligible to claim rewards once every 7 days per wallet!");
+        return;
+      }
+
       try {
         const res = await fetch(CONFIG.apiBase + "?action=claim", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ stakeId, wallet: state.wallet })
+          body: JSON.stringify({ stakeId: stakeId, id: stakeId, wallet: state.wallet })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Claim failed");
-        alert(data.message);
+        
+        localStorage.setItem(lastClaimKey, Date.now());
+        alert(data.message || "Successfully claimed!");
         fetchUserStakes();
       } catch (e) {
         alert("Action failed: " + e.message);
       }
     }
 
-    // New Withdraw / Unstake Function
     async function withdrawStake(stakeId) {
       if (!state.wallet) return;
       if (!confirm("Are you sure you want to withdraw your staked tokens?")) return;
@@ -326,10 +343,14 @@
         const res = await fetch(CONFIG.apiBase + "?action=withdraw", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ stakeId, wallet: state.wallet })
+          body: JSON.stringify({ 
+            stakeId: stakeId, 
+            id: stakeId, 
+            wallet: state.wallet 
+          })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Withdrawal failed");
+        if (!res.ok) throw new Error(data.error || data.message || "Withdrawal failed");
         alert(data.message || "Successfully withdrawn!");
         fetchUserStakes();
       } catch (e) {
