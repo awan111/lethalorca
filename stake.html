@@ -1,104 +1,333 @@
-import { MongoClient, ObjectId } from 'mongodb';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LORCA Staking Pool</title>
+  <style>
+    .lorca-stake-section{
+      --ink:#eaf6ff;
+      --bg-deep:#04141f;
+      --bg-panel:#0b2536;
+      --line:#123b52;
+      --teal:#2dd6c4;
+      --gold:#f5b942;
+      --danger:#ff6b6b;
+      font-family:'Segoe UI', Roboto, sans-serif;
+      background:radial-gradient(circle at 20% -10%, #0f3b52 0%, var(--bg-deep) 60%);
+      color:var(--ink);
+      padding:48px 16px;
+      min-height:100vh;
+    }
+    .stake-wrap{ max-width:760px; margin:0 auto; }
+    .stake-head h2{
+      margin:0; font-size:28px; letter-spacing:.5px;
+      color:var(--gold);
+    }
+    .stake-sub{ margin:6px 0 24px; color:#9fc8d8; font-size:14px; }
 
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Content-Type'
-  );
+    .wallet-bar{
+      display:flex; justify-content:space-between; align-items:center;
+      background:var(--bg-panel); border:1px solid var(--line);
+      border-radius:10px; padding:12px 16px; margin-bottom:20px;
+    }
+    .wallet-status{ font-size:13px; color:#8fb9c9; }
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+    .btn{ cursor:pointer; border:none; border-radius:8px; padding:10px 18px;
+      font-weight:600; font-size:14px; transition:.15s transform, .15s opacity; }
+    .btn:hover{ transform:translateY(-1px); }
+    .btn-outline{ background:transparent; border:1px solid var(--teal); color:var(--teal); }
+    .btn-primary{ background:linear-gradient(135deg,var(--teal),#1a9c8e); color:#02201c; }
+    .btn-ghost{ background:transparent; color:#9fc8d8; border:1px solid var(--line); }
+    .btn:disabled{ opacity:.4; cursor:not-allowed; transform:none; }
 
-  const uri = process.env.MONGODB_URI || process.env.MONGO_URI;
-  if (!uri) {
-    return res.status(500).json({ success: false, error: 'Database URI environment variable is missing' });
-  }
+    .balance-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:26px; }
+    .balance-card{
+      background:var(--bg-panel); border:1px solid var(--line); border-radius:10px;
+      padding:14px; display:flex; flex-direction:column; gap:6px;
+    }
+    .balance-label{ font-size:12px; color:#7fa6b8; text-transform:uppercase; letter-spacing:.5px; }
+    .balance-value{ font-size:20px; font-weight:700; }
+    .balance-value.glow{ color:var(--gold); text-shadow:0 0 12px rgba(245,185,66,.4); }
 
-  let client;
-  try {
-    client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
-    await client.connect();
-    const db = client.db('lethalorca');
-    const collection = db.collection('stakes');
+    .block-label{ display:block; font-size:13px; color:#9fc8d8; margin-bottom:10px; text-transform:uppercase; letter-spacing:.5px; }
 
-    const { action, wallet } = req.query;
+    .speed-block{ margin-bottom:22px; }
+    .speed-options{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .speed-btn{
+      background:var(--bg-panel); border:1px solid var(--line); border-radius:10px;
+      padding:14px 10px; color:var(--ink); cursor:pointer; text-align:left;
+      display:flex; flex-direction:column; gap:4px; transition:.15s;
+    }
+    .speed-btn small{ color:#7fa6b8; }
+    .speed-btn.active{ border-color:var(--teal); box-shadow:0 0 0 1px var(--teal) inset; }
+    .speed-btn:hover{ border-color:var(--teal); }
 
-    // 1. List active stakes for wallet
-    if (req.method === 'GET' && action === 'list') {
-      if (!wallet) return res.status(400).json({ success: false, error: 'Wallet address required' });
-      const stakes = await collection.find({ wallet, status: 'active' }).toArray();
-      return res.status(200).json({ success: true, stakes });
+    .stake-input-row{ display:flex; gap:10px; margin-bottom:10px; }
+    .stake-input-row input{
+      flex:1; background:var(--bg-panel); border:1px solid var(--line); border-radius:8px;
+      padding:12px 14px; color:var(--ink); font-size:15px; outline:none;
+    }
+    .stake-input-row input:focus{ border-color:var(--teal); }
+
+    .est-row{ font-size:13px; color:#7fa6b8; margin-bottom:28px; }
+    .est-row span{ color:var(--gold); font-weight:600; }
+
+    .stake-list{ display:flex; flex-direction:column; gap:10px; }
+    .empty-msg{ color:#5f8494; font-size:13px; }
+    .stake-item{
+      background:var(--bg-panel); border:1px solid var(--line); border-radius:10px;
+      padding:12px 16px; display:flex; justify-content:space-between; align-items:center; gap:10px;
+      flex-wrap:wrap;
+    }
+    .stake-item .meta{ font-size:12px; color:#7fa6b8; }
+    .stake-item .amt{ font-weight:700; color:var(--gold); }
+    .unstake-btn{
+      background:transparent; border:1px solid var(--danger); color:var(--danger);
+      border-radius:6px; padding:6px 12px; font-size:12px; cursor:pointer;
+    }
+    .unstake-btn:disabled{ opacity:.4; cursor:not-allowed; border-color:#5f8494; color:#5f8494; }
+
+    @media(max-width:560px){
+      .balance-row, .speed-options{ grid-template-columns:1fr; }
+      .stake-input-row{ flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+
+<section id="lorca-staking" class="lorca-stake-section">
+  <div class="stake-wrap">
+
+    <div class="stake-head">
+      <h2>LORCA Staking Pool</h2>
+      <p class="stake-sub">Lock your $LORCA, pick a speed, watch it multiply.</p>
+    </div>
+
+    <!-- Wallet bar -->
+    <div class="wallet-bar">
+      <span id="walletStatus" class="wallet-status">Wallet not connected</span>
+      <button id="connectWalletBtn" class="btn btn-outline">Connect Phantom</button>
+    </div>
+
+    <!-- Balance -->
+    <div class="balance-row">
+      <div class="balance-card">
+        <span class="balance-label">Available LORCA</span>
+        <span id="availableBalance" class="balance-value">15000.00</span>
+      </div>
+      <div class="balance-card">
+        <span class="balance-label">Currently Staked</span>
+        <span id="stakedBalance" class="balance-value">0.00</span>
+      </div>
+      <div class="balance-card">
+        <span class="balance-label">Pending Rewards</span>
+        <span id="pendingRewards" class="balance-value glow">0.00</span>
+      </div>
+    </div>
+
+    <!-- Speed / multiplier selector -->
+    <div class="speed-block">
+      <span class="block-label">Choose Boost Speed</span>
+      <div class="speed-options" id="speedOptions">
+        <button class="speed-btn active" data-mult="1" data-lock="3" data-apr="40">
+          <strong>1x Calm Tide</strong>
+          <small>3 days · 40% APR</small>
+        </button>
+        <button class="speed-btn" data-mult="2" data-lock="7" data-apr="90">
+          <strong>2x Rising Swell</strong>
+          <small>7 days · 90% APR</small>
+        </button>
+        <button class="speed-btn" data-mult="3" data-lock="14" data-apr="150">
+          <strong>3x Whale Surge</strong>
+          <small>14 days · 150% APR</small>
+        </button>
+      </div>
+    </div>
+
+    <!-- Stake input -->
+    <div class="stake-input-row">
+      <input type="number" id="stakeAmount" placeholder="Amount of LORCA to stake" min="0" />
+      <button id="maxBtn" class="btn btn-ghost">Max</button>
+      <button id="stakeBtn" class="btn btn-primary">Stake LORCA</button>
+    </div>
+
+    <div class="est-row">
+      Estimated reward at maturity: <span id="estReward">0.00</span> LORCA
+      (<span id="estDays">3</span> days lock)
+    </div>
+
+    <!-- Active stakes -->
+    <div class="active-stakes">
+      <span class="block-label">Your Active Stakes</span>
+      <div id="stakeList" class="stake-list">
+        <p class="empty-msg">No active stakes yet.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  (function(){
+    const CONFIG = {
+      apiBase: "https://lethalorca-backend.vercel.app/api/stake",
+      useBackend: true,
+      lorcaDecimals: 2
+    };
+
+    let state = {
+      wallet: null,
+      available: 15000,
+      staked: 0,
+      pending: 0,
+      selected: { mult: 1, lock: 3, apr: 40 },
+      stakes: []
+    };
+
+    const el = id => document.getElementById(id);
+
+    // Connect Phantom Wallet
+    el("connectWalletBtn").addEventListener("click", async () => {
+      try {
+        if (window.solana && window.solana.isPhantom) {
+          const resp = await window.solana.connect();
+          state.wallet = resp.publicKey.toString();
+          el("walletStatus").textContent = "Connected: " + state.wallet.slice(0,4) + "..." + state.wallet.slice(-4);
+          el("connectWalletBtn").textContent = "Connected";
+          el("connectWalletBtn").disabled = true;
+          fetchUserStakes();
+        } else {
+          alert("Phantom wallet not found. Please install it from phantom.app");
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Wallet connection was cancelled or failed.");
+      }
+    });
+
+    async function fetchUserStakes() {
+      if (!state.wallet) return;
+      try {
+        const res = await fetch(`${CONFIG.apiBase}?action=list&wallet=${state.wallet}`);
+        const data = await res.json();
+        if (data.success && data.stakes) {
+          state.stakes = data.stakes.map(s => ({
+            id: s._id,
+            amount: s.amount,
+            mult: s.mult || 1,
+            apr: s.apr || 40,
+            lockDays: s.days || s.lockDays || 3,
+            startedAt: new Date(s.createdAt).getTime(),
+            maturesAt: new Date(s.createdAt).getTime() + (s.days || 3) * 24 * 60 * 60 * 1000
+          }));
+          state.staked = state.stakes.reduce((sum, s) => sum + s.amount, 0);
+          render();
+        }
+      } catch (err) {
+        console.error("Failed to load stakes:", err);
+      }
     }
 
-    // 2. Create a new stake (supports 1 day, 3 days, 7 days, 14 days)
-    if (req.method === 'POST' && action === 'create') {
-      const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-      const { wallet: userWallet, amount, mult, lockDays, apr } = body;
-
-      if (!userWallet || !amount) {
-        return res.status(400).json({ success: false, error: 'Missing wallet address or amount' });
-      }
-
-      const newStake = {
-        wallet: userWallet,
-        amount: parseFloat(amount),
-        mult: parseInt(mult) || 1,
-        days: parseInt(lockDays) || 1,
-        apr: parseFloat(apr) || 20,
-        createdAt: new Date(),
-        status: 'active'
-      };
-
-      await collection.insertOne(newStake);
-      return res.status(200).json({ success: true, stake: newStake });
-    }
-
-    // 3. Claim or Unstake
-    if (req.method === 'POST' && action === 'claim') {
-      const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-      const { stakeId, wallet: userWallet } = body;
-
-      if (!stakeId || !userWallet) {
-        return res.status(400).json({ success: false, error: 'Missing stake ID or wallet' });
-      }
-
-      const queryId = ObjectId.isValid(stakeId) ? new ObjectId(stakeId) : stakeId;
-      const stake = await collection.findOne({ _id: queryId, wallet: userWallet, status: 'active' });
-
-      if (!stake) {
-        return res.status(404).json({ success: false, error: 'Active stake not found' });
-      }
-
-      const lockDurationDays = stake.days || stake.lockDays || 1;
-      const maturesAt = new Date(stake.createdAt).getTime() + lockDurationDays * 24 * 60 * 60 * 1000;
-      const now = Date.now();
-      const isMatured = now >= maturesAt;
-
-      // Update status in MongoDB
-      await collection.updateOne(
-        { _id: queryId },
-        { $set: { status: isMatured ? 'claimed' : 'unstaked_early', claimedAt: new Date() } }
-      );
-
-      return res.status(200).json({ 
-        success: true, 
-        message: isMatured ? 'Successfully claimed stake and rewards!' : 'Unstaked early successfully.',
-        amountReturned: stake.amount 
+    // Speed selector
+    document.querySelectorAll(".speed-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.selected = {
+          mult: Number(btn.dataset.mult),
+          lock: Number(btn.dataset.lock),
+          apr: Number(btn.dataset.apr)
+        };
+        updateEstimate();
       });
+    });
+
+    el("maxBtn").addEventListener("click", () => {
+      el("stakeAmount").value = state.available.toFixed(CONFIG.lorcaDecimals);
+      updateEstimate();
+    });
+
+    el("stakeAmount").addEventListener("input", updateEstimate);
+
+    function updateEstimate(){
+      const amt = Number(el("stakeAmount").value) || 0;
+      const { apr, lock } = state.selected;
+      const reward = amt * (apr/100) * (lock/365);
+      el("estReward").textContent = reward.toFixed(CONFIG.lorcaDecimals);
+      el("estDays").textContent = lock;
     }
 
-    return res.status(400).json({ success: false, error: 'Invalid action' });
+    // Stake Action
+    el("stakeBtn").addEventListener("click", async () => {
+      const amt = Number(el("stakeAmount").value);
+      if (!amt || amt <= 0) { alert("Enter a valid amount to stake."); return; }
+      if (amt > state.available) { alert("You don't have that much LORCA available."); return; }
+      if (!state.wallet) { alert("Connect your wallet first."); return; }
 
-  } catch (error) {
-    console.error('API Error:', error);
-    return res.status(500).json({ success: false, error: error.message || 'Database connection error' });
-  } finally {
-    if (client) {
-      await client.close();
+      try {
+        const res = await fetch(CONFIG.apiBase + "?action=create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            wallet: state.wallet,
+            amount: amt,
+            mult: state.selected.mult,
+            lockDays: state.selected.lock,
+            apr: state.selected.apr
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Stake failed");
+        
+        state.available -= amt;
+        state.staked += amt;
+        el("stakeAmount").value = "";
+        fetchUserStakes();
+        updateEstimate();
+      } catch (e) {
+        alert("Staking failed: " + e.message);
+      }
+    });
+
+    function render(){
+      el("availableBalance").textContent = state.available.toFixed(CONFIG.lorcaDecimals);
+      el("stakedBalance").textContent = state.staked.toFixed(CONFIG.lorcaDecimals);
+
+      let pending = 0;
+      const list = el("stakeList");
+      list.innerHTML = "";
+      if (state.stakes.length === 0) {
+        list.innerHTML = '<p class="empty-msg">No active stakes yet.</p>';
+      } else {
+        state.stakes.forEach(s => {
+          const now = Date.now();
+          const elapsed = Math.min(now - s.startedAt, s.maturesAt - s.startedAt);
+          const frac = Math.max(0, elapsed / (s.maturesAt - s.startedAt));
+          const accrued = s.amount * (s.apr/100) * (s.lockDays/365) * frac;
+          pending += accrued;
+          const matured = now >= s.maturesAt;
+          const daysLeft = Math.max(0, Math.ceil((s.maturesAt - now) / 86400000));
+
+          const item = document.createElement("div");
+          item.className = "stake-item";
+          item.innerHTML = `
+            <div>
+              <div class="amt">${s.amount.toFixed(CONFIG.lorcaDecimals)} LORCA · ${s.mult}x</div>
+              <div class="meta">${matured ? "Matured — ready to claim" : daysLeft + " day(s) left"} · +${accrued.toFixed(2)} accrued</div>
+            </div>
+            <button class="unstake-btn" disabled>${matured ? "Claim" : "Locked"}</button>
+          `;
+          list.appendChild(item);
+        });
+      }
+      el("pendingRewards").textContent = pending.toFixed(CONFIG.lorcaDecimals);
     }
-  }
-}
+
+    updateEstimate();
+    render();
+  })();
+</script>
+
+</body>
+</html>
