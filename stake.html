@@ -1,104 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lethal Orca Staking Withdrawal</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #121212; color: #fff; padding: 20px; }
-        .container { max-width: 600px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        input, button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px; border: none; font-size: 16px; }
-        input { background: #2c2c2c; color: #fff; }
-        button { background: #00ffcc; color: #000; font-weight: bold; cursor: pointer; }
-        button:hover { background: #00cc99; }
-        .stake-card { background: #2a2a2a; padding: 15px; margin-top: 15px; border-radius: 8px; border-left: 5px solid #00ffcc; }
-        .error { color: #ff4d4d; margin-top: 10px; }
-        .success { color: #00ffcc; margin-top: 10px; }
-    </style>
-</head>
-<body>
+import { MongoClient, ObjectId } from 'mongodb';
 
-    <div class="container">
-        <h2>Lethal Orca - Staking Dashboard</h2>
-        <p>Apna Wallet Address enter kar ke apne stakes check karein:</p>
-        
-        <input type="text" id="walletInput" placeholder="Enter Wallet Address (e.g., 3bveeb...)" value="3bveebwJQgzrj8GFEwXExbDZuZEexQuNmi7bKXAbdndE">
-        <button onclick="fetchStakes()">Load My Stakes</button>
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Content-Type'
+  );
 
-        <div id="message"></div>
-        <div id="stakesList"></div>
-    </div>
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
-    <script>
-        async function fetchStakes() {
-            const wallet = document.getElementById('walletInput').value.trim();
-            const messageDiv = document.getElementById('message');
-            const stakesListDiv = document.getElementById('stakesList');
-            
-            messageDiv.innerHTML = "";
-            stakesListDiv.innerHTML = "Loading...";
+  const uri = process.env.MONGODB_URI || process.env.MONGO_URI;
+  if (!uri) {
+    return res.status(500).json({ success: false, error: 'Database URI environment variable is missing' });
+  }
 
-            if (!wallet) {
-                messageDiv.innerHTML = "<p class='error'>Please enter a valid wallet address!</p>";
-                stakesListDiv.innerHTML = "";
-                return;
-            }
+  let client;
+  try {
+    client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
+    await client.connect();
+    const db = client.db('lethalorca');
+    const collection = db.collection('stakes');
 
-            try {
-                // Backend API call to get stakes (Aap ko backend par yeh route banana hoga jo DB se stakes laye)
-                const response = await fetch(`http://localhost:5000/api/stakes?wallet=${wallet}`);
-                const data = await response.json();
+    const { action, wallet } = req.query;
 
-                if (!data.success || data.stakes.length === 0) {
-                    stakesListDiv.innerHTML = "<p>No active stakes found for this wallet.</p>";
-                    return;
-                }
+    // 1. List active stakes for wallet
+    if (req.method === 'GET' && action === 'list') {
+      if (!wallet) return res.status(400).json({ success: false, error: 'Wallet address required' });
+      const stakes = await collection.find({ wallet, status: 'active' }).toArray();
+      return res.status(200).json({ success: true, stakes });
+    }
 
-                stakesListDiv.innerHTML = "";
-                data.stakes.forEach(stake => {
-                    const card = document.createElement('div');
-                    card.className = 'stake-card';
-                    card.innerHTML = `
-                        <p><b>Amount:</b> ${stake.amount} LORCA</p>
-                        <p><b>Days:</b> ${stake.days} | <b>APR:</b> ${stake.apr}%</p>
-                        <p><b>Status:</b> ${stake.status}</p>
-                        <p><b>Created At:</b> ${new Date(stake.createdAt).toLocaleString()}</p>
-                        ${stake.status === 'active' ? `<button onclick="withdrawStake('${stake._id}', '${wallet}')">Withdraw / Claim</button>` : '<span style="color:gray;">Withdrawn</span>'}
-                    `;
-                    stakesListDiv.appendChild(card);
-                });
+    // 2. Create a new stake (supports 1 day, 3 days, 7 days, 14 days)
+    if (req.method === 'POST' && action === 'create') {
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+      const { wallet: userWallet, amount, mult, lockDays, apr } = body;
 
-            } catch (error) {
-                console.error(error);
-                stakesListDiv.innerHTML = "<p class='error'>Failed to connect to backend server.</p>";
-            }
-        }
+      if (!userWallet || !amount) {
+        return res.status(400).json({ success: false, error: 'Missing wallet address or amount' });
+      }
 
-        async function withdrawStake(stakeId, wallet) {
-            if (!confirm("Kya aap apna stake withdraw karna chahte hain?")) return;
+      const newStake = {
+        wallet: userWallet,
+        amount: parseFloat(amount),
+        mult: parseInt(mult) || 1,
+        days: parseInt(lockDays) || 1,
+        apr: parseFloat(apr) || 20,
+        createdAt: new Date(),
+        status: 'active'
+      };
 
-            try {
-                const response = await fetch('http://localhost:5000/api/withdraw-stake', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ stakeId, wallet })
-                });
+      await collection.insertOne(newStake);
+      return res.status(200).json({ success: true, stake: newStake });
+    }
 
-                const result = await response.json();
-                const messageDiv = document.getElementById('message');
+    // 3. Claim or Unstake
+    if (req.method === 'POST' && action === 'claim') {
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+      const { stakeId, wallet: userWallet } = body;
 
-                if (result.success) {
-                    messageDiv.innerHTML = `<p class='success'>${result.message}</p>`;
-                    fetchStakes(); // Refresh list
-                } else {
-                    messageDiv.innerHTML = `<p class='error'>Error: ${result.error}</p>`;
-                }
-            } catch (error) {
-                console.error(error);
-                alert("Withdrawal request failed!");
-            }
-        }
-    </script>
+      if (!stakeId || !userWallet) {
+        return res.status(400).json({ success: false, error: 'Missing stake ID or wallet' });
+      }
 
-</body>
-</html>
+      const queryId = ObjectId.isValid(stakeId) ? new ObjectId(stakeId) : stakeId;
+      const stake = await collection.findOne({ _id: queryId, wallet: userWallet, status: 'active' });
+
+      if (!stake) {
+        return res.status(404).json({ success: false, error: 'Active stake not found' });
+      }
+
+      const lockDurationDays = stake.days || stake.lockDays || 1;
+      const maturesAt = new Date(stake.createdAt).getTime() + lockDurationDays * 24 * 60 * 60 * 1000;
+      const now = Date.now();
+      const isMatured = now >= maturesAt;
+
+      // Update status in MongoDB
+      await collection.updateOne(
+        { _id: queryId },
+        { $set: { status: isMatured ? 'claimed' : 'unstaked_early', claimedAt: new Date() } }
+      );
+
+      return res.status(200).json({ 
+        success: true, 
+        message: isMatured ? 'Successfully claimed stake and rewards!' : 'Unstaked early successfully.',
+        amountReturned: stake.amount 
+      });
+    }
+
+    return res.status(400).json({ success: false, error: 'Invalid action' });
+
+  } catch (error) {
+    console.error('API Error:', error);
+    return res.status(500).json({ success: false, error: error.message || 'Database connection error' });
+  } finally {
+    if (client) {
+      await client.close();
+    }
+  }
+}
