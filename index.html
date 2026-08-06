@@ -69,7 +69,6 @@
   }
   .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-glow); box-shadow: 0 0 16px var(--teal-glow); }
   
-  /* Fixed Nav Links Styling - Bright, Clear & Clean */
   nav .links { display: flex; gap: 22px; font-size: 14px; align-items: center; }
   nav .links a { 
     color: var(--ink); 
@@ -361,6 +360,7 @@
   }
   .newsletter-box p { margin: 0; max-width: 440px; font-size: 14.5px; color: var(--muted); }
 
+  /* Professional Generator Modal & Multi-Step Wizard */
   .generator-modal {
     display: none;
     position: fixed;
@@ -431,11 +431,17 @@
     align-items: center;
     gap: 4px;
   }
-  .modal-nav-btn:hover {
+  .modal-nav-btn:hover:not(:disabled) {
     background: rgba(45, 212, 191, 0.3);
     border-color: #fff;
     color: #fff;
     box-shadow: 0 0 10px rgba(94,234,212,0.5);
+  }
+  .modal-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    border-color: var(--line);
+    color: var(--muted);
   }
 
   .close-btn {
@@ -447,15 +453,114 @@
     line-height: 1;
     padding: 4px;
   }
-
   .close-btn:hover { color: #ff5555; }
 
-  .generator-iframe {
-    width: 100%;
-    height: 100%;
+  /* Wizard Steps Container */
+  .generator-body {
     flex-grow: 1;
-    border: none;
-    display: block;
+    padding: 30px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .wizard-step {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .wizard-step.active {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .wizard-step h4 {
+    font-family: var(--display);
+    font-size: 22px;
+    color: var(--ink);
+  }
+
+  .wizard-step p {
+    color: var(--muted);
+    font-size: 14.5px;
+    line-height: 1.6;
+  }
+
+  .wizard-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 10px;
+  }
+
+  .wizard-option-card {
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.02);
+    padding: 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .wizard-option-card:hover, .wizard-option-card.selected {
+    border-color: var(--teal-glow);
+    background: rgba(94,234,212,0.06);
+    box-shadow: 0 0 15px rgba(94,234,212,0.15);
+  }
+  .wizard-option-card h5 {
+    font-family: var(--display);
+    font-size: 15px;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .wizard-option-card span {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .wizard-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .wizard-input-group label {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--teal);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .wizard-input-group input {
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.03);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .wizard-input-group input:focus {
+    border-color: var(--teal-glow);
+  }
+
+  .wizard-footer-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+    margin-top: auto;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes modalIn {
@@ -499,6 +604,7 @@
     #orca-trail { display: none; }
     section { padding: 90px 5% 50px; }
     .generator-modal-content { height: 94vh; max-height: none; }
+    .wizard-options { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -765,49 +871,131 @@
   </div>
 </footer>
 
+<!-- Professional Multi-Step Wizard Modal -->
 <div id="generatorModal" class="generator-modal">
   <div class="generator-modal-content">
     <div class="generator-header">
       <div class="generator-header-left">
-        <button onclick="iframeBack()" class="modal-nav-btn" title="Go Back">← Back</button>
-        <button onclick="iframeForward()" class="modal-nav-btn" title="Go Forward">Next →</button>
-        <h3>⚡ LORCA MINT</h3>
+        <button id="modalBackBtn" onclick="modalPrevStep()" class="modal-nav-btn" title="Go Back" disabled>← Back</button>
+        <button id="modalNextBtn" onclick="modalNextStep()" class="modal-nav-btn" title="Go Forward">Next →</button>
+        <h3>⚡ LORCA GENERATOR WIZARD</h3>
       </div>
       <button onclick="closeGenerator()" class="close-btn">✕</button>
     </div>
-    <iframe id="generatorFrame" src="generator.html" class="generator-iframe" allow="autoplay"></iframe>
+    
+    <div class="generator-body">
+      <!-- Step 1 -->
+      <div class="wizard-step active" id="step-1">
+        <h4>Step 1: Select Token Tier</h4>
+        <p>Choose your generation configuration to get started with $LORCA parameters.</p>
+        <div class="wizard-options">
+          <div class="wizard-option-card selected" onclick="selectTier(this)">
+            <h5>Abyssal Standard</h5>
+            <span>Standard pump.fun supply & liquidity setup.</span>
+          </div>
+          <div class="wizard-option-card" onclick="selectTier(this)">
+            <h5>Deep Trench Custom</h5>
+            <span>Custom parameters and reward hooks enabled.</span>
+          </div>
+        </div>
+        <div class="wizard-footer-info">
+          <span>Progress: Step 1 of 3</span>
+          <span>Status: Ready</span>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="wizard-step" id="step-2">
+        <h4>Step 2: Enter Parameters</h4>
+        <p>Provide your token allocation details and developer wallet parameters.</p>
+        <div class="wizard-input-group">
+          <label>Token Name / Symbol</label>
+          <input type="text" value="LethalOrca / LORCA" placeholder="Enter name">
+        </div>
+        <div class="wizard-input-group">
+          <label>Dev Holding Target (%)</label>
+          <input type="text" value="3.5%" placeholder="Enter percentage">
+        </div>
+        <div class="wizard-footer-info">
+          <span>Progress: Step 2 of 3</span>
+          <span>Status: Configuring</span>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="wizard-step" id="step-3">
+        <h4>Step 3: Review & Generate</h4>
+        <p>Verify your configuration before dispatching to the Solana network.</p>
+        <div class="wizard-input-group">
+          <label>Contract Mint Verification</label>
+          <input type="text" readonly value="7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump">
+        </div>
+        <button class="btn btn-primary" style="margin-top: 10px;" onclick="alert('Configuration verified! Ready for launch.')">Initialize Mint</button>
+        <div class="wizard-footer-info">
+          <span>Progress: Step 3 of 3</span>
+          <span>Status: Final Step</span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
+let currentStep = 1;
+const totalSteps = 3;
+
 function openGenerator() {
   document.getElementById('generatorModal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  updateWizardUI();
 }
 
 function closeGenerator() {
   document.getElementById('generatorModal').style.display = 'none';
   document.body.style.overflow = 'auto';
-  var iframe = document.getElementById('generatorFrame');
-  iframe.src = iframe.src;
+  currentStep = 1;
+  updateWizardUI();
 }
 
-function iframeBack() {
-  const iframe = document.getElementById('generatorFrame');
-  try {
-    iframe.contentWindow.history.back();
-  } catch (e) {
-    console.error('Back navigation error:', e);
+function modalNextStep() {
+  if (currentStep < totalSteps) {
+    currentStep++;
+    updateWizardUI();
   }
 }
 
-function iframeForward() {
-  const iframe = document.getElementById('generatorFrame');
-  try {
-    iframe.contentWindow.history.forward();
-  } catch (e) {
-    console.error('Forward navigation error:', e);
+function modalPrevStep() {
+  if (currentStep > 1) {
+    currentStep--;
+    updateWizardUI();
   }
+}
+
+function updateWizardUI() {
+  // Hide all steps
+  for (let i = 1; i <= totalSteps; i++) {
+    document.getElementById(`step-${i}`).classList.remove('active');
+  }
+  // Show current step
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+
+  // Update button states
+  const backBtn = document.getElementById('modalBackBtn');
+  const nextBtn = document.getElementById('modalNextBtn');
+
+  backBtn.disabled = currentStep === 1;
+  if (currentStep === totalSteps) {
+    nextBtn.disabled = true;
+    nextBtn.innerText = 'Done ✓';
+  } else {
+    nextBtn.disabled = false;
+    nextBtn.innerText = 'Next →';
+  }
+}
+
+function selectTier(card) {
+  document.querySelectorAll('.wizard-option-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
 }
 
 window.onclick = function(event) {
