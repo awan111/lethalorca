@@ -421,6 +421,33 @@
     to { opacity: 1; transform: scale(1); }
   }
 
+  /* --- REFERRAL BOX --- */
+  .referral-box {
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 28px;
+    background: linear-gradient(180deg, var(--deep2), var(--deep));
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    margin-top: 28px;
+  }
+  .referral-box .ref-connect-row { margin-bottom: 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .referral-box .ref-status { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+  .referral-box .ref-code-row {
+    display: flex; gap: 10px; margin: 14px 0; flex-wrap: wrap;
+  }
+  .referral-box input {
+    flex: 1; min-width: 180px; padding: 12px 14px;
+    border-radius: 10px; border: 1px solid var(--line);
+    background: rgba(255,255,255,0.03); color: var(--ink);
+    font-family: var(--mono); font-size: 13.5px;
+  }
+  .referral-box .ref-stats {
+    display: flex; gap: 24px; margin-top: 14px; flex-wrap: wrap;
+    font-family: var(--mono); font-size: 12.5px; color: var(--muted);
+  }
+  .referral-box .ref-stats strong { color: var(--gold); }
+  #refMessage { font-family: var(--mono); font-size: 12.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
+
   /* --- MOBILE SPECIFIC FIXES --- */
   @media (max-width: 768px) {
     nav .links { display: none; }
@@ -447,6 +474,7 @@
     <a href="#faq">FAQ</a>
     <a href="#community">Community</a>
     <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
+    <a href="#referral" style="color: var(--gold); font-weight: 600;">Refer & Earn</a>
   </div>
 </nav>
 
@@ -620,6 +648,40 @@
 
 <hr class="divider">
 
+<section id="referral">
+  <div class="depth-marker"><span class="depth-val">–3800m</span><span class="depth-name">Refer & Earn</span></div>
+  <h2 class="section-title">Bring a friend, earn LORCA</h2>
+  <p class="section-lede">Connect your wallet to get your unique referral code. Every friend who joins using it earns you both bonus $LORCA.</p>
+
+  <div class="referral-box">
+    <div class="ref-connect-row">
+      <button class="btn btn-staking" id="refConnectBtn">Connect Wallet</button>
+      <div class="ref-status" id="refStatus">Not connected</div>
+    </div>
+
+    <div class="ref-code-row">
+      <input type="text" id="myReferralCode" readonly placeholder="Connect wallet to see your code" />
+      <button class="btn btn-ghost" id="copyRefBtn">Copy</button>
+    </div>
+
+    <div class="ref-stats">
+      <span>Referrals: <strong id="refCount">0</strong></span>
+      <span>Earned: <strong id="refEarnings">0</strong> LORCA</span>
+    </div>
+
+    <hr class="divider" style="margin: 20px 0;">
+
+    <div class="ref-code-row">
+      <input type="text" id="applyCodeInput" placeholder="Have a friend's code? Enter it here" />
+      <button class="btn btn-generator" id="applyRefBtn">Apply</button>
+    </div>
+
+    <p id="refMessage"></p>
+  </div>
+</section>
+
+<hr class="divider">
+
 <section id="community">
   <div class="depth-marker"><span class="depth-val">–6000m</span><span class="depth-name">Hadal / Community</span></div>
   <h2 class="section-title">Join the crew</h2>
@@ -689,6 +751,75 @@ window.onclick = function(event) {
     closeGenerator();
   }
 }
+
+// ---- Referral System ----
+const REFERRAL_BACKEND_URL = "https://lethalorca-backend.vercel.app";
+let referralWallet = null;
+
+async function connectReferralWallet() {
+  try {
+    if (!window.solana || !window.solana.isPhantom) {
+      document.getElementById('refStatus').innerText = "Phantom wallet not found — install it first.";
+      return;
+    }
+    const resp = await window.solana.connect();
+    referralWallet = resp.publicKey.toString();
+    document.getElementById('refStatus').innerText =
+      "Connected: " + referralWallet.slice(0, 4) + "..." + referralWallet.slice(-4);
+    document.getElementById('refConnectBtn').innerText = "Connected";
+    loadReferralData(referralWallet);
+  } catch (err) {
+    console.error('Wallet connect error:', err);
+    document.getElementById('refStatus').innerText = "Connection failed. Try again.";
+  }
+}
+
+async function loadReferralData(wallet) {
+  try {
+    const res = await fetch(`${REFERRAL_BACKEND_URL}/api/referral?action=get-code&wallet=${wallet}`);
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('myReferralCode').value = data.referralCode;
+      document.getElementById('refCount').innerText = data.referralCount;
+      document.getElementById('refEarnings').innerText = data.referralEarnings;
+    }
+  } catch (err) {
+    console.error('Referral load error:', err);
+  }
+}
+
+document.getElementById('refConnectBtn').addEventListener('click', connectReferralWallet);
+
+document.getElementById('copyRefBtn').addEventListener('click', () => {
+  const code = document.getElementById('myReferralCode').value;
+  if (!code) return;
+  navigator.clipboard.writeText(code);
+  document.getElementById('refMessage').innerText = "Code copied to clipboard.";
+});
+
+document.getElementById('applyRefBtn').addEventListener('click', async () => {
+  const code = document.getElementById('applyCodeInput').value.trim();
+  if (!referralWallet) {
+    document.getElementById('refMessage').innerText = "Connect your wallet first.";
+    return;
+  }
+  if (!code) {
+    document.getElementById('refMessage').innerText = "Enter a referral code first.";
+    return;
+  }
+  try {
+    const res = await fetch(`${REFERRAL_BACKEND_URL}/api/referral?action=apply-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ wallet: referralWallet, code })
+    });
+    const data = await res.json();
+    document.getElementById('refMessage').innerText = data.success ? data.message : data.error;
+    if (data.success) loadReferralData(referralWallet);
+  } catch (err) {
+    document.getElementById('refMessage').innerText = "Something went wrong.";
+  }
+});
 </script>
 
 </body>
