@@ -398,11 +398,34 @@
     flex-shrink: 0;
   }
 
+  .generator-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
   .generator-header h3 {
     font-family: var(--display);
-    font-size: 16px;
+    font-size: 15px;
     color: #00f2fe;
     letter-spacing: 0.5px;
+  }
+
+  .modal-nav-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .modal-nav-btn:hover {
+    background: rgba(0, 242, 254, 0.15);
+    border-color: #00f2fe;
+    color: #00f2fe;
   }
 
   .close-btn {
@@ -698,7 +721,7 @@
   <h2 class="section-title">Join the crew</h2>
   <p class="section-lede">Follow along, ask questions, and watch the build happen in real time.</p>
   <div class="community-grid">
-    <a class="comm-card" href="https://x.com/lethalorcatdo" target="_blank" rel="noopener">
+    <a class="comm-card" href="url?id=9" target="_blank" rel="noopener">
       <div class="plat">X / Twitter</div>
       <div class="handle">@lethalorcatdo ↗</div>
     </a>
@@ -735,7 +758,11 @@
 <div id="generatorModal" class="generator-modal">
   <div class="generator-modal-content">
     <div class="generator-header">
-      <h3>⚡ LORCA MINT GENERATOR</h3>
+      <div class="generator-header-left">
+        <button onclick="iframeBack()" class="modal-nav-btn" title="Go Back">← Back</button>
+        <button onclick="iframeForward()" class="modal-nav-btn" title="Go Forward">Next →</button>
+        <h3>⚡ LORCA MINT GENERATOR</h3>
+      </div>
       <button onclick="closeGenerator()" class="close-btn">✕</button>
     </div>
     <iframe id="generatorFrame" src="generator.html" class="generator-iframe" allow="autoplay"></iframe>
@@ -753,6 +780,24 @@ function closeGenerator() {
   document.body.style.overflow = 'auto';
   var iframe = document.getElementById('generatorFrame');
   iframe.src = iframe.src;
+}
+
+function iframeBack() {
+  const iframe = document.getElementById('generatorFrame');
+  try {
+    iframe.contentWindow.history.back();
+  } catch (e) {
+    console.error('Back navigation error:', e);
+  }
+}
+
+function iframeForward() {
+  const iframe = document.getElementById('generatorFrame');
+  try {
+    iframe.contentWindow.history.forward();
+  } catch (e) {
+    console.error('Forward navigation error:', e);
+  }
 }
 
 window.onclick = function(event) {
