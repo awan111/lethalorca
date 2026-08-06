@@ -669,6 +669,10 @@
       <span>Earned: <strong id="refEarnings">0</strong> LORCA</span>
     </div>
 
+    <div class="ref-code-row" style="margin-top: 16px;">
+      <button class="btn btn-play" id="claimRefBtn" style="width: 100%;">Claim Referral Bonus</button>
+    </div>
+
     <hr class="divider" style="margin: 20px 0;">
 
     <div class="ref-code-row">
@@ -818,6 +822,36 @@ document.getElementById('applyRefBtn').addEventListener('click', async () => {
     if (data.success) loadReferralData(referralWallet);
   } catch (err) {
     document.getElementById('refMessage').innerText = "Something went wrong.";
+  }
+});
+
+document.getElementById('claimRefBtn').addEventListener('click', async () => {
+  if (!referralWallet) {
+    document.getElementById('refMessage').innerText = "Connect your wallet first.";
+    return;
+  }
+
+  document.getElementById('claimRefBtn').innerText = "Claiming...";
+  document.getElementById('claimRefBtn').disabled = true;
+
+  try {
+    const res = await fetch(`${REFERRAL_BACKEND_URL}/api/claim-referral`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ wallet: referralWallet })
+    });
+    const data = await res.json();
+
+    document.getElementById('refMessage').innerText = data.success
+      ? data.message
+      : data.error;
+
+    if (data.success) loadReferralData(referralWallet);
+  } catch (err) {
+    document.getElementById('refMessage').innerText = "Claim failed. Try again.";
+  } finally {
+    document.getElementById('claimRefBtn').innerText = "Claim Referral Bonus";
+    document.getElementById('claimRefBtn').disabled = false;
   }
 });
 </script>
