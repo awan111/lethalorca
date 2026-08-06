@@ -67,8 +67,20 @@
     gap: 10px;
   }
   .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-glow); box-shadow: 0 0 16px var(--teal-glow); }
-  nav .links { display: flex; gap: 24px; font-size: 14px; color: var(--muted); align-items: center; }
-  nav .links a:hover { color: var(--teal-glow); text-shadow: 0 0 10px rgba(94,234,212,0.5); }
+  
+  /* Uniform Nav Links Styling */
+  nav .links { display: flex; gap: 24px; font-size: 14px; align-items: center; }
+  nav .links a { 
+    color: var(--muted); 
+    font-family: var(--body); 
+    font-weight: 500; 
+    text-decoration: none;
+    transition: color 0.2s ease, text-shadow 0.2s ease; 
+  }
+  nav .links a:hover { 
+    color: var(--teal-glow); 
+    text-shadow: 0 0 10px rgba(94,234,212,0.5); 
+  }
 
   section { position: relative; z-index: 1; padding: 120px 5% 80px; max-width: 1240px; margin: 0 auto; }
 
@@ -108,7 +120,6 @@
     margin-top: 20px;
   }
   
-  /* CTA Buttons — Sleek Mobile Friendly Grid */
   .hero-cta { 
     display: flex; 
     gap: 14px; 
@@ -183,7 +194,6 @@
     box-shadow: 0 8px 35px rgba(0, 242, 254, 0.75);
   }
 
-  /* Staking Button Style */
   .btn-staking {
     background: linear-gradient(135deg, #10b981, #059669);
     color: #fff;
@@ -350,7 +360,6 @@
   }
   .newsletter-box p { margin: 0; max-width: 440px; font-size: 14.5px; color: var(--muted); }
 
-  /* --- SLEEK RESPONSIVE GENERATOR MODAL --- */
   .generator-modal {
     display: none;
     position: fixed;
@@ -421,7 +430,6 @@
     to { opacity: 1; transform: scale(1); }
   }
 
-  /* --- REFERRAL BOX --- */
   .referral-box {
     border: 1px solid var(--line);
     border-radius: 18px;
@@ -448,7 +456,6 @@
   .referral-box .ref-stats strong { color: var(--gold); }
   #refMessage { font-family: var(--mono); font-size: 12.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
 
-  /* --- MOBILE SPECIFIC FIXES --- */
   @media (max-width: 768px) {
     nav .links { display: none; }
     #hero { align-items: center; text-align: center; }
@@ -473,8 +480,8 @@
     <a href="#roadmap">Roadmap</a>
     <a href="#faq">FAQ</a>
     <a href="#community">Community</a>
-    <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
-    <a href="#referral" style="color: var(--teal-glow); font-weight: 600;">Refer & Earn</a>
+    <a href="stake.html">Staking Pool</a>
+    <a href="#referral">Refer & Earn</a>
   </div>
 </nav>
 
@@ -725,7 +732,6 @@
   </div>
 </footer>
 
-<!-- GENERATOR MODAL WINDOW -->
 <div id="generatorModal" class="generator-modal">
   <div class="generator-modal-content">
     <div class="generator-header">
@@ -739,14 +745,14 @@
 <script>
 function openGenerator() {
   document.getElementById('generatorModal').style.display = 'flex';
-  document.body.style.overflow = 'hidden'; // Prevents background page scrolling
+  document.body.style.overflow = 'hidden';
 }
 
 function closeGenerator() {
   document.getElementById('generatorModal').style.display = 'none';
   document.body.style.overflow = 'auto';
   var iframe = document.getElementById('generatorFrame');
-  iframe.src = iframe.src; // Reloads iframe to stop generator audio/timer
+  iframe.src = iframe.src;
 }
 
 window.onclick = function(event) {
@@ -756,7 +762,6 @@ window.onclick = function(event) {
   }
 }
 
-// ---- Referral System ----
 const REFERRAL_BACKEND_URL = "https://lethalorca-backend.vercel.app";
 let referralWallet = null;
 
