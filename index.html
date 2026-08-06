@@ -15,7 +15,7 @@
     --teal-glow: #5eead4;
     --gold: #f2c94c;
     --ink: #f4fcfc;
-    --muted: #8ab4b4;
+    --muted: #a3c4c4;
     --line: rgba(94, 234, 212, 0.2);
     --display: 'Space Grotesk', sans-serif;
     --body: 'Inter', sans-serif;
@@ -53,7 +53,7 @@
     padding: 16px 5%;
     z-index: 100;
     backdrop-filter: blur(16px);
-    background: rgba(2,9,16,0.85);
+    background: rgba(2,9,16,0.9);
     border-bottom: 1px solid var(--line);
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
@@ -65,21 +65,22 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    color: #fff;
   }
   .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-glow); box-shadow: 0 0 16px var(--teal-glow); }
   
-  /* Uniform Nav Links Styling */
-  nav .links { display: flex; gap: 24px; font-size: 14px; align-items: center; }
+  /* Fixed Nav Links Styling - Bright, Clear & Clean */
+  nav .links { display: flex; gap: 22px; font-size: 14px; align-items: center; }
   nav .links a { 
-    color: var(--muted); 
+    color: var(--ink); 
     font-family: var(--body); 
-    font-weight: 500; 
+    font-weight: 600; 
     text-decoration: none;
     transition: color 0.2s ease, text-shadow 0.2s ease; 
   }
   nav .links a:hover { 
     color: var(--teal-glow); 
-    text-shadow: 0 0 10px rgba(94,234,212,0.5); 
+    text-shadow: 0 0 12px rgba(94,234,212,0.6); 
   }
 
   section { position: relative; z-index: 1; padding: 120px 5% 80px; max-width: 1240px; margin: 0 auto; }
@@ -307,7 +308,7 @@
   }
   .comm-card:hover { border-color: var(--teal-glow); transform: translateY(-3px); }
   .comm-card .plat { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
-  .comm-card .handle { font-family: var(--display); font-size: 17px; }
+  .comm-card .handle { font-family: var(--display); font-size: 17px; color: var(--ink); }
 
   footer {
     padding: 50px 5% 40px;
@@ -392,40 +393,49 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 20px;
+    padding: 12px 18px;
     background: rgba(5, 18, 30, 0.98);
-    border-bottom: 1px solid rgba(94, 234, 212, 0.2);
+    border-bottom: 1px solid rgba(94, 234, 212, 0.25);
     flex-shrink: 0;
+    gap: 12px;
   }
 
   .generator-header-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
   }
 
   .generator-header h3 {
     font-family: var(--display);
-    font-size: 15px;
+    font-size: 14px;
     color: #00f2fe;
     letter-spacing: 0.5px;
+    margin-left: 4px;
   }
 
+  /* Clear & Prominent Back and Next Navigation Buttons with Arrows */
   .modal-nav-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--line);
-    color: var(--ink);
+    background: rgba(45, 212, 191, 0.15);
+    border: 1px solid var(--teal-glow);
+    color: var(--teal-glow);
     font-family: var(--mono);
     font-size: 11px;
-    padding: 5px 10px;
-    border-radius: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: 600;
     transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
   .modal-nav-btn:hover {
-    background: rgba(0, 242, 254, 0.15);
-    border-color: #00f2fe;
-    color: #00f2fe;
+    background: rgba(45, 212, 191, 0.3);
+    border-color: #fff;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(94,234,212,0.5);
   }
 
   .close-btn {
@@ -721,11 +731,11 @@
   <h2 class="section-title">Join the crew</h2>
   <p class="section-lede">Follow along, ask questions, and watch the build happen in real time.</p>
   <div class="community-grid">
-    <a class="comm-card" href="url?id=9" target="_blank" rel="noopener">
+    <a class="comm-card" href="https://x.com/lethalorcatdo" target="_blank" rel="noopener">
       <div class="plat">X / Twitter</div>
       <div class="handle">@lethalorcatdo ↗</div>
     </a>
-    <a class="comm-card" href="https://t.co/OphC6f1Fxe" target="_blank" rel="noopener">
+    <a class="comm-card" href="https://lethalorca.com/#transparency0" target="_blank" rel="noopener">
       <div class="plat">Discord</div>
       <div class="handle">Join the Crew ↗</div>
     </a>
@@ -761,7 +771,7 @@
       <div class="generator-header-left">
         <button onclick="iframeBack()" class="modal-nav-btn" title="Go Back">← Back</button>
         <button onclick="iframeForward()" class="modal-nav-btn" title="Go Forward">Next →</button>
-        <h3>⚡ LORCA MINT GENERATOR</h3>
+        <h3>⚡ LORCA MINT</h3>
       </div>
       <button onclick="closeGenerator()" class="close-btn">✕</button>
     </div>
