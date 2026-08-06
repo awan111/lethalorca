@@ -30,8 +30,6 @@
     line-height: 1.6;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
   }
   a { color: var(--teal-glow); text-decoration: none; }
 
@@ -39,7 +37,7 @@
     position: fixed;
     inset: 0;
     background-image: radial-gradient(circle at 20% 20%, rgba(45,212,191,0.08), transparent 40%),
-                       radial-gradient(circle at 80% 60%, rgba(242,201,76,0.05), transparent 45%);
+                        radial-gradient(circle at 80% 60%, rgba(242,201,76,0.05), transparent 45%);
     pointer-events: none;
     z-index: 0;
   }
@@ -99,7 +97,6 @@
     letter-spacing: 2px;
     margin-bottom: 20px;
     text-transform: uppercase;
-    text-shadow: 0 0 10px rgba(45,212,191,0.3);
   }
   h1.hero-title {
     font-family: var(--display);
@@ -139,7 +136,6 @@
     justify-content: center;
     gap: 8px;
     transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    position: relative;
     text-align: center;
   }
   .btn-primary {
@@ -729,41 +725,6 @@
 
 <hr class="divider">
 
-<section id="screenshots">
-  <div class="depth-marker"><span class="depth-val">–2500m</span><span class="depth-name">Gameplay</span></div>
-  <h2 class="section-title">See it in action</h2>
-  <p class="section-lede">Game screenshots showing the fishing arcade in action.</p>
-  <div class="screenshot-row">
-    <div class="screenshot-img"><img src="./screenshot-1.png" alt="LethalOrca Fishing hero screen" onerror="this.alt='Game screenshot 1'"></div>
-    <div class="screenshot-img"><img src="./screenshot-2.png" alt="LethalOrca Fishing start screen" onerror="this.alt='Game screenshot 2'"></div>
-    <div class="screenshot-img"><img src="./screenshot-3.png" alt="LethalOrca Fishing gameplay" onerror="this.alt='Game screenshot 3'"></div>
-  </div>
-</section>
-
-<hr class="divider">
-
-<section id="updates">
-  <div class="depth-marker"><span class="depth-val">–3200m</span><span class="depth-name">Build Log</span></div>
-  <h2 class="section-title">Latest updates</h2>
-  <p class="section-lede">Progress, shared as it happens — not saved up for a big reveal.</p>
-  <div class="updates-list">
-    <div class="update-item">
-      <div class="update-date">JUL 2026</div>
-      <div class="update-text"><span class="tag">Launch</span>$LORCA token live on pump.fun with contract address published above.</div>
-    </div>
-    <div class="update-item">
-      <div class="update-date">JUL 2026</div>
-      <div class="update-text"><span class="tag">Backend</span>Withdrawal system deployed and ready for Phase 2 wallet integration.</div>
-    </div>
-    <div class="update-item">
-      <div class="update-date">JUL 2026</div>
-      <div class="update-text"><span class="tag">Update</span>Wallet-connect preview added to the game — UI functional, backend live.</div>
-    </div>
-  </div>
-</section>
-
-<hr class="divider">
-
 <section id="faq">
   <div class="depth-marker"><span class="depth-val">–5000m</span><span class="depth-name">FAQ</span></div>
   <h2 class="section-title">Common questions</h2>
@@ -781,328 +742,146 @@
       <summary>When does the full game launch?</summary>
       <div class="faq-answer">Targeted for next quarter, on Android first. Follow the Build Log above or the X account for exact dates as they're confirmed.</div>
     </details>
-    <details class="faq-item">
-      <summary>Can I withdraw tokens right now?</summary>
-      <div class="faq-answer">The current game build includes a wallet-connect preview for demonstration. Real token withdrawals are live during Phase 2, once the backend is fully operational with all security measures in place.</div>
-    </details>
-    <details class="faq-item">
-      <summary>Who's behind this project?</summary>
-      <div class="faq-answer">An independent, self-funded developer building in public. See the About section above for background, and follow along on X for regular build updates.</div>
-    </details>
   </div>
 </section>
 
-<hr class="divider">
-
-<section id="referral">
-  <div class="depth-marker"><span class="depth-val">–3800m</span><span class="depth-name">Refer & Earn</span></div>
-  <h2 class="section-title">Bring a friend, earn LORCA</h2>
-  <p class="section-lede">Connect your wallet to get your unique referral code. Every friend who joins using it earns you both bonus $LORCA.</p>
-
-  <div class="referral-box">
-    <div class="ref-connect-row">
-      <button class="btn btn-staking" id="refConnectBtn">Connect Wallet</button>
-      <div class="ref-status" id="refStatus">Not connected</div>
-    </div>
-
-    <div class="ref-code-row">
-      <input type="text" id="myReferralCode" readonly placeholder="Connect wallet to see your code" />
-      <button class="btn btn-ghost" id="copyRefBtn">Copy</button>
-    </div>
-
-    <div class="ref-stats">
-      <span>Referrals: <strong id="refCount">0</strong></span>
-      <span>Earned: <strong id="refEarnings">0</strong> LORCA</span>
-    </div>
-
-    <div class="ref-code-row" style="margin-top: 16px;">
-      <button class="btn btn-play" id="claimRefBtn" style="width: 100%;">Claim Referral Bonus</button>
-    </div>
-
-    <hr class="divider" style="margin: 20px 0;">
-
-    <div class="ref-code-row">
-      <input type="text" id="applyCodeInput" placeholder="Have a friend's code? Enter it here" />
-      <button class="btn btn-generator" id="applyRefBtn">Apply</button>
-    </div>
-
-    <p id="refMessage"></p>
-  </div>
-</section>
-
-<hr class="divider">
-
-<section id="community">
-  <div class="depth-marker"><span class="depth-val">–6000m</span><span class="depth-name">Hadal / Community</span></div>
-  <h2 class="section-title">Join the crew</h2>
-  <p class="section-lede">Follow along, ask questions, and watch the build happen in real time.</p>
-  <div class="community-grid">
-    <a class="comm-card" href="https://x.com/lethalorcatdo" target="_blank" rel="noopener">
-      <div class="plat">X / Twitter</div>
-      <div class="handle">@lethalorcatdo ↗</div>
-    </a>
-    <a class="comm-card" href="https://lethalorca.com/#transparency0" target="_blank" rel="noopener">
-      <div class="plat">Discord</div>
-      <div class="handle">Join the Crew ↗</div>
-    </a>
-    <a class="comm-card" href="https://t.me/Lethal_Orca" target="_blank" rel="noopener">
-      <div class="plat">Telegram</div>
-      <div class="handle">Join the Chat ↗</div>
-    </a>
-    <a class="comm-card" href="https://pump.fun/coin/7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump" target="_blank" rel="noopener">
-      <div class="plat">pump.fun</div>
-      <div class="handle">View on pump.fun ↗</div>
-    </a>
-  </div>
-
-  <div class="newsletter-box">
-    <p>Don't use Telegram or Discord? Get major updates by email instead — no spam, just real progress.</p>
-    <a class="btn btn-ghost" href="mailto:lethalorca@gmail.com?subject=Add me to LethalOrca updates">Get Email Updates</a>
-  </div>
-</section>
-
-<footer>
-  <div class="disclaimer">
-    <strong>Risk disclosure:</strong> $LORCA is an experimental, early-stage cryptocurrency token. It carries high risk, including the possible loss of your full investment. Nothing on this page is financial advice, and no one associated with this project can guarantee its price, liquidity, or future value. Cryptocurrency markets are volatile and largely unregulated — always do your own research, verify all contract addresses independently, and only invest what you can afford to lose.
-  </div>
-  <div class="foot-bottom">
-    <span>© 2026 LethalOrca. Built independently.</span>
-    <span>Not affiliated with pump.fun.</span>
-  </div>
-</footer>
-
-<!-- Professional Multi-Step Wizard Modal -->
-<div id="generatorModal" class="generator-modal">
+<!-- Generator Modal with Back & Next Navigation -->
+<div class="generator-modal" id="generatorModal">
   <div class="generator-modal-content">
     <div class="generator-header">
       <div class="generator-header-left">
-        <button id="modalBackBtn" onclick="modalPrevStep()" class="modal-nav-btn" title="Go Back" disabled>← Back</button>
-        <button id="modalNextBtn" onclick="modalNextStep()" class="modal-nav-btn" title="Go Forward">Next →</button>
-        <h3>⚡ LORCA GENERATOR WIZARD</h3>
+        <button class="modal-nav-btn" id="modalBackBtn" onclick="prevStep()" disabled>← Back</button>
+        <button class="modal-nav-btn" id="modalNextBtn" onclick="nextStep()">Next →</button>
+        <h3>LORCA Generator Wizard</h3>
       </div>
-      <button onclick="closeGenerator()" class="close-btn">✕</button>
+      <button class="close-btn" onclick="closeGenerator()">&times;</button>
     </div>
     
     <div class="generator-body">
       <!-- Step 1 -->
       <div class="wizard-step active" id="step-1">
-        <h4>Step 1: Select Token Tier</h4>
-        <p>Choose your generation configuration to get started with $LORCA parameters.</p>
+        <h4>Select Project Type</h4>
+        <p>Choose what you would like to generate or configure for your LethalOrca ecosystem project.</p>
         <div class="wizard-options">
-          <div class="wizard-option-card selected" onclick="selectTier(this)">
-            <h5>Abyssal Standard</h5>
-            <span>Standard pump.fun supply & liquidity setup.</span>
+          <div class="wizard-option-card selected" onclick="selectOption(this, 'type', 'Token Utility')">
+            <h5>Token Utility</h5>
+            <span>Configure staking, rewards, or utility mechanics.</span>
           </div>
-          <div class="wizard-option-card" onclick="selectTier(this)">
-            <h5>Deep Trench Custom</h5>
-            <span>Custom parameters and reward hooks enabled.</span>
+          <div class="wizard-option-card" onclick="selectOption(this, 'type', 'Game Asset')">
+            <h5>Game Asset</h5>
+            <span>Generate custom fishing arcade items or upgrades.</span>
           </div>
         </div>
-        <div class="wizard-footer-info">
-          <span>Progress: Step 1 of 3</span>
-          <span>Status: Ready</span>
-        </div>
+        <div class="wizard-footer-info"><span>Step 1 of 3</span><span>LethalOrca Core</span></div>
       </div>
 
       <!-- Step 2 -->
       <div class="wizard-step" id="step-2">
-        <h4>Step 2: Enter Parameters</h4>
-        <p>Provide your token allocation details and developer wallet parameters.</p>
+        <h4>Configure Parameters</h4>
+        <p>Enter the specific parameters for your chosen module.</p>
         <div class="wizard-input-group">
-          <label>Token Name / Symbol</label>
-          <input type="text" value="LethalOrca / LORCA" placeholder="Enter name">
+          <label>Parameter Name / Symbol</label>
+          <input type="text" id="paramName" placeholder="e.g. LORCA-POOL" value="LORCA-POOL" />
         </div>
-        <div class="wizard-input-group">
-          <label>Dev Holding Target (%)</label>
-          <input type="text" value="3.5%" placeholder="Enter percentage">
+        <div class="wizard-input-group" style="margin-top:16px;">
+          <label>Allocation / Weight (%)</label>
+          <input type="number" id="paramWeight" placeholder="25" value="25" />
         </div>
-        <div class="wizard-footer-info">
-          <span>Progress: Step 2 of 3</span>
-          <span>Status: Configuring</span>
-        </div>
+        <div class="wizard-footer-info"><span>Step 2 of 3</span><span>LethalOrca Core</span></div>
       </div>
 
       <!-- Step 3 -->
       <div class="wizard-step" id="step-3">
-        <h4>Step 3: Review & Generate</h4>
-        <p>Verify your configuration before dispatching to the Solana network.</p>
-        <div class="wizard-input-group">
-          <label>Contract Mint Verification</label>
-          <input type="text" readonly value="7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump">
+        <h4>Review & Generate</h4>
+        <p>Confirm your settings before deploying or exporting your generator configuration.</p>
+        <div class="ledger" style="margin-top:10px;">
+          <div class="ledger-row"><span class="ledger-key">Module Type</span><span class="ledger-val" id="reviewType">Token Utility</span></div>
+          <div class="ledger-row"><span class="ledger-key">Parameter</span><span class="ledger-val" id="reviewParam">LORCA-POOL</span></div>
+          <div class="ledger-row"><span class="ledger-key">Allocation</span><span class="ledger-val" id="reviewWeight">25%</span></div>
         </div>
-        <button class="btn btn-primary" style="margin-top: 10px;" onclick="alert('Configuration verified! Ready for launch.')">Initialize Mint</button>
-        <div class="wizard-footer-info">
-          <span>Progress: Step 3 of 3</span>
-          <span>Status: Final Step</span>
-        </div>
+        <button class="btn btn-primary" style="width:100%; margin-top:20px;" onclick="completeGeneration()">Deploy / Export Configuration</button>
+        <div class="wizard-footer-info" style="margin-top:16px;"><span>Step 3 of 3</span><span>Ready</span></div>
       </div>
     </div>
   </div>
 </div>
 
+<footer>
+  <div class="disclaimer">
+    <strong>Risk disclosure:</strong> $LORCA is an experimental, early-stage cryptocurrency token. It carries highest risk of loss. Cryptocurrency tokens, especially those launched on pump.fun, are extremely volatile and speculative. Never invest money you cannot afford to lose. DYOR.
+  </div>
+  <div class="foot-bottom">
+    <span>&copy; 2026 LethalOrca ($LORCA). All rights reserved.</span>
+    <span>Built in open water.</span>
+  </div>
+</footer>
+
 <script>
-let currentStep = 1;
-const totalSteps = 3;
+  let currentStep = 1;
+  const totalSteps = 3;
+  let selectedType = 'Token Utility';
 
-function openGenerator() {
-  document.getElementById('generatorModal').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-  updateWizardUI();
-}
-
-function closeGenerator() {
-  document.getElementById('generatorModal').style.display = 'none';
-  document.body.style.overflow = 'auto';
-  currentStep = 1;
-  updateWizardUI();
-}
-
-function modalNextStep() {
-  if (currentStep < totalSteps) {
-    currentStep++;
-    updateWizardUI();
+  function openGenerator() {
+    document.getElementById('generatorModal').style.display = 'flex';
+    currentStep = 1;
+    updateWizard();
   }
-}
 
-function modalPrevStep() {
-  if (currentStep > 1) {
-    currentStep--;
-    updateWizardUI();
+  function closeGenerator() {
+    document.getElementById('generatorModal').style.display = 'none';
   }
-}
 
-function updateWizardUI() {
-  // Hide all steps
-  for (let i = 1; i <= totalSteps; i++) {
-    document.getElementById(`step-${i}`).classList.remove('active');
+  function nextStep() {
+    if (currentStep < totalSteps) {
+      currentStep++;
+      updateWizard();
+    }
   }
-  // Show current step
-  document.getElementById(`step-${currentStep}`).classList.add('active');
 
-  // Update button states
-  const backBtn = document.getElementById('modalBackBtn');
-  const nextBtn = document.getElementById('modalNextBtn');
-
-  backBtn.disabled = currentStep === 1;
-  if (currentStep === totalSteps) {
-    nextBtn.disabled = true;
-    nextBtn.innerText = 'Done ✓';
-  } else {
-    nextBtn.disabled = false;
-    nextBtn.innerText = 'Next →';
+  function prevStep() {
+    if (currentStep > 1) {
+      currentStep--;
+      updateWizard();
+    }
   }
-}
 
-function selectTier(card) {
-  document.querySelectorAll('.wizard-option-card').forEach(c => c.classList.remove('selected'));
-  card.classList.add('selected');
-}
+  function updateWizard() {
+    // Hide all steps
+    for (let i = 1; i <= totalSteps; i++) {
+      document.getElementById('step-' + i).classList.remove('active');
+    }
+    // Show current step
+    document.getElementById('step-' + currentStep).classList.add('active');
 
-window.onclick = function(event) {
-  var modal = document.getElementById('generatorModal');
-  if (event.target == modal) {
+    // Update buttons
+    const backBtn = document.getElementById('modalBackBtn');
+    const nextBtn = document.getElementById('modalNextBtn');
+
+    backBtn.disabled = currentStep === 1;
+    if (currentStep === totalSteps) {
+      nextBtn.disabled = true;
+      nextBtn.innerText = 'Done ✓';
+      // Populate review
+      document.getElementById('reviewType').innerText = selectedType;
+      document.getElementById('reviewParam').innerText = document.getElementById('paramName').value || 'LORCA-POOL';
+      document.getElementById('reviewWeight').innerText = (document.getElementById('paramWeight').value || '25') + '%';
+    } else {
+      nextBtn.disabled = false;
+      nextBtn.innerText = 'Next →';
+    }
+  }
+
+  function selectOption(el, category, value) {
+    const cards = el.parentElement.querySelectorAll('.wizard-option-card');
+    cards.forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedType = value;
+  }
+
+  function completeGeneration() {
+    alert('Configuration successfully exported/deployed for LethalOrca!');
     closeGenerator();
   }
-}
-
-const REFERRAL_BACKEND_URL = "https://lethalorca-backend.vercel.app";
-let referralWallet = null;
-
-async function connectReferralWallet() {
-  try {
-    if (!window.solana || !window.solana.isPhantom) {
-      document.getElementById('refStatus').innerText = "Phantom wallet not found — install it first.";
-      return;
-    }
-    const resp = await window.solana.connect();
-    referralWallet = resp.publicKey.toString();
-    document.getElementById('refStatus').innerText =
-      "Connected: " + referralWallet.slice(0, 4) + "..." + referralWallet.slice(-4);
-    document.getElementById('refConnectBtn').innerText = "Connected";
-    loadReferralData(referralWallet);
-  } catch (err) {
-    console.error('Wallet connect error:', err);
-    document.getElementById('refStatus').innerText = "Connection failed. Try again.";
-  }
-}
-
-async function loadReferralData(wallet) {
-  try {
-    const res = await fetch(`${REFERRAL_BACKEND_URL}/api/referral?action=get-code&wallet=${wallet}`);
-    const data = await res.json();
-    if (data.success) {
-      document.getElementById('myReferralCode').value = data.referralCode;
-      document.getElementById('refCount').innerText = data.referralCount;
-      document.getElementById('refEarnings').innerText = data.referralEarnings;
-    }
-  } catch (err) {
-    console.error('Referral load error:', err);
-  }
-}
-
-document.getElementById('refConnectBtn').addEventListener('click', connectReferralWallet);
-
-document.getElementById('copyRefBtn').addEventListener('click', () => {
-  const code = document.getElementById('myReferralCode').value;
-  if (!code) return;
-  navigator.clipboard.writeText(code);
-  document.getElementById('refMessage').innerText = "Code copied to clipboard.";
-});
-
-document.getElementById('applyRefBtn').addEventListener('click', async () => {
-  const code = document.getElementById('applyCodeInput').value.trim();
-  if (!referralWallet) {
-    document.getElementById('refMessage').innerText = "Connect your wallet first.";
-    return;
-  }
-  if (!code) {
-    document.getElementById('refMessage').innerText = "Enter a referral code first.";
-    return;
-  }
-  try {
-    const res = await fetch(`${REFERRAL_BACKEND_URL}/api/referral?action=apply-code`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wallet: referralWallet, code })
-    });
-    const data = await res.json();
-    document.getElementById('refMessage').innerText = data.success ? data.message : data.error;
-    if (data.success) loadReferralData(referralWallet);
-  } catch (err) {
-    document.getElementById('refMessage').innerText = "Something went wrong.";
-  }
-});
-
-document.getElementById('claimRefBtn').addEventListener('click', async () => {
-  if (!referralWallet) {
-    document.getElementById('refMessage').innerText = "Connect your wallet first.";
-    return;
-  }
-
-  document.getElementById('claimRefBtn').innerText = "Claiming...";
-  document.getElementById('claimRefBtn').disabled = true;
-
-  try {
-    const res = await fetch(`${REFERRAL_BACKEND_URL}/api/claim-referral`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wallet: referralWallet })
-    });
-    const data = await res.json();
-
-    document.getElementById('refMessage').innerText = data.success
-      ? data.message
-      : data.error;
-
-    if (data.success) loadReferralData(referralWallet);
-  } catch (err) {
-    document.getElementById('refMessage').innerText = "Claim failed. Try again.";
-  } finally {
-    document.getElementById('claimRefBtn').innerText = "Claim Referral Bonus";
-    document.getElementById('claimRefBtn').disabled = false;
-  }
-});
 </script>
-
 </body>
 </html>
