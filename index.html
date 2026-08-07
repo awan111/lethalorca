@@ -80,6 +80,52 @@
     text-shadow: 0 0 12px rgba(94,234,212,0.6); 
   }
 
+  .nav-burger {
+    display: none;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: rgba(94,234,212,0.08);
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  .nav-burger span {
+    width: 20px; height: 2px;
+    background: var(--teal-glow);
+    border-radius: 2px;
+    box-shadow: 0 0 6px rgba(94,234,212,0.6);
+    transition: all 0.25s ease;
+  }
+  .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-burger.open span:nth-child(2) { opacity: 0; }
+  .nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 68px; left: 0; right: 0;
+    background: rgba(2,9,16,0.98);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(16px);
+    z-index: 99;
+    padding: 10px 6% 20px;
+    flex-direction: column;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    color: var(--ink);
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 17px;
+    padding: 14px 4px;
+    border-bottom: 1px solid rgba(94,234,212,0.12);
+  }
+  .mobile-menu a:last-child { border-bottom: none; }
+  .mobile-menu a:active { color: var(--teal-glow); }
+
   section { position: relative; z-index: 1; padding: 120px 5% 80px; max-width: 1240px; margin: 0 auto; }
 
   #hero {
@@ -125,9 +171,9 @@
   }
   .btn {
     font-family: var(--body);
-    font-weight: 600;
-    font-size: 14px;
-    padding: 14px 24px;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 17px 30px;
     border-radius: 100px;
     border: 1px solid var(--line);
     cursor: pointer;
@@ -137,24 +183,31 @@
     gap: 8px;
     transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     text-align: center;
+    box-shadow: 0 0 18px rgba(94, 234, 212, 0.18);
   }
   .btn-primary {
     background: linear-gradient(135deg, var(--teal-glow), var(--teal));
     color: var(--abyss);
     border: none;
     font-weight: 700;
-    box-shadow: 0 4px 25px rgba(45, 212, 191, 0.4);
+    box-shadow: 0 4px 30px rgba(45, 212, 191, 0.55);
   }
   .btn-primary:hover {
-    box-shadow: 0 8px 35px rgba(45, 212, 191, 0.65);
+    box-shadow: 0 8px 45px rgba(45, 212, 191, 0.8);
     transform: translateY(-2px);
   }
-  .btn-ghost { color: var(--ink); background: rgba(255,255,255,0.03); }
+  .btn-ghost {
+    color: var(--ink);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(94, 234, 212, 0.4);
+    box-shadow: 0 0 20px rgba(94, 234, 212, 0.15);
+  }
   .btn-ghost:hover {
     border-color: var(--teal-glow);
     color: var(--teal-glow);
-    background: rgba(94,234,212,0.08);
+    background: rgba(94,234,212,0.1);
     transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(94, 234, 212, 0.45);
   }
 
   .btn-play {
@@ -162,12 +215,12 @@
     color: #2a1f00;
     border: none;
     font-weight: 700;
-    box-shadow: 0 4px 25px rgba(242, 201, 76, 0.45);
+    box-shadow: 0 4px 32px rgba(242, 201, 76, 0.6);
     animation: play-pulse 2.6s ease-in-out infinite;
   }
   .btn-play:hover {
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 10px 35px rgba(242, 201, 76, 0.7);
+    box-shadow: 0 10px 45px rgba(242, 201, 76, 0.85);
   }
   .btn-play .play-icon {
     display: inline-flex;
@@ -183,11 +236,11 @@
     color: #000;
     border: none;
     font-weight: 700;
-    box-shadow: 0 4px 25px rgba(0, 242, 254, 0.45);
+    box-shadow: 0 4px 32px rgba(0, 242, 254, 0.6);
   }
   .btn-generator:hover {
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 35px rgba(0, 242, 254, 0.75);
+    box-shadow: 0 8px 45px rgba(0, 242, 254, 0.9);
   }
 
   .btn-staking {
@@ -195,16 +248,16 @@
     color: #fff;
     border: none;
     font-weight: 700;
-    box-shadow: 0 4px 25px rgba(16, 185, 129, 0.45);
+    box-shadow: 0 4px 32px rgba(16, 185, 129, 0.6);
   }
   .btn-staking:hover {
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 35px rgba(16, 185, 129, 0.75);
+    box-shadow: 0 8px 45px rgba(16, 185, 129, 0.9);
   }
 
   @keyframes play-pulse {
-    0%, 100% { box-shadow: 0 4px 25px rgba(242, 201, 76, 0.45); }
-    50% { box-shadow: 0 4px 35px rgba(242, 201, 76, 0.75); }
+    0%, 100% { box-shadow: 0 4px 32px rgba(242, 201, 76, 0.6); }
+    50% { box-shadow: 0 4px 48px rgba(242, 201, 76, 0.9); }
   }
 
   #orca-trail { position: absolute; right: -5%; top: 20%; width: 55%; max-width: 640px; opacity: 0.9; }
@@ -590,17 +643,68 @@
   .referral-box .ref-stats strong { color: var(--gold); }
   #refMessage { font-family: var(--mono); font-size: 12.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
 
+  /* Side Back / Next module-navigation arrows — present on every landing page */
+  .page-nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 150;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(5, 18, 30, 0.85);
+    border: 1px solid var(--teal-glow);
+    color: var(--teal-glow);
+    font-size: 22px;
+    box-shadow: 0 0 22px rgba(94, 234, 212, 0.35);
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
+    text-decoration: none;
+  }
+  .page-nav-arrow:hover {
+    background: rgba(94, 234, 212, 0.15);
+    box-shadow: 0 0 32px rgba(94, 234, 212, 0.6);
+    transform: translateY(-50%) scale(1.08);
+  }
+  .page-nav-arrow.prev { left: 14px; }
+  .page-nav-arrow.next { right: 14px; }
+  .page-nav-label {
+    position: absolute;
+    top: 100%;
+    margin-top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    white-space: nowrap;
+    background: rgba(2,9,16,0.85);
+    padding: 3px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+  }
+
   @media (max-width: 768px) {
     nav .links { display: none; }
+    .nav-burger { display: flex; }
     #hero { align-items: center; text-align: center; }
-    .hero-sub { margin-left: auto; margin-right: auto; }
-    .hero-cta { flex-direction: column; width: 100%; gap: 10px; }
-    .hero-cta .btn { width: 100%; }
+    .hero-sub { font-size: 16.5px; margin-left: auto; margin-right: auto; }
+    .hero-cta { flex-direction: column; width: 100%; gap: 12px; }
+    .hero-cta .btn { width: 100%; font-size: 17px; padding: 18px 24px; }
     .about-grid { grid-template-columns: 1fr; gap: 24px; }
     #orca-trail { display: none; }
     section { padding: 90px 5% 50px; }
+    .section-title { font-size: 30px; }
+    .section-lede { font-size: 16px; }
     .generator-modal-content { height: 94vh; max-height: none; }
     .wizard-options { grid-template-columns: 1fr; }
+    .page-nav-arrow { width: 42px; height: 42px; font-size: 18px; }
+    .page-nav-arrow.prev { left: 8px; }
+    .page-nav-arrow.next { right: 8px; }
+    .page-nav-label { display: none; }
   }
 </style>
 </head>
@@ -618,7 +722,30 @@
     <a href="stake.html">Staking Pool</a>
     <a href="#referral">Refer & Earn</a>
   </div>
+  <button class="nav-burger" id="navBurger" onclick="toggleMobileMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="toggleMobileMenu()">About</a>
+  <a href="#transparency" onclick="toggleMobileMenu()">Transparency</a>
+  <a href="#roadmap" onclick="toggleMobileMenu()">Roadmap</a>
+  <a href="#faq" onclick="toggleMobileMenu()">FAQ</a>
+  <a href="#community" onclick="toggleMobileMenu()">Community</a>
+  <a href="stake.html">Staking Pool</a>
+  <a href="#referral" onclick="toggleMobileMenu()">Refer &amp; Earn</a>
+</div>
+
+<!-- Persistent side back/next arrows to move between site modules -->
+<a class="page-nav-arrow prev" id="pageNavPrev" href="#" aria-label="Previous page">
+  ←
+  <span class="page-nav-label" id="pageNavPrevLabel"></span>
+</a>
+<a class="page-nav-arrow next" id="pageNavNext" href="#" aria-label="Next page">
+  →
+  <span class="page-nav-label" id="pageNavNextLabel"></span>
+</a>
 
 <section id="hero">
   <div class="depth-tag">0m — Surface</div>
@@ -882,6 +1009,41 @@
     alert('Configuration successfully exported/deployed for LethalOrca!');
     closeGenerator();
   }
+
+  // Mobile hamburger menu toggle
+  function toggleMobileMenu() {
+    document.getElementById('navBurger').classList.toggle('open');
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+
+  // ---- Persistent side Back / Next module navigation ----
+  // Add this exact array (and the two <a> elements + this script block) to
+  // every landing page — index.html, game.html, stake.html — so the arrows
+  // cycle through the same order everywhere.
+  (function () {
+    const pages = [
+      { file: 'index.html', label: 'Home' },
+      { file: 'game.html', label: 'Play & Earn' },
+      { file: 'stake.html', label: 'Staking Pool' }
+    ];
+
+    const currentFile = (location.pathname.split('/').pop() || 'index.html');
+    let idx = pages.findIndex(p => p.file === currentFile);
+    if (idx === -1) idx = 0;
+
+    const prevPage = pages[(idx - 1 + pages.length) % pages.length];
+    const nextPage = pages[(idx + 1) % pages.length];
+
+    const prevEl = document.getElementById('pageNavPrev');
+    const nextEl = document.getElementById('pageNavNext');
+    const prevLabel = document.getElementById('pageNavPrevLabel');
+    const nextLabel = document.getElementById('pageNavNextLabel');
+
+    if (prevEl) prevEl.href = prevPage.file;
+    if (nextEl) nextEl.href = nextPage.file;
+    if (prevLabel) prevLabel.textContent = prevPage.label;
+    if (nextLabel) nextLabel.textContent = nextPage.label;
+  })();
 </script>
 </body>
 </html>
