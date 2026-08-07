@@ -15,7 +15,7 @@
     --teal-glow: #5eead4;
     --gold: #f2c94c;
     --ink: #f4fcfc;
-    --muted: #a3c4c4;
+    --muted: #8ab4b4;
     --line: rgba(94, 234, 212, 0.2);
     --display: 'Space Grotesk', sans-serif;
     --body: 'Inter', sans-serif;
@@ -30,6 +30,8 @@
     line-height: 1.6;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   a { color: var(--teal-glow); text-decoration: none; }
 
@@ -37,7 +39,7 @@
     position: fixed;
     inset: 0;
     background-image: radial-gradient(circle at 20% 20%, rgba(45,212,191,0.08), transparent 40%),
-                        radial-gradient(circle at 80% 60%, rgba(242,201,76,0.05), transparent 45%);
+                       radial-gradient(circle at 80% 60%, rgba(242,201,76,0.05), transparent 45%);
     pointer-events: none;
     z-index: 0;
   }
@@ -51,7 +53,7 @@
     padding: 16px 5%;
     z-index: 100;
     backdrop-filter: blur(16px);
-    background: rgba(2,9,16,0.9);
+    background: rgba(2,9,16,0.85);
     border-bottom: 1px solid var(--line);
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
@@ -63,68 +65,10 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #fff;
   }
   .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-glow); box-shadow: 0 0 16px var(--teal-glow); }
-  
-  nav .links { display: flex; gap: 22px; font-size: 14px; align-items: center; }
-  nav .links a { 
-    color: var(--ink); 
-    font-family: var(--body); 
-    font-weight: 600; 
-    text-decoration: none;
-    transition: color 0.2s ease, text-shadow 0.2s ease; 
-  }
-  nav .links a:hover { 
-    color: var(--teal-glow); 
-    text-shadow: 0 0 12px rgba(94,234,212,0.6); 
-  }
-
-  .nav-burger {
-    display: none;
-    width: 40px; height: 40px;
-    border-radius: 10px;
-    border: 1px solid var(--line);
-    background: rgba(94,234,212,0.08);
-    cursor: pointer;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-  }
-  .nav-burger span {
-    width: 20px; height: 2px;
-    background: var(--teal-glow);
-    border-radius: 2px;
-    box-shadow: 0 0 6px rgba(94,234,212,0.6);
-    transition: all 0.25s ease;
-  }
-  .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-  .nav-burger.open span:nth-child(2) { opacity: 0; }
-  .nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-  .mobile-menu {
-    display: none;
-    position: fixed;
-    top: 68px; left: 0; right: 0;
-    background: rgba(2,9,16,0.98);
-    border-bottom: 1px solid var(--line);
-    backdrop-filter: blur(16px);
-    z-index: 99;
-    padding: 10px 6% 20px;
-    flex-direction: column;
-  }
-  .mobile-menu.open { display: flex; }
-  .mobile-menu a {
-    color: var(--ink);
-    font-family: var(--body);
-    font-weight: 600;
-    font-size: 17px;
-    padding: 14px 4px;
-    border-bottom: 1px solid rgba(94,234,212,0.12);
-  }
-  .mobile-menu a:last-child { border-bottom: none; }
-  .mobile-menu a:active { color: var(--teal-glow); }
+  nav .links { display: flex; gap: 24px; font-size: 14px; color: var(--muted); align-items: center; }
+  nav .links a:hover { color: var(--teal-glow); text-shadow: 0 0 10px rgba(94,234,212,0.5); }
 
   section { position: relative; z-index: 1; padding: 120px 5% 80px; max-width: 1240px; margin: 0 auto; }
 
@@ -143,6 +87,7 @@
     letter-spacing: 2px;
     margin-bottom: 20px;
     text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(45,212,191,0.3);
   }
   h1.hero-title {
     font-family: var(--display);
@@ -163,6 +108,7 @@
     margin-top: 20px;
   }
   
+  /* CTA Buttons — Sleek Mobile Friendly Grid */
   .hero-cta { 
     display: flex; 
     gap: 14px; 
@@ -171,9 +117,9 @@
   }
   .btn {
     font-family: var(--body);
-    font-weight: 700;
-    font-size: 16px;
-    padding: 17px 30px;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 14px 24px;
     border-radius: 100px;
     border: 1px solid var(--line);
     cursor: pointer;
@@ -182,32 +128,26 @@
     justify-content: center;
     gap: 8px;
     transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
     text-align: center;
-    box-shadow: 0 0 18px rgba(94, 234, 212, 0.18);
   }
   .btn-primary {
     background: linear-gradient(135deg, var(--teal-glow), var(--teal));
     color: var(--abyss);
     border: none;
     font-weight: 700;
-    box-shadow: 0 4px 30px rgba(45, 212, 191, 0.55);
+    box-shadow: 0 4px 25px rgba(45, 212, 191, 0.4);
   }
   .btn-primary:hover {
-    box-shadow: 0 8px 45px rgba(45, 212, 191, 0.8);
+    box-shadow: 0 8px 35px rgba(45, 212, 191, 0.65);
     transform: translateY(-2px);
   }
-  .btn-ghost {
-    color: var(--ink);
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(94, 234, 212, 0.4);
-    box-shadow: 0 0 20px rgba(94, 234, 212, 0.15);
-  }
+  .btn-ghost { color: var(--ink); background: rgba(255,255,255,0.03); }
   .btn-ghost:hover {
     border-color: var(--teal-glow);
     color: var(--teal-glow);
-    background: rgba(94,234,212,0.1);
+    background: rgba(94,234,212,0.08);
     transform: translateY(-2px);
-    box-shadow: 0 0 30px rgba(94, 234, 212, 0.45);
   }
 
   .btn-play {
@@ -215,12 +155,12 @@
     color: #2a1f00;
     border: none;
     font-weight: 700;
-    box-shadow: 0 4px 32px rgba(242, 201, 76, 0.6);
+    box-shadow: 0 4px 25px rgba(242, 201, 76, 0.45);
     animation: play-pulse 2.6s ease-in-out infinite;
   }
   .btn-play:hover {
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 10px 45px rgba(242, 201, 76, 0.85);
+    box-shadow: 0 10px 35px rgba(242, 201, 76, 0.7);
   }
   .btn-play .play-icon {
     display: inline-flex;
@@ -236,28 +176,29 @@
     color: #000;
     border: none;
     font-weight: 700;
-    box-shadow: 0 4px 32px rgba(0, 242, 254, 0.6);
+    box-shadow: 0 4px 25px rgba(0, 242, 254, 0.45);
   }
   .btn-generator:hover {
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 45px rgba(0, 242, 254, 0.9);
+    box-shadow: 0 8px 35px rgba(0, 242, 254, 0.75);
   }
 
+  /* Staking Button Style */
   .btn-staking {
     background: linear-gradient(135deg, #10b981, #059669);
     color: #fff;
     border: none;
     font-weight: 700;
-    box-shadow: 0 4px 32px rgba(16, 185, 129, 0.6);
+    box-shadow: 0 4px 25px rgba(16, 185, 129, 0.45);
   }
   .btn-staking:hover {
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 45px rgba(16, 185, 129, 0.9);
+    box-shadow: 0 8px 35px rgba(16, 185, 129, 0.75);
   }
 
   @keyframes play-pulse {
-    0%, 100% { box-shadow: 0 4px 32px rgba(242, 201, 76, 0.6); }
-    50% { box-shadow: 0 4px 48px rgba(242, 201, 76, 0.9); }
+    0%, 100% { box-shadow: 0 4px 25px rgba(242, 201, 76, 0.45); }
+    50% { box-shadow: 0 4px 35px rgba(242, 201, 76, 0.75); }
   }
 
   #orca-trail { position: absolute; right: -5%; top: 20%; width: 55%; max-width: 640px; opacity: 0.9; }
@@ -356,7 +297,7 @@
   }
   .comm-card:hover { border-color: var(--teal-glow); transform: translateY(-3px); }
   .comm-card .plat { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
-  .comm-card .handle { font-family: var(--display); font-size: 17px; color: var(--ink); }
+  .comm-card .handle { font-family: var(--display); font-size: 17px; }
 
   footer {
     padding: 50px 5% 40px;
@@ -409,7 +350,7 @@
   }
   .newsletter-box p { margin: 0; max-width: 440px; font-size: 14.5px; color: var(--muted); }
 
-  /* Professional Generator Modal & Multi-Step Wizard */
+  /* --- SLEEK RESPONSIVE GENERATOR MODAL --- */
   .generator-modal {
     display: none;
     position: fixed;
@@ -442,55 +383,17 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 18px;
+    padding: 14px 20px;
     background: rgba(5, 18, 30, 0.98);
-    border-bottom: 1px solid rgba(94, 234, 212, 0.25);
+    border-bottom: 1px solid rgba(94, 234, 212, 0.2);
     flex-shrink: 0;
-    gap: 12px;
-  }
-
-  .generator-header-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
   }
 
   .generator-header h3 {
     font-family: var(--display);
-    font-size: 14px;
+    font-size: 16px;
     color: #00f2fe;
     letter-spacing: 0.5px;
-    margin-left: 4px;
-  }
-
-  /* Clear & Prominent Back and Next Navigation Buttons with Arrows */
-  .modal-nav-btn {
-    background: rgba(45, 212, 191, 0.15);
-    border: 1px solid var(--teal-glow);
-    color: var(--teal-glow);
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .modal-nav-btn:hover:not(:disabled) {
-    background: rgba(45, 212, 191, 0.3);
-    border-color: #fff;
-    color: #fff;
-    box-shadow: 0 0 10px rgba(94,234,212,0.5);
-  }
-  .modal-nav-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    border-color: var(--line);
-    color: var(--muted);
   }
 
   .close-btn {
@@ -502,114 +405,15 @@
     line-height: 1;
     padding: 4px;
   }
+
   .close-btn:hover { color: #ff5555; }
 
-  /* Wizard Steps Container */
-  .generator-body {
+  .generator-iframe {
+    width: 100%;
+    height: 100%;
     flex-grow: 1;
-    padding: 30px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-  .wizard-step {
-    display: none;
-    animation: fadeIn 0.3s ease;
-  }
-  .wizard-step.active {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .wizard-step h4 {
-    font-family: var(--display);
-    font-size: 22px;
-    color: var(--ink);
-  }
-
-  .wizard-step p {
-    color: var(--muted);
-    font-size: 14.5px;
-    line-height: 1.6;
-  }
-
-  .wizard-options {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-top: 10px;
-  }
-
-  .wizard-option-card {
-    border: 1px solid var(--line);
-    background: rgba(255,255,255,0.02);
-    padding: 18px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  .wizard-option-card:hover, .wizard-option-card.selected {
-    border-color: var(--teal-glow);
-    background: rgba(94,234,212,0.06);
-    box-shadow: 0 0 15px rgba(94,234,212,0.15);
-  }
-  .wizard-option-card h5 {
-    font-family: var(--display);
-    font-size: 15px;
-    color: #fff;
-    margin-bottom: 6px;
-  }
-  .wizard-option-card span {
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  .wizard-input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 10px;
-  }
-  .wizard-input-group label {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--teal);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-  .wizard-input-group input {
-    padding: 14px 16px;
-    border-radius: 10px;
-    border: 1px solid var(--line);
-    background: rgba(255,255,255,0.03);
-    color: var(--ink);
-    font-family: var(--mono);
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s ease;
-  }
-  .wizard-input-group input:focus {
-    border-color: var(--teal-glow);
-  }
-
-  .wizard-footer-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid var(--line);
-    padding-top: 16px;
-    margin-top: auto;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--muted);
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
+    border: none;
+    display: block;
   }
 
   @keyframes modalIn {
@@ -617,6 +421,7 @@
     to { opacity: 1; transform: scale(1); }
   }
 
+  /* --- REFERRAL BOX --- */
   .referral-box {
     border: 1px solid var(--line);
     border-radius: 18px;
@@ -643,68 +448,17 @@
   .referral-box .ref-stats strong { color: var(--gold); }
   #refMessage { font-family: var(--mono); font-size: 12.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
 
-  /* Side Back / Next module-navigation arrows — present on every landing page */
-  .page-nav-arrow {
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 150;
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(5, 18, 30, 0.85);
-    border: 1px solid var(--teal-glow);
-    color: var(--teal-glow);
-    font-size: 22px;
-    box-shadow: 0 0 22px rgba(94, 234, 212, 0.35);
-    backdrop-filter: blur(8px);
-    transition: all 0.25s ease;
-    text-decoration: none;
-  }
-  .page-nav-arrow:hover {
-    background: rgba(94, 234, 212, 0.15);
-    box-shadow: 0 0 32px rgba(94, 234, 212, 0.6);
-    transform: translateY(-50%) scale(1.08);
-  }
-  .page-nav-arrow.prev { left: 14px; }
-  .page-nav-arrow.next { right: 14px; }
-  .page-nav-label {
-    position: absolute;
-    top: 100%;
-    margin-top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    color: var(--muted);
-    white-space: nowrap;
-    background: rgba(2,9,16,0.85);
-    padding: 3px 8px;
-    border-radius: 20px;
-    border: 1px solid var(--line);
-  }
-
+  /* --- MOBILE SPECIFIC FIXES --- */
   @media (max-width: 768px) {
     nav .links { display: none; }
-    .nav-burger { display: flex; }
     #hero { align-items: center; text-align: center; }
-    .hero-sub { font-size: 16.5px; margin-left: auto; margin-right: auto; }
-    .hero-cta { flex-direction: column; width: 100%; gap: 12px; }
-    .hero-cta .btn { width: 100%; font-size: 17px; padding: 18px 24px; }
+    .hero-sub { margin-left: auto; margin-right: auto; }
+    .hero-cta { flex-direction: column; width: 100%; gap: 10px; }
+    .hero-cta .btn { width: 100%; }
     .about-grid { grid-template-columns: 1fr; gap: 24px; }
     #orca-trail { display: none; }
     section { padding: 90px 5% 50px; }
-    .section-title { font-size: 30px; }
-    .section-lede { font-size: 16px; }
     .generator-modal-content { height: 94vh; max-height: none; }
-    .wizard-options { grid-template-columns: 1fr; }
-    .page-nav-arrow { width: 42px; height: 42px; font-size: 18px; }
-    .page-nav-arrow.prev { left: 8px; }
-    .page-nav-arrow.next { right: 8px; }
-    .page-nav-label { display: none; }
   }
 </style>
 </head>
@@ -719,33 +473,10 @@
     <a href="#roadmap">Roadmap</a>
     <a href="#faq">FAQ</a>
     <a href="#community">Community</a>
-    <a href="stake.html">Staking Pool</a>
-    <a href="#referral">Refer & Earn</a>
+    <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
+    <a href="#referral" style="color: var(--teal-glow); font-weight: 600;">Refer & Earn</a>
   </div>
-  <button class="nav-burger" id="navBurger" onclick="toggleMobileMenu()" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
 </nav>
-
-<div class="mobile-menu" id="mobileMenu">
-  <a href="#about" onclick="toggleMobileMenu()">About</a>
-  <a href="#transparency" onclick="toggleMobileMenu()">Transparency</a>
-  <a href="#roadmap" onclick="toggleMobileMenu()">Roadmap</a>
-  <a href="#faq" onclick="toggleMobileMenu()">FAQ</a>
-  <a href="#community" onclick="toggleMobileMenu()">Community</a>
-  <a href="stake.html">Staking Pool</a>
-  <a href="#referral" onclick="toggleMobileMenu()">Refer &amp; Earn</a>
-</div>
-
-<!-- Persistent side back/next arrows to move between site modules -->
-<a class="page-nav-arrow prev" id="pageNavPrev" href="#" aria-label="Previous page">
-  ←
-  <span class="page-nav-label" id="pageNavPrevLabel"></span>
-</a>
-<a class="page-nav-arrow next" id="pageNavNext" href="#" aria-label="Next page">
-  →
-  <span class="page-nav-label" id="pageNavNextLabel"></span>
-</a>
 
 <section id="hero">
   <div class="depth-tag">0m — Surface</div>
@@ -852,6 +583,41 @@
 
 <hr class="divider">
 
+<section id="screenshots">
+  <div class="depth-marker"><span class="depth-val">–2500m</span><span class="depth-name">Gameplay</span></div>
+  <h2 class="section-title">See it in action</h2>
+  <p class="section-lede">Game screenshots showing the fishing arcade in action.</p>
+  <div class="screenshot-row">
+    <div class="screenshot-img"><img src="./screenshot-1.png" alt="LethalOrca Fishing hero screen" onerror="this.alt='Game screenshot 1'"></div>
+    <div class="screenshot-img"><img src="./screenshot-2.png" alt="LethalOrca Fishing start screen" onerror="this.alt='Game screenshot 2'"></div>
+    <div class="screenshot-img"><img src="./screenshot-3.png" alt="LethalOrca Fishing gameplay" onerror="this.alt='Game screenshot 3'"></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="updates">
+  <div class="depth-marker"><span class="depth-val">–3200m</span><span class="depth-name">Build Log</span></div>
+  <h2 class="section-title">Latest updates</h2>
+  <p class="section-lede">Progress, shared as it happens — not saved up for a big reveal.</p>
+  <div class="updates-list">
+    <div class="update-item">
+      <div class="update-date">JUL 2026</div>
+      <div class="update-text"><span class="tag">Launch</span>$LORCA token live on pump.fun with contract address published above.</div>
+    </div>
+    <div class="update-item">
+      <div class="update-date">JUL 2026</div>
+      <div class="update-text"><span class="tag">Backend</span>Withdrawal system deployed and ready for Phase 2 wallet integration.</div>
+    </div>
+    <div class="update-item">
+      <div class="update-date">JUL 2026</div>
+      <div class="update-text"><span class="tag">Update</span>Wallet-connect preview added to the game — UI functional, backend live.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
 <section id="faq">
   <div class="depth-marker"><span class="depth-val">–5000m</span><span class="depth-name">FAQ</span></div>
   <h2 class="section-title">Common questions</h2>
@@ -869,181 +635,226 @@
       <summary>When does the full game launch?</summary>
       <div class="faq-answer">Targeted for next quarter, on Android first. Follow the Build Log above or the X account for exact dates as they're confirmed.</div>
     </details>
+    <details class="faq-item">
+      <summary>Can I withdraw tokens right now?</summary>
+      <div class="faq-answer">The current game build includes a wallet-connect preview for demonstration. Real token withdrawals are live during Phase 2, once the backend is fully operational with all security measures in place.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Who's behind this project?</summary>
+      <div class="faq-answer">An independent, self-funded developer building in public. See the About section above for background, and follow along on X for regular build updates.</div>
+    </details>
   </div>
 </section>
 
-<!-- Generator Modal with Back & Next Navigation -->
-<div class="generator-modal" id="generatorModal">
-  <div class="generator-modal-content">
-    <div class="generator-header">
-      <div class="generator-header-left">
-        <button class="modal-nav-btn" id="modalBackBtn" onclick="prevStep()" disabled>← Back</button>
-        <button class="modal-nav-btn" id="modalNextBtn" onclick="nextStep()">Next →</button>
-        <h3>LORCA Generator Wizard</h3>
-      </div>
-      <button class="close-btn" onclick="closeGenerator()">&times;</button>
-    </div>
-    
-    <div class="generator-body">
-      <!-- Step 1 -->
-      <div class="wizard-step active" id="step-1">
-        <h4>Select Project Type</h4>
-        <p>Choose what you would like to generate or configure for your LethalOrca ecosystem project.</p>
-        <div class="wizard-options">
-          <div class="wizard-option-card selected" onclick="selectOption(this, 'type', 'Token Utility')">
-            <h5>Token Utility</h5>
-            <span>Configure staking, rewards, or utility mechanics.</span>
-          </div>
-          <div class="wizard-option-card" onclick="selectOption(this, 'type', 'Game Asset')">
-            <h5>Game Asset</h5>
-            <span>Generate custom fishing arcade items or upgrades.</span>
-          </div>
-        </div>
-        <div class="wizard-footer-info"><span>Step 1 of 3</span><span>LethalOrca Core</span></div>
-      </div>
+<hr class="divider">
 
-      <!-- Step 2 -->
-      <div class="wizard-step" id="step-2">
-        <h4>Configure Parameters</h4>
-        <p>Enter the specific parameters for your chosen module.</p>
-        <div class="wizard-input-group">
-          <label>Parameter Name / Symbol</label>
-          <input type="text" id="paramName" placeholder="e.g. LORCA-POOL" value="LORCA-POOL" />
-        </div>
-        <div class="wizard-input-group" style="margin-top:16px;">
-          <label>Allocation / Weight (%)</label>
-          <input type="number" id="paramWeight" placeholder="25" value="25" />
-        </div>
-        <div class="wizard-footer-info"><span>Step 2 of 3</span><span>LethalOrca Core</span></div>
-      </div>
+<section id="referral">
+  <div class="depth-marker"><span class="depth-val">–3800m</span><span class="depth-name">Refer & Earn</span></div>
+  <h2 class="section-title">Bring a friend, earn LORCA</h2>
+  <p class="section-lede">Connect your wallet to get your unique referral code. Every friend who joins using it earns you both bonus $LORCA.</p>
 
-      <!-- Step 3 -->
-      <div class="wizard-step" id="step-3">
-        <h4>Review & Generate</h4>
-        <p>Confirm your settings before deploying or exporting your generator configuration.</p>
-        <div class="ledger" style="margin-top:10px;">
-          <div class="ledger-row"><span class="ledger-key">Module Type</span><span class="ledger-val" id="reviewType">Token Utility</span></div>
-          <div class="ledger-row"><span class="ledger-key">Parameter</span><span class="ledger-val" id="reviewParam">LORCA-POOL</span></div>
-          <div class="ledger-row"><span class="ledger-key">Allocation</span><span class="ledger-val" id="reviewWeight">25%</span></div>
-        </div>
-        <button class="btn btn-primary" style="width:100%; margin-top:20px;" onclick="completeGeneration()">Deploy / Export Configuration</button>
-        <div class="wizard-footer-info" style="margin-top:16px;"><span>Step 3 of 3</span><span>Ready</span></div>
-      </div>
+  <div class="referral-box">
+    <div class="ref-connect-row">
+      <button class="btn btn-staking" id="refConnectBtn">Connect Wallet</button>
+      <div class="ref-status" id="refStatus">Not connected</div>
     </div>
+
+    <div class="ref-code-row">
+      <input type="text" id="myReferralCode" readonly placeholder="Connect wallet to see your code" />
+      <button class="btn btn-ghost" id="copyRefBtn">Copy</button>
+    </div>
+
+    <div class="ref-stats">
+      <span>Referrals: <strong id="refCount">0</strong></span>
+      <span>Earned: <strong id="refEarnings">0</strong> LORCA</span>
+    </div>
+
+    <div class="ref-code-row" style="margin-top: 16px;">
+      <button class="btn btn-play" id="claimRefBtn" style="width: 100%;">Claim Referral Bonus</button>
+    </div>
+
+    <hr class="divider" style="margin: 20px 0;">
+
+    <div class="ref-code-row">
+      <input type="text" id="applyCodeInput" placeholder="Have a friend's code? Enter it here" />
+      <button class="btn btn-generator" id="applyRefBtn">Apply</button>
+    </div>
+
+    <p id="refMessage"></p>
   </div>
-</div>
+</section>
+
+<hr class="divider">
+
+<section id="community">
+  <div class="depth-marker"><span class="depth-val">–6000m</span><span class="depth-name">Hadal / Community</span></div>
+  <h2 class="section-title">Join the crew</h2>
+  <p class="section-lede">Follow along, ask questions, and watch the build happen in real time.</p>
+  <div class="community-grid">
+    <a class="comm-card" href="https://x.com/lethalorcatdo" target="_blank" rel="noopener">
+      <div class="plat">X / Twitter</div>
+      <div class="handle">@lethalorcatdo ↗</div>
+    </a>
+    <a class="comm-card" href="https://t.co/OphC6f1Fxe" target="_blank" rel="noopener">
+      <div class="plat">Discord</div>
+      <div class="handle">Join the Crew ↗</div>
+    </a>
+    <a class="comm-card" href="https://t.me/Lethal_Orca" target="_blank" rel="noopener">
+      <div class="plat">Telegram</div>
+      <div class="handle">Join the Chat ↗</div>
+    </a>
+    <a class="comm-card" href="https://pump.fun/coin/7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump" target="_blank" rel="noopener">
+      <div class="plat">pump.fun</div>
+      <div class="handle">View on pump.fun ↗</div>
+    </a>
+  </div>
+
+  <div class="newsletter-box">
+    <p>Don't use Telegram or Discord? Get major updates by email instead — no spam, just real progress.</p>
+    <a class="btn btn-ghost" href="mailto:lethalorca@gmail.com?subject=Add me to LethalOrca updates">Get Email Updates</a>
+  </div>
+</section>
 
 <footer>
   <div class="disclaimer">
-    <strong>Risk disclosure:</strong> $LORCA is an experimental, early-stage cryptocurrency token. It carries highest risk of loss. Cryptocurrency tokens, especially those launched on pump.fun, are extremely volatile and speculative. Never invest money you cannot afford to lose. DYOR.
+    <strong>Risk disclosure:</strong> $LORCA is an experimental, early-stage cryptocurrency token. It carries high risk, including the possible loss of your full investment. Nothing on this page is financial advice, and no one associated with this project can guarantee its price, liquidity, or future value. Cryptocurrency markets are volatile and largely unregulated — always do your own research, verify all contract addresses independently, and only invest what you can afford to lose.
   </div>
   <div class="foot-bottom">
-    <span>&copy; 2026 LethalOrca ($LORCA). All rights reserved.</span>
-    <span>Built in open water.</span>
+    <span>© 2026 LethalOrca. Built independently.</span>
+    <span>Not affiliated with pump.fun.</span>
   </div>
 </footer>
 
+<!-- GENERATOR MODAL WINDOW -->
+<div id="generatorModal" class="generator-modal">
+  <div class="generator-modal-content">
+    <div class="generator-header">
+      <h3>⚡ LORCA MINT GENERATOR</h3>
+      <button onclick="closeGenerator()" class="close-btn">✕</button>
+    </div>
+    <iframe id="generatorFrame" src="generator.html" class="generator-iframe" allow="autoplay"></iframe>
+  </div>
+</div>
+
 <script>
-  let currentStep = 1;
-  const totalSteps = 3;
-  let selectedType = 'Token Utility';
+function openGenerator() {
+  document.getElementById('generatorModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden'; // Prevents background page scrolling
+}
 
-  function openGenerator() {
-    document.getElementById('generatorModal').style.display = 'flex';
-    currentStep = 1;
-    updateWizard();
-  }
+function closeGenerator() {
+  document.getElementById('generatorModal').style.display = 'none';
+  document.body.style.overflow = 'auto';
+  var iframe = document.getElementById('generatorFrame');
+  iframe.src = iframe.src; // Reloads iframe to stop generator audio/timer
+}
 
-  function closeGenerator() {
-    document.getElementById('generatorModal').style.display = 'none';
-  }
-
-  function nextStep() {
-    if (currentStep < totalSteps) {
-      currentStep++;
-      updateWizard();
-    }
-  }
-
-  function prevStep() {
-    if (currentStep > 1) {
-      currentStep--;
-      updateWizard();
-    }
-  }
-
-  function updateWizard() {
-    // Hide all steps
-    for (let i = 1; i <= totalSteps; i++) {
-      document.getElementById('step-' + i).classList.remove('active');
-    }
-    // Show current step
-    document.getElementById('step-' + currentStep).classList.add('active');
-
-    // Update buttons
-    const backBtn = document.getElementById('modalBackBtn');
-    const nextBtn = document.getElementById('modalNextBtn');
-
-    backBtn.disabled = currentStep === 1;
-    if (currentStep === totalSteps) {
-      nextBtn.disabled = true;
-      nextBtn.innerText = 'Done ✓';
-      // Populate review
-      document.getElementById('reviewType').innerText = selectedType;
-      document.getElementById('reviewParam').innerText = document.getElementById('paramName').value || 'LORCA-POOL';
-      document.getElementById('reviewWeight').innerText = (document.getElementById('paramWeight').value || '25') + '%';
-    } else {
-      nextBtn.disabled = false;
-      nextBtn.innerText = 'Next →';
-    }
-  }
-
-  function selectOption(el, category, value) {
-    const cards = el.parentElement.querySelectorAll('.wizard-option-card');
-    cards.forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedType = value;
-  }
-
-  function completeGeneration() {
-    alert('Configuration successfully exported/deployed for LethalOrca!');
+window.onclick = function(event) {
+  var modal = document.getElementById('generatorModal');
+  if (event.target == modal) {
     closeGenerator();
   }
+}
 
-  // Mobile hamburger menu toggle
-  function toggleMobileMenu() {
-    document.getElementById('navBurger').classList.toggle('open');
-    document.getElementById('mobileMenu').classList.toggle('open');
+// ---- Referral System ----
+const REFERRAL_BACKEND_URL = "https://lethalorca-backend.vercel.app";
+let referralWallet = null;
+
+async function connectReferralWallet() {
+  try {
+    if (!window.solana || !window.solana.isPhantom) {
+      document.getElementById('refStatus').innerText = "Phantom wallet not found — install it first.";
+      return;
+    }
+    const resp = await window.solana.connect();
+    referralWallet = resp.publicKey.toString();
+    document.getElementById('refStatus').innerText =
+      "Connected: " + referralWallet.slice(0, 4) + "..." + referralWallet.slice(-4);
+    document.getElementById('refConnectBtn').innerText = "Connected";
+    loadReferralData(referralWallet);
+  } catch (err) {
+    console.error('Wallet connect error:', err);
+    document.getElementById('refStatus').innerText = "Connection failed. Try again.";
+  }
+}
+
+async function loadReferralData(wallet) {
+  try {
+    const res = await fetch(`${REFERRAL_BACKEND_URL}/api/referral?action=get-code&wallet=${wallet}`);
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('myReferralCode').value = data.referralCode;
+      document.getElementById('refCount').innerText = data.referralCount;
+      document.getElementById('refEarnings').innerText = data.referralEarnings;
+    }
+  } catch (err) {
+    console.error('Referral load error:', err);
+  }
+}
+
+document.getElementById('refConnectBtn').addEventListener('click', connectReferralWallet);
+
+document.getElementById('copyRefBtn').addEventListener('click', () => {
+  const code = document.getElementById('myReferralCode').value;
+  if (!code) return;
+  navigator.clipboard.writeText(code);
+  document.getElementById('refMessage').innerText = "Code copied to clipboard.";
+});
+
+document.getElementById('applyRefBtn').addEventListener('click', async () => {
+  const code = document.getElementById('applyCodeInput').value.trim();
+  if (!referralWallet) {
+    document.getElementById('refMessage').innerText = "Connect your wallet first.";
+    return;
+  }
+  if (!code) {
+    document.getElementById('refMessage').innerText = "Enter a referral code first.";
+    return;
+  }
+  try {
+    const res = await fetch(`${REFERRAL_BACKEND_URL}/api/referral?action=apply-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ wallet: referralWallet, code })
+    });
+    const data = await res.json();
+    document.getElementById('refMessage').innerText = data.success ? data.message : data.error;
+    if (data.success) loadReferralData(referralWallet);
+  } catch (err) {
+    document.getElementById('refMessage').innerText = "Something went wrong.";
+  }
+});
+
+document.getElementById('claimRefBtn').addEventListener('click', async () => {
+  if (!referralWallet) {
+    document.getElementById('refMessage').innerText = "Connect your wallet first.";
+    return;
   }
 
-  // ---- Persistent side Back / Next module navigation ----
-  // Add this exact array (and the two <a> elements + this script block) to
-  // every landing page — index.html, game.html, stake.html — so the arrows
-  // cycle through the same order everywhere.
-  (function () {
-    const pages = [
-      { file: 'index.html', label: 'Home' },
-      { file: 'game.html', label: 'Play & Earn' },
-      { file: 'stake.html', label: 'Staking Pool' }
-    ];
+  document.getElementById('claimRefBtn').innerText = "Claiming...";
+  document.getElementById('claimRefBtn').disabled = true;
 
-    const currentFile = (location.pathname.split('/').pop() || 'index.html');
-    let idx = pages.findIndex(p => p.file === currentFile);
-    if (idx === -1) idx = 0;
+  try {
+    const res = await fetch(`${REFERRAL_BACKEND_URL}/api/claim-referral`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ wallet: referralWallet })
+    });
+    const data = await res.json();
 
-    const prevPage = pages[(idx - 1 + pages.length) % pages.length];
-    const nextPage = pages[(idx + 1) % pages.length];
+    document.getElementById('refMessage').innerText = data.success
+      ? data.message
+      : data.error;
 
-    const prevEl = document.getElementById('pageNavPrev');
-    const nextEl = document.getElementById('pageNavNext');
-    const prevLabel = document.getElementById('pageNavPrevLabel');
-    const nextLabel = document.getElementById('pageNavNextLabel');
-
-    if (prevEl) prevEl.href = prevPage.file;
-    if (nextEl) nextEl.href = nextPage.file;
-    if (prevLabel) prevLabel.textContent = prevPage.label;
-    if (nextLabel) nextLabel.textContent = nextPage.label;
-  })();
+    if (data.success) loadReferralData(referralWallet);
+  } catch (err) {
+    document.getElementById('refMessage').innerText = "Claim failed. Try again.";
+  } finally {
+    document.getElementById('claimRefBtn').innerText = "Claim Referral Bonus";
+    document.getElementById('claimRefBtn').disabled = false;
+  }
+});
 </script>
+
 </body>
 </html>
