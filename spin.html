@@ -1,335 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LethalOrca — Spin & Win</title>
-<style>
-  :root{
-    --abyss:#070C13;
-    --deep:#0B1C2C;
-    --tide:#0E2E3E;
-    --brand:#2DD4C4;
-    --brand-deep:#0E8C82;
-    --mint:#8CFCE8;
-    --cyan:#3FE3E0;
-    --coral:#FF6B4A;
-    --ink:#F2FBFA;
-    --ink-dim:#89A6A8;
-    --orca-navy:#0F2439;
-    --font-display: 'Baloo 2', 'Segoe UI', sans-serif;
-    --font-body: 'Inter', 'Segoe UI', sans-serif;
-  }
-  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
-
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    min-height:100vh;
-    background:
-      radial-gradient(ellipse at 50% -10%, rgba(63,227,224,0.16), transparent 60%),
-      radial-gradient(ellipse at 20% 110%, rgba(45,212,196,0.10), transparent 50%),
-      linear-gradient(180deg, var(--abyss), var(--deep) 60%, var(--tide));
-    font-family: var(--font-body);
-    color:var(--ink);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    padding:24px 16px 60px;
-    overflow-x:hidden;
-    position:relative;
-  }
-
-  /* ambient bubbles */
-  .bubble{
-    position:fixed; bottom:-40px; border-radius:50%;
-    background:rgba(63,227,224,0.10);
-    border:1px solid rgba(63,227,224,0.25);
-    animation:rise linear infinite;
-    pointer-events:none;
-  }
-  @keyframes rise{
-    to{ transform:translateY(-110vh) translateX(var(--drift,20px)); opacity:0; }
-  }
-
-  header{
-    width:100%; max-width:520px;
-    display:flex; justify-content:space-between; align-items:center;
-    margin-bottom:18px; z-index:2;
-  }
-  .brand{
-    display:flex; align-items:center; gap:8px;
-    font-family:var(--font-display); font-weight:800; font-size:1.15rem;
-    letter-spacing:0.5px;
-  }
-  .brand .mini-logo{
-    width:30px; height:30px; flex-shrink:0;
-    filter:drop-shadow(0 0 6px rgba(45,212,196,0.5));
-  }
-  .brand span.lethal{color:var(--ink);}
-  .brand span.orca{color:var(--brand);}
-
-  #walletBtn{
-    background:linear-gradient(135deg, var(--cyan), #1f9d9a);
-    color:#04211f; border:none; padding:9px 16px; border-radius:999px;
-    font-weight:700; font-size:0.85rem; cursor:pointer;
-    box-shadow:0 4px 14px rgba(63,227,224,0.35);
-    transition:transform .15s ease;
-  }
-  #walletBtn:active{ transform:scale(0.96); }
-  #walletBtn.connected{
-    background:rgba(255,255,255,0.06); color:var(--ink);
-    border:1px solid rgba(255,255,255,0.15); box-shadow:none;
-  }
-
-  .balance-row{
-    display:flex; align-items:center; gap:10px; margin-bottom:24px; z-index:2;
-    flex-wrap:wrap; justify-content:center;
-  }
-  .balance-pill{
-    display:flex; align-items:center; gap:6px;
-    background:rgba(45,212,196,0.08);
-    border:1px solid rgba(45,212,196,0.3);
-    padding:8px 14px; border-radius:999px;
-    font-weight:700; font-size:0.95rem;
-  }
-  .balance-pill .coin-dot{
-    width:16px; height:16px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #eafffb, var(--brand) 55%, var(--brand-deep));
-  }
-  #withdrawBtn{
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(140,252,232,0.35);
-    color:var(--mint); padding:8px 16px; border-radius:999px;
-    font-weight:700; font-size:0.85rem; cursor:pointer;
-    transition:transform .15s ease, background .15s ease;
-  }
-  #withdrawBtn:hover:not(:disabled){ background:rgba(140,252,232,0.1); }
-  #withdrawBtn:active{ transform:scale(0.96); }
-  #withdrawBtn:disabled{ opacity:0.4; cursor:not-allowed; }
-
-  .modal-backdrop{
-    position:fixed; inset:0; background:rgba(3,8,14,0.7); backdrop-filter:blur(4px);
-    display:none; align-items:center; justify-content:center; z-index:100; padding:20px;
-  }
-  .modal-backdrop.open{ display:flex; }
-  .modal{
-    width:100%; max-width:340px; background:linear-gradient(165deg, var(--deep), var(--tide));
-    border:1px solid rgba(45,212,196,0.3); border-radius:16px; padding:22px;
-    box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(45,212,196,0.15);
-  }
-  .modal h3{
-    font-family:var(--font-display); color:var(--ink); font-size:1.15rem; margin-bottom:4px;
-  }
-  .modal p.sub{ color:var(--ink-dim); font-size:0.78rem; margin-bottom:16px; }
-  .modal label{ font-size:0.75rem; color:var(--ink-dim); display:block; margin-bottom:6px; }
-  .modal input{
-    width:100%; background:rgba(0,0,0,0.25); border:1px solid rgba(140,252,232,0.25);
-    color:var(--ink); padding:11px 12px; border-radius:10px; font-size:1rem;
-    margin-bottom:14px; outline:none; font-family:var(--font-body);
-  }
-  .modal input:focus{ border-color:var(--brand); }
-  .modal-actions{ display:flex; gap:10px; }
-  .modal-actions button{
-    flex:1; padding:11px; border-radius:10px; border:none; font-weight:700; cursor:pointer;
-    font-size:0.88rem; transition:transform .15s ease;
-  }
-  .modal-actions button:active{ transform:scale(0.97); }
-  #withdrawCancel{ background:rgba(255,255,255,0.06); color:var(--ink-dim); }
-  #withdrawConfirm{ background:linear-gradient(135deg, var(--brand), var(--brand-deep)); color:#03211d; }
-  #withdrawConfirm:disabled{ opacity:0.5; cursor:not-allowed; }
-  #withdrawMsg{ font-size:0.78rem; margin-top:10px; min-height:16px; text-align:center; }
-
-  .wheel-stage{
-    position:relative; width:min(340px, 84vw); aspect-ratio:1/1;
-    margin-bottom:22px; z-index:2;
-  }
-  .pointer{
-    position:absolute; top:-30px; left:50%; transform:translateX(-50%);
-    width:46px; height:46px; z-index:5;
-    filter:drop-shadow(0 4px 8px rgba(0,0,0,0.6)) drop-shadow(0 0 12px rgba(45,212,196,0.65));
-    animation:bob 1.8s ease-in-out infinite;
-  }
-  @keyframes bob{
-    0%,100%{ transform:translateX(-50%) translateY(0); }
-    50%{ transform:translateX(-50%) translateY(4px); }
-  }
-  @keyframes rimGlow{
-    0%,100%{ box-shadow:0 0 0 3px rgba(45,212,196,0.28), 0 0 26px 4px rgba(45,212,196,0.35), 0 14px 44px rgba(0,0,0,0.6); }
-    50%{ box-shadow:0 0 0 3px rgba(140,252,232,0.45), 0 0 44px 12px rgba(45,212,196,0.55), 0 14px 44px rgba(0,0,0,0.6); }
-  }
-  .rim{
-    position:absolute; inset:0; border-radius:50%;
-    background:conic-gradient(from 0deg, var(--brand-deep), var(--mint) 15%, var(--brand) 30%, var(--brand-deep) 45%, var(--mint) 60%, var(--brand) 75%, var(--brand-deep) 90%, var(--brand-deep));
-    padding:12px;
-    animation: rimGlow 2.6s ease-in-out infinite;
-  }
-  .rim::before{
-    content:"";
-    position:absolute; inset:4px; border-radius:50%;
-    background:linear-gradient(155deg, rgba(255,255,255,0.5), rgba(255,255,255,0) 40%);
-    mix-blend-mode:overlay; pointer-events:none;
-  }
-  #wheel{
-    width:100%; height:100%; border-radius:50%; display:block;
-    transition: transform 4.5s cubic-bezier(.12,.72,.14,1);
-    background:var(--abyss);
-    box-shadow: inset 0 0 30px rgba(0,0,0,0.7), inset 0 2px 6px rgba(255,255,255,0.08);
-  }
-  .glass-overlay{
-    position:absolute; inset:12px; border-radius:50%; pointer-events:none; z-index:3;
-    background:
-      radial-gradient(circle at 32% 22%, rgba(255,255,255,0.35), rgba(255,255,255,0) 32%),
-      radial-gradient(circle at 70% 80%, rgba(0,0,0,0.25), rgba(0,0,0,0) 45%);
-  }
-  .hub{
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:62px; height:62px; border-radius:50%;
-    background:radial-gradient(circle at 35% 28%, #eafffb, var(--brand) 50%, var(--brand-deep) 85%);
-    display:flex; align-items:center; justify-content:center;
-    font-family:var(--font-display); font-weight:800; color:#03211d; font-size:0.72rem;
-    box-shadow:0 0 0 5px var(--deep), 0 0 24px rgba(45,212,196,0.6), 0 4px 14px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.6), inset 0 -3px 6px rgba(0,0,0,0.25);
-    z-index:4;
-  }
-
-  #spinBtn{
-    background:linear-gradient(135deg, var(--brand), var(--brand-deep));
-    color:#03211d; border:none; padding:15px 46px; border-radius:999px;
-    font-family:var(--font-display); font-weight:700; font-size:1.15rem;
-    letter-spacing:0.5px; cursor:pointer; z-index:2;
-    box-shadow:0 6px 22px rgba(45,212,196,0.4);
-    transition:transform .15s ease, box-shadow .15s ease;
-  }
-  #spinBtn:active{ transform:scale(0.96); }
-  #spinBtn:disabled{
-    background:rgba(255,255,255,0.08); color:var(--ink-dim);
-    box-shadow:none; cursor:not-allowed;
-  }
-
-  #status{
-    min-height:24px; margin-top:14px; font-weight:600; text-align:center; z-index:2;
-    color:var(--cyan);
-  }
-  #status.win{ color:var(--mint); font-size:1.05rem; }
-
-  .cooldown{
-    font-size:0.8rem; color:var(--ink-dim); margin-top:4px; z-index:2;
-  }
-
-  .disclaimer{
-    max-width:380px; margin-top:28px; z-index:2;
-    background:rgba(255,107,74,0.06);
-    border:1px solid rgba(255,107,74,0.22);
-    border-left:2px solid var(--coral);
-    border-radius:8px; padding:8px 12px;
-    font-size:0.68rem; line-height:1.4; color:var(--ink-dim);
-    text-align:center;
-  }
-  .disclaimer b{ color:var(--coral); }
-
-  footer{
-    margin-top:20px; font-size:0.72rem; color:var(--ink-dim); z-index:2;
-  }
-
-  .coin-fx{
-    position:fixed; top:0; left:0; font-size:22px; pointer-events:none; z-index:50;
-    animation:pop 1s ease-out forwards;
-  }
-  @keyframes pop{
-    0%{ transform:translateY(0) scale(0.6); opacity:1; }
-    100%{ transform:translateY(-140px) translateX(var(--dx,0px)) scale(1.1); opacity:0; }
-  }
-</style>
-</head>
-<body>
-
-<header>
-  <div class="brand">
-    <svg class="mini-logo" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="miniRing" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#8CFCE8"/>
-          <stop offset="50%" stop-color="#2DD4C4"/>
-          <stop offset="100%" stop-color="#0E8C82"/>
-        </linearGradient>
-      </defs>
-      <circle cx="30" cy="30" r="28" fill="#0B1C2C" stroke="url(#miniRing)" stroke-width="3"/>
-      <path fill="#F2FBFA" d="M12 34c4-11 15-19 26-20 2 0 3 2 1 3-8 3-15 9-19 16-2 3-1 6 1 7 3 2 6 1 8-1 2-2 4-2 5 0 1 2 0 4-2 5-5 4-13 4-18 0-2-2-3-6-2-10z"/>
-      <path fill="#0F2439" d="M17 33c3-6 9-11 16-13-1 3-1 6 1 8-5 3-10 5-15 6-1-1-1-1-2-1z"/>
-      <ellipse cx="19" cy="24" rx="1.6" ry="1.4" fill="#0B1C2C"/>
-    </svg>
-    <span class="lethal">Lethal</span><span class="orca">Orca</span>
-  </div>
-  <button id="walletBtn">Connect Phantom</button>
-</header>
-
-<div class="balance-row">
-  <div class="balance-pill"><div class="coin-dot"></div><span id="balanceText">Connect wallet to view $LORCA</span></div>
-  <button id="withdrawBtn" disabled>Withdraw</button>
-</div>
-
-<div class="wheel-stage">
-  <svg class="pointer" viewBox="0 0 64 48" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="orcaBody" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#1C3A52"/>
-        <stop offset="60%" stop-color="#0F2439"/>
-        <stop offset="100%" stop-color="#081420"/>
-      </linearGradient>
-    </defs>
-    <path fill="url(#orcaBody)" d="M4 30c6-14 20-24 34-26 4-1 8 0 9 2 1 2-1 4-4 5-9 3-18 9-23 17-2 3-2 6 0 8 3 3 8 3 12 0 2-2 5-3 7-1 2 2 1 5-1 7-6 5-15 6-22 2C10 41 5 36 4 30z"/>
-    <path fill="#F2FBFA" d="M14 32c3-5 8-9 14-11-1 3-1 6 1 8-4 3-9 4-13 5-1-1-2-1-2-2z"/>
-    <ellipse cx="16" cy="21" rx="2.4" ry="2" fill="#F2FBFA"/>
-    <ellipse cx="16.6" cy="21" rx="1" ry="0.9" fill="#081420"/>
-    <path d="M46 6c2 3 2 7 0 10-3-2-4-6-3-10 1-1 2-1 3 0z" fill="var(--brand)"/>
-  </svg>
-  <div class="rim">
-    <svg id="wheel" viewBox="0 0 300 300"></svg>
-    <div class="glass-overlay"></div>
-  </div>
-  <div class="hub">SPIN</div>
-</div>
-
-<button id="spinBtn" disabled>Connect Wallet</button>
-<div id="status"></div>
-<div class="cooldown" id="cooldownText"></div>
-<div class="cooldown" id="spinsLeftText"></div>
-
-<div class="disclaimer">
-  <b>Disclaimer:</b> Fun reward feature only — no monetary value, not gambling or investment. Spins generate in-game $LORCA rewards as part of play-to-earn.
-</div>
-
-<footer>lethalorca.com &middot; Solana Play-to-Earn</footer>
-
-<div class="modal-backdrop" id="withdrawModal">
-  <div class="modal">
-    <h3>Withdraw $LORCA</h3>
-    <p class="sub">Send your earned tokens to your connected Phantom wallet.</p>
-    <label>Amount (available: <span id="modalBalance">0</span> $LORCA)</label>
-    <input type="number" id="withdrawAmount" placeholder="e.g. 250" min="1">
-    <label>Destination</label>
-    <input type="text" id="withdrawWallet" disabled>
-    <div class="modal-actions">
-      <button id="withdrawCancel">Cancel</button>
-      <button id="withdrawConfirm">Confirm</button>
-    </div>
-    <div id="withdrawMsg"></div>
-  </div>
-</div>
-
 <script>
 /* ================= CONFIG ================= */
-// Point these at your live Vercel backend (lethalorca-backend repo).
-// The server should own the RNG, weighting, and cooldown — never trust the client for the payout.
-const API_BASE = "https://lethalorca-backend.vercel.app"; // your live Vercel backend
+const API_BASE = "https://lethalorca-backend.vercel.app";
 const ENDPOINTS = {
-  status:   "/api/spin/status",   // GET  -> { canSpin, secondsLeft, balance }
-  spin:     "/api/spin/play",     // POST { wallet } -> { result, amount, balance }
-  withdraw: "/api/withdraw",      // POST { wallet, amount } -> { success, txSignature, balance }
+  status:   "/api/spin/status",
+  spin:     "/api/spin/play",
+  withdraw: "/api/withdraw",
 };
-const DEMO_MODE = false; // now using your live backend
-const MAX_SPINS_PER_DAY = 5; // client-side guard for demo — enforce the real limit server-side in production
+const DEMO_MODE = false;
+const MAX_SPINS_PER_DAY = 5;
 
-/* Segments must match your backend's weighting exactly (labels only affect the wheel drawing) */
 const SEGMENTS = [
   { label: "0",    amount: 0,    weight: 30, color: "#0F3654" },
   { label: "10",   amount: 10,   weight: 25, color: "#123B5E" },
@@ -337,7 +16,7 @@ const SEGMENTS = [
   { label: "50",   amount: 50,   weight: 12, color: "#123B5E" },
   { label: "100",  amount: 100,  weight: 8,  color: "#0F3654" },
   { label: "250",  amount: 250,  weight: 4,  color: "#123B5E" },
-  { label: "500",  amount: 500,  weight: 2,  color: "#0F3654" },
+  { label: "500",  amount: 500,  weight: 2,  color: "#123B5E" },
   { label: "JACKPOT\n1000", amount: 1000, weight: 1, color: "#7A1F1F" },
 ];
 
@@ -409,7 +88,7 @@ function buildWheel(){
 }
 buildWheel();
 
-/* ================= WEIGHTED PICK (demo fallback only) ================= */
+/* ================= WEIGHTED PICK ================= */
 function weightedPick(){
   const total = SEGMENTS.reduce((s,x)=>s+x.weight,0);
   let r = Math.random() * total;
@@ -439,7 +118,6 @@ async function connectWallet(){
       return;
     }
   }else if(DEMO_MODE){
-    // No Phantom extension found — fall back to a mock wallet so the demo/preview is still usable.
     wallet = "Demo" + Math.random().toString(36).slice(2,10);
     statusEl.textContent = "Phantom not detected — using a demo wallet for preview.";
   }else{
@@ -511,7 +189,6 @@ function startCooldownDisplay(seconds){
 
 async function requestSpinResult(){
   if(DEMO_MODE){
-    // client-side simulation for preview only — real build must use server RNG
     await new Promise(res=>setTimeout(res, 400));
     const idx = weightedPick();
     return { index: idx, amount: SEGMENTS[idx].amount };
@@ -645,7 +322,7 @@ withdrawConfirm.addEventListener('click', async ()=>{
     const r = await fetch(`${API_BASE}${ENDPOINTS.withdraw}`, {
       method:"POST",
       headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ wallet, amount: amt })
+      body: JSON.stringify({ receiverAddress: wallet, amount: amt })
     });
     const data = await r.json();
     if(!r.ok || !data.success) throw new Error(data.message || "failed");
@@ -676,5 +353,3 @@ for(let i=0;i<16;i++){
   document.body.appendChild(b);
 }
 </script>
-</body>
-</html>
