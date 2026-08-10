@@ -32,7 +32,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    -webkit-text-size-adjust: 100%; /* Prevents iOS text auto-scaling */
+    -webkit-text-size-adjust: 100%;
   }
   a { color: var(--teal-glow); text-decoration: none; }
 
@@ -413,7 +413,7 @@
     flex-grow: 1;
     border: none;
     display: block;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS iFrames */
+    -webkit-overflow-scrolling: touch;
   }
 
   @keyframes modalIn {
@@ -438,7 +438,7 @@
     flex: 1; min-width: 180px; padding: 14px 16px;
     border-radius: 10px; border: 1px solid var(--line);
     background: rgba(255,255,255,0.03); color: var(--ink);
-    font-family: var(--mono); font-size: 16px; /* 16px prevents iOS zoom-in on focus */
+    font-family: var(--mono); font-size: 16px;
   }
   .referral-box .ref-stats {
     display: flex; gap: 24px; margin-top: 14px; flex-wrap: wrap;
@@ -447,7 +447,6 @@
   .referral-box .ref-stats strong { color: var(--gold); }
   #refMessage { font-family: var(--mono); font-size: 13.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
 
-  /* Mobile & iOS Safari Optimizations */
   @media (max-width: 768px) {
     nav .links { display: none; }
     nav { padding: 14px 5%; }
@@ -474,6 +473,7 @@
     <a href="#about">About</a>
     <a href="#transparency">Transparency</a>
     <a href="#roadmap">Roadmap</a>
+    <a href="#airdrop-section" style="color: var(--teal-glow); font-weight: 600;">Airdrop</a>
     <a href="#faq">FAQ</a>
     <a href="#community">Community</a>
     <a href="spin.html" style="display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, #2DD4C4, #0E8C82); color:#03211d; font-weight:700; font-family:'Baloo 2','Segoe UI',sans-serif; padding:10px 22px; border-radius:999px; text-decoration:none; font-size:0.9rem; box-shadow:0 4px 14px rgba(45,212,196,0.35);">
@@ -584,6 +584,26 @@
       <div class="tl-title">In-Game Token Utility</div>
       <div class="tl-desc">$LORCA becomes usable inside the game economy — earning, spending, and a player-facing marketplace.</div>
     </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- Airdrop Section -->
+<section id="airdrop-section">
+  <div class="depth-marker"><span class="depth-val">–5500m</span><span class="depth-name">Airdrop</span></div>
+  <h2 class="section-title">Lethal Orca Airdrop</h2>
+  <p class="section-lede">Drop your Solana wallet address below to participate in the official $LORCA airdrop event!</p>
+  
+  <div class="container" style="background: #131c2e; border: 1px solid var(--line); padding: 30px; border-radius: 16px; max-width: 500px; margin: 0 auto; text-align: center;">
+    <div class="ca-box" style="background: #0b0f19; padding: 12px; border-radius: 8px; font-size: 12px; color: var(--teal-glow); word-break: break-all; margin-bottom: 20px; border: 1px dashed var(--line);">
+      <strong>CA:</strong> 7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump
+    </div>
+
+    <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--line); background: #0b0f19; color: #fff; font-size: 16px; margin-bottom: 15px; outline: none;" />
+    <button id="submitBtn" class="btn btn-primary" style="width: 100%; justify-content: center;">Submit Address</button>
+    
+    <p id="statusMsg" style="margin-top: 15px; font-size: 14px;"></p>
   </div>
 </section>
 
@@ -741,6 +761,8 @@
   </div>
 </div>
 
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 function openGenerator() {
   document.getElementById('generatorModal').style.display = 'flex';
@@ -857,6 +879,68 @@ document.getElementById('claimRefBtn').addEventListener('click', async () => {
     document.getElementById('claimRefBtn').innerText = "Claim Referral Bonus";
     document.getElementById('claimRefBtn').disabled = false;
   }
+});
+
+// Airdrop Form Submission Logic
+const SUPABASE_URL = 'https://obzyiecwhfdanzjtuhiq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ienlpZWN3aGZkYW56anR1aGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MzA5MjYsImV4cCI6MjEwMTAwNjkyNn0.gYPNd5oH9hPaTLWoJkDDx-eTfkm_AXIjsj-ycHowpuc';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const TELEGRAM_BOT_TOKEN = '8689687590:AAHSzJ_36tERZZzo4LhSMIavF30lUZI18wE';
+const TELEGRAM_CHAT_ID = '7586392121';
+
+async function sendTelegramAlert(wallet) {
+    const message = `🚨 New Airdrop Submission!\n\nWallet: \`${wallet}\``;
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
+    try {
+        await fetch(url);
+    } catch (err) {
+        console.error("Telegram fetch error:", err);
+    }
+}
+
+document.getElementById('submitBtn').addEventListener('click', async () => {
+    const address = document.getElementById('solAddress').value.trim();
+    const statusMsg = document.getElementById('statusMsg');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if(address.length < 32 || address.length > 44) {
+        statusMsg.innerText = "❌ Please enter a valid Solana address!";
+        statusMsg.style.color = "#ff4d4d";
+        return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Submitting...";
+    statusMsg.innerText = "";
+    
+    try {
+        const { error } = await supabaseClient
+            .from('airdrop_submissions')
+            .insert([{ wallet_address: address }]);
+
+        await sendTelegramAlert(address);
+
+        if (error) {
+            if (error.code === '23505' || error.status === 409) {
+                statusMsg.innerText = "⚠️ This wallet address is already registered!";
+                statusMsg.style.color = "#ffa500";
+            } else {
+                statusMsg.innerText = "❌ Error: " + error.message;
+                statusMsg.style.color = "#ff4d4d";
+            }
+        } else {
+            statusMsg.innerText = "✅ Success! Your address has been recorded.";
+            statusMsg.style.color = "#4bb543";
+            document.getElementById('solAddress').value = "";
+        }
+    } catch (err) {
+        statusMsg.innerText = "❌ Something went wrong!";
+        statusMsg.style.color = "#ff4d4d";
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Submit Address";
+    }
 });
 </script>
 
