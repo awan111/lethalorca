@@ -108,7 +108,6 @@
     margin-top: 20px;
   }
   
-  /* CTA Buttons — Sleek Mobile Friendly Grid */
   .hero-cta { 
     display: flex; 
     gap: 14px; 
@@ -171,6 +170,18 @@
     font-size: 10px;
   }
 
+  .btn-spin {
+    background: linear-gradient(135deg, #2DD4C4, #0E8C82);
+    color: #03211d;
+    border: none;
+    font-weight: 700;
+    box-shadow: 0 4px 25px rgba(45, 212, 196, 0.45);
+  }
+  .btn-spin:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 35px rgba(45, 212, 196, 0.75);
+  }
+
   .btn-generator {
     background: linear-gradient(135deg, #00f2fe, #3b82f6);
     color: #000;
@@ -183,7 +194,6 @@
     box-shadow: 0 8px 35px rgba(0, 242, 254, 0.75);
   }
 
-  /* Staking Button Style */
   .btn-staking {
     background: linear-gradient(135deg, #10b981, #059669);
     color: #fff;
@@ -196,7 +206,6 @@
     box-shadow: 0 8px 35px rgba(16, 185, 129, 0.75);
   }
 
-  /* Airdrop Button Style */
   .btn-airdrop {
     background: linear-gradient(135deg, #a855f7, #6366f1);
     color: #fff;
@@ -363,7 +372,6 @@
   }
   .newsletter-box p { margin: 0; max-width: 440px; font-size: 14.5px; color: var(--muted); }
 
-  /* --- SLEEK RESPONSIVE GENERATOR MODAL --- */
   .generator-modal {
     display: none;
     position: fixed;
@@ -434,7 +442,6 @@
     to { opacity: 1; transform: scale(1); }
   }
 
-  /* --- AIRDROP & REFERRAL BOX --- */
   .referral-box {
     border: 1px solid var(--line);
     border-radius: 18px;
@@ -461,7 +468,6 @@
   .referral-box .ref-stats strong { color: var(--gold); }
   #refMessage { font-family: var(--mono); font-size: 12.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
 
-  /* --- MOBILE SPECIFIC FIXES --- */
   @media (max-width: 768px) {
     nav .links { display: none; }
     #hero { align-items: center; text-align: center; }
@@ -487,9 +493,6 @@
     <a href="#airdrop" style="color: var(--teal-glow); font-weight: 600;">Airdrop</a>
     <a href="#faq">FAQ</a>
     <a href="#community">Community</a>
-    <a href="spin.html" style="display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, #2DD4C4, #0E8C82); color:#03211d; font-weight:700; font-family:'Baloo 2','Segoe UI',sans-serif; padding:10px 22px; border-radius:999px; text-decoration:none; font-size:0.9rem; box-shadow:0 4px 14px rgba(45,212,196,0.35);">
-      🎡 Spin & Win
-    </a>
     <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
     <a href="#referral" style="color: var(--teal-glow); font-weight: 600;">Refer & Earn</a>
   </div>
@@ -502,6 +505,7 @@
   
   <div class="hero-cta">
     <a class="btn btn-play" href="game.html"><span class="play-icon">▶</span> Play & Earn</a>
+    <a class="btn btn-spin" href="spin.html"><span class="spin-icon">🎡</span> Spin & Win</a>
     <button class="btn btn-generator" onclick="openGenerator()">
       <span class="gen-icon">⚡</span> LORCA GENERATOR
     </button>
@@ -603,7 +607,6 @@
 
 <hr class="divider">
 
-<!-- AIRDROP SECTION ADDED HERE (Navbar safe) -->
 <section id="airdrop">
   <div class="depth-marker"><span class="depth-val">–3500m</span><span class="depth-name">Airdrop Portal</span></div>
   <h2 class="section-title">Claim Your $LORCA Airdrop</h2>
@@ -772,7 +775,6 @@
   </div>
 </footer>
 
-<!-- GENERATOR MODAL WINDOW -->
 <div id="generatorModal" class="generator-modal">
   <div class="generator-modal-content">
     <div class="generator-header">
@@ -786,14 +788,14 @@
 <script>
 function openGenerator() {
   document.getElementById('generatorModal').style.display = 'flex';
-  document.body.style.overflow = 'hidden'; // Prevents background page scrolling
+  document.body.style.overflow = 'hidden';
 }
 
 function closeGenerator() {
   document.getElementById('generatorModal').style.display = 'none';
   document.body.style.overflow = 'auto';
   var iframe = document.getElementById('generatorFrame');
-  iframe.src = iframe.src; // Reloads iframe to stop generator audio/timer
+  iframe.src = iframe.src;
 }
 
 window.onclick = function(event) {
@@ -803,9 +805,7 @@ window.onclick = function(event) {
   }
 }
 
-// ---- Airdrop System Script ----
 let airdropWallet = null;
-
 async function connectAirdropWallet() {
   try {
     if (!window.solana || !window.solana.isPhantom) {
@@ -817,17 +817,13 @@ async function connectAirdropWallet() {
     document.getElementById('airdropStatus').innerText =
       "Connected: " + airdropWallet.slice(0, 4) + "..." + airdropWallet.slice(-4);
     document.getElementById('airdropConnectBtn').innerText = "Connected";
-    
-    // Simulate fetching eligibility for demo
     document.getElementById('airdropAmount').innerText = "1,500";
     document.getElementById('airdropClaimStatus').innerText = "Eligible";
     document.getElementById('airdropMessage').innerText = "Wallet connected! You are eligible for the airdrop.";
   } catch (err) {
-    console.error('Wallet connect error:', err);
     document.getElementById('airdropStatus').innerText = "Connection failed. Try again.";
   }
 }
-
 document.getElementById('airdropConnectBtn').addEventListener('click', connectAirdropWallet);
 
 document.getElementById('claimAirdropBtn').addEventListener('click', async () => {
@@ -835,10 +831,8 @@ document.getElementById('claimAirdropBtn').addEventListener('click', async () =>
     document.getElementById('airdropMessage').innerText = "Connect your wallet first.";
     return;
   }
-
   document.getElementById('claimAirdropBtn').innerText = "Processing Claim...";
   document.getElementById('claimAirdropBtn').disabled = true;
-
   setTimeout(() => {
     document.getElementById('airdropMessage').innerText = "Airdrop claimed successfully! Tokens sent to your wallet.";
     document.getElementById('airdropClaimStatus').innerText = "Claimed";
@@ -846,7 +840,6 @@ document.getElementById('claimAirdropBtn').addEventListener('click', async () =>
   }, 1500);
 });
 
-// ---- Referral System ----
 const REFERRAL_BACKEND_URL = "https://lethalorca-backend.vercel.app";
 let referralWallet = null;
 
@@ -863,7 +856,6 @@ async function connectReferralWallet() {
     document.getElementById('refConnectBtn').innerText = "Connected";
     loadReferralData(referralWallet);
   } catch (err) {
-    console.error('Wallet connect error:', err);
     document.getElementById('refStatus').innerText = "Connection failed. Try again.";
   }
 }
@@ -877,13 +869,10 @@ async function loadReferralData(wallet) {
       document.getElementById('refCount').innerText = data.referralCount;
       document.getElementById('refEarnings').innerText = data.referralEarnings;
     }
-  } catch (err) {
-    console.error('Referral load error:', err);
-  }
+  } catch (err) {}
 }
 
 document.getElementById('refConnectBtn').addEventListener('click', connectReferralWallet);
-
 document.getElementById('copyRefBtn').addEventListener('click', () => {
   const code = document.getElementById('myReferralCode').value;
   if (!code) return;
@@ -920,10 +909,8 @@ document.getElementById('claimRefBtn').addEventListener('click', async () => {
     document.getElementById('refMessage').innerText = "Connect your wallet first.";
     return;
   }
-
   document.getElementById('claimRefBtn').innerText = "Claiming...";
   document.getElementById('claimRefBtn').disabled = true;
-
   try {
     const res = await fetch(`${REFERRAL_BACKEND_URL}/api/claim-referral`, {
       method: 'POST',
@@ -931,11 +918,7 @@ document.getElementById('claimRefBtn').addEventListener('click', async () => {
       body: JSON.stringify({ wallet: referralWallet })
     });
     const data = await res.json();
-
-    document.getElementById('refMessage').innerText = data.success
-      ? data.message
-      : data.error;
-
+    document.getElementById('refMessage').innerText = data.success ? data.message : data.error;
     if (data.success) loadReferralData(referralWallet);
   } catch (err) {
     document.getElementById('refMessage').innerText = "Claim failed. Try again.";
@@ -945,6 +928,5 @@ document.getElementById('claimRefBtn').addEventListener('click', async () => {
   }
 });
 </script>
-
 </body>
 </html>
