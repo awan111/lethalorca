@@ -6,6 +6,8 @@
 <title>LethalOrca — $LORCA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Cloudflare Turnstile Script -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
   :root {
     --abyss: #020910;
@@ -837,7 +839,7 @@
       <div class="plat">Discord</div>
       <div class="handle">Join the Crew ↗</div>
     </a>
-    <a class="comm-card" href="https://t.me/Lethal_Orca" target="_blank" rel="noopener">
+    <a class="comm-card" href="url?id=9" target="_blank" rel="noopener">
       <div class="plat">Telegram</div>
       <div class="handle">Join the Chat ↗</div>
     </a>
@@ -888,6 +890,10 @@
     </div>
 
     <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--abyss); color: #fff; font-size: 15px; margin-bottom: 15px; outline: none; font-family: var(--mono);" />
+    
+    <!-- Cloudflare Turnstile Widget with Real Site Key -->
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAAEMVw7OeY-Wtd3CO" data-callback="onTurnstileSuccess" data-theme="dark" style="margin-bottom: 15px;"></div>
+
     <button id="submitBtn" class="btn btn-airdrop" style="width: 100%; justify-content: center; padding: 16px; border-radius: 10px;">Submit Address</button>
     
     <p id="statusMsg" style="margin-top: 15px; font-size: 14px; text-align: center;"></p>
@@ -1033,7 +1039,13 @@ document.getElementById('claimRefBtn').addEventListener('click', async () => {
   }
 });
 
-// Airdrop Form Submission Logic with Strict Solana Base58 Validation
+// Cloudflare Turnstile Token Variable
+let turnstileToken = null;
+function onTurnstileSuccess(token) {
+    turnstileToken = token;
+}
+
+// Airdrop Form Submission Logic with Strict Solana Base58 & Turnstile Validation
 const SUPABASE_URL = 'https://obzyiecwhfdanzjtuhiq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ienlpZWN3aGZkYW56anR1aGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MzA5MjYsImV4cCI6MjEwMTAwNjkyNn0.gYPNd5oH9hPaTLWoJkDDx-eTfkm_AXIjsj-ycHowpuc';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1056,10 +1068,17 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     const statusMsg = document.getElementById('statusMsg');
     const submitBtn = document.getElementById('submitBtn');
     
-    // Strict Solana Base58 Address Regex Validation (blocks spam/bots sending random text)
+    // Strict Solana Base58 Address Regex Validation
     const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
     if (!solanaRegex.test(address)) {
         statusMsg.innerText = "❌ Please enter a valid Solana wallet address!";
+        statusMsg.style.color = "#ff4d4d";
+        return;
+    }
+
+    // Turnstile Captcha Verification Check
+    if (!turnstileToken) {
+        statusMsg.innerText = "❌ Please complete the CAPTCHA verification!";
         statusMsg.style.color = "#ff4d4d";
         return;
     }
@@ -1087,6 +1106,10 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
             statusMsg.innerText = "✅ Success! Your address has been recorded.";
             statusMsg.style.color = "#4bb543";
             document.getElementById('solAddress').value = "";
+            if (window.turnstile) {
+                turnstile.reset();
+                turnstileToken = null;
+            }
         }
     } catch (err) {
         statusMsg.innerText = "❌ Something went wrong!";
