@@ -1033,7 +1033,7 @@ document.getElementById('claimRefBtn').addEventListener('click', async () => {
   }
 });
 
-// Airdrop Form Submission Logic
+// Airdrop Form Submission Logic with Strict Solana Base58 Validation
 const SUPABASE_URL = 'https://obzyiecwhfdanzjtuhiq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ienlpZWN3aGZkYW56anR1aGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MzA5MjYsImV4cCI6MjEwMTAwNjkyNn0.gYPNd5oH9hPaTLWoJkDDx-eTfkm_AXIjsj-ycHowpuc';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1056,8 +1056,10 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     const statusMsg = document.getElementById('statusMsg');
     const submitBtn = document.getElementById('submitBtn');
     
-    if(address.length < 32 || address.length > 44) {
-        statusMsg.innerText = "❌ Please enter a valid Solana address!";
+    // Strict Solana Base58 Address Regex Validation (blocks spam/bots sending random text)
+    const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+    if (!solanaRegex.test(address)) {
+        statusMsg.innerText = "❌ Please enter a valid Solana wallet address!";
         statusMsg.style.color = "#ff4d4d";
         return;
     }
