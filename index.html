@@ -36,36 +36,35 @@
   }
   a { color: var(--teal-glow); text-decoration: none; }
 
-  /* Fixed Top-Left Buttons Styling (Below Navbar to prevent overlap) */
+  /* Pro Fixed Top-Left Back Button */
   .top-left-buttons {
     position: fixed;
-    top: 80px;
+    top: 85px;
     left: 20px;
-    display: flex;
-    gap: 10px;
     z-index: 99;
   }
   .top-left-buttons .btn-top {
-    padding: 8px 16px;
-    font-size: 13px;
+    padding: 10px 18px;
+    font-size: 13.5px;
     font-weight: 600;
-    border-radius: 8px;
-    background: rgba(5, 18, 30, 0.85);
-    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(5, 18, 30, 0.9);
+    border: 1px solid rgba(94, 234, 212, 0.35);
     color: var(--teal-glow);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     cursor: pointer;
     font-family: var(--body);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6), 0 0 15px rgba(45,212,191,0.15);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    gap: 6px;
   }
   .top-left-buttons .btn-top:hover {
-    background: rgba(94, 234, 212, 0.15);
+    background: rgba(94, 234, 212, 0.2);
     border-color: var(--teal-glow);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 25px rgba(94,234,212,0.35);
     transform: translateY(-2px);
   }
 
@@ -263,9 +262,27 @@
     box-shadow: 0 8px 35px rgba(16, 185, 129, 0.75);
   }
 
+  .btn-airdrop {
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    color: #fff;
+    border: none;
+    font-weight: 700;
+    box-shadow: 0 4px 25px rgba(168, 85, 247, 0.45);
+    animation: airdrop-pulse 2.8s ease-in-out infinite;
+  }
+  .btn-airdrop:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 35px rgba(236, 72, 153, 0.75);
+  }
+
   @keyframes play-pulse {
     0%, 100% { box-shadow: 0 4px 25px rgba(242, 201, 76, 0.45); }
     50% { box-shadow: 0 4px 35px rgba(242, 201, 76, 0.75); }
+  }
+
+  @keyframes airdrop-pulse {
+    0%, 100% { box-shadow: 0 4px 25px rgba(168, 85, 247, 0.45); }
+    50% { box-shadow: 0 4px 35px rgba(236, 72, 153, 0.75); }
   }
 
   #orca-trail { position: absolute; right: -5%; top: 20%; width: 55%; max-width: 640px; opacity: 0.9; }
@@ -417,6 +434,7 @@
   }
   .newsletter-box p { margin: 0; max-width: 440px; font-size: 15px; color: var(--muted); }
 
+  /* Modals (Generator & Airdrop Popups) */
   .generator-modal {
     display: none;
     position: fixed;
@@ -483,6 +501,31 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  /* Pro Airdrop Modal Box */
+  .airdrop-modal-content {
+    background: linear-gradient(180deg, #081a2b, #05121e);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 520px;
+    padding: 30px;
+    box-shadow: 0 0 60px rgba(168, 85, 247, 0.3);
+    position: relative;
+    animation: modalIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .airdrop-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .airdrop-modal-header h3 {
+    font-family: var(--display);
+    font-size: 20px;
+    color: #ec4899;
+  }
+
   @keyframes modalIn {
     from { opacity: 0; transform: scale(0.96); }
     to { opacity: 1; transform: scale(1); }
@@ -536,10 +579,12 @@
 <body>
 <div class="noise-layer"></div>
 
-<!-- Top Left Fixed Buttons (Visible everywhere on page) -->
+<!-- Pro Fixed Top-Left Back Button (Visible everywhere) -->
 <div class="top-left-buttons">
-    <button class="btn-top" onclick="history.back()">← Back</button>
-    <a href="#airdrop-section" class="btn-top">Airdrop</a>
+    <button class="btn-top" onclick="history.back()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back
+    </button>
 </div>
 
 <nav>
@@ -548,7 +593,7 @@
     <a href="#about">About</a>
     <a href="#transparency">Transparency</a>
     <a href="#roadmap">Roadmap</a>
-    <a href="#airdrop-section" style="color: var(--teal-glow); font-weight: 600;">Airdrop</a>
+    <a href="#" onclick="openAirdropModal(); return false;" style="color: #ec4899; font-weight: 600;">Airdrop</a>
     <a href="#faq">FAQ</a>
     <a href="#community">Community</a>
     <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
@@ -562,7 +607,7 @@
   <a href="#about" onclick="toggleMobileMenu()">About</a>
   <a href="#transparency" onclick="toggleMobileMenu()">Transparency</a>
   <a href="#roadmap" onclick="toggleMobileMenu()">Roadmap</a>
-  <a href="#airdrop-section" onclick="toggleMobileMenu()" style="color: var(--teal-glow); font-weight: 600;">Airdrop</a>
+  <a href="#" onclick="toggleMobileMenu(); openAirdropModal();" style="color: #ec4899; font-weight: 600;">Airdrop</a>
   <a href="#faq" onclick="toggleMobileMenu()">FAQ</a>
   <a href="#community" onclick="toggleMobileMenu()">Community</a>
   <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
@@ -575,6 +620,9 @@
   <p class="hero-sub">$LORCA is a community-first token on pump.fun, paired with LethalOrca Fishing — a play-and-earn arcade game launching next quarter. Every detail below is verifiable. Do your own research before investing.</p>
   
   <div class="hero-cta">
+    <button class="btn btn-airdrop" onclick="openAirdropModal()">
+      <span>💎 CLAIM AIRDROP</span>
+    </button>
     <a class="btn btn-play" href="game.html"><span class="play-icon">▶</span> Daily Play & Earn</a>
     <button class="btn btn-generator" onclick="openGenerator()">
       <span class="gen-icon">⚡</span> LORCA GENERATOR
@@ -582,7 +630,6 @@
     <a class="btn btn-staking" href="stake.html">
       <span class="stake-icon">⚓</span> STAKING POOL
     </a>
-    <a class="btn btn-ghost" href="#transparency">View Token Details</a>
     <a class="btn btn-ghost" href="https://t.me/Lethal_Orca" target="_blank" rel="noopener">Join Telegram ↗</a>
   </div>
 
@@ -601,26 +648,6 @@
       <path d="M 58 -6 L 78 -20 L 72 2 L 82 18 L 58 6 Z" fill="#0d1f2b" stroke="#2dd4bf" stroke-width="1"/>
     </g>
   </svg>
-</section>
-
-<hr class="divider">
-
-<!-- Airdrop Section (Moved right below Hero section) -->
-<section id="airdrop-section">
-  <div class="depth-marker"><span class="depth-val">–5500m</span><span class="depth-name">Airdrop</span></div>
-  <h2 class="section-title">Lethal Orca Airdrop</h2>
-  <p class="section-lede">Drop your Solana wallet address below to participate in the official $LORCA airdrop event!</p>
-  
-  <div class="container" style="background: var(--deep); border: 1px solid var(--line); padding: 30px; border-radius: 16px; max-width: 500px; margin: 0 auto; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
-    <div class="ca-box" style="background: var(--abyss); padding: 12px; border-radius: 8px; font-size: 12px; color: var(--teal-glow); word-break: break-all; margin-bottom: 20px; border: 1px dashed var(--line);">
-      <strong>CA:</strong> 7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump
-    </div>
-
-    <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--abyss); color: #fff; font-size: 16px; margin-bottom: 15px; outline: none;" />
-    <button id="submitBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 16px;">Submit Address</button>
-    
-    <p id="statusMsg" style="margin-top: 15px; font-size: 14px;"></p>
-  </div>
 </section>
 
 <hr class="divider">
@@ -836,6 +863,7 @@
   </div>
 </footer>
 
+<!-- Generator Modal Popup -->
 <div id="generatorModal" class="generator-modal">
   <div class="generator-modal-content">
     <div class="generator-header">
@@ -843,6 +871,26 @@
       <button onclick="closeGenerator()" class="close-btn">✕</button>
     </div>
     <iframe id="generatorFrame" src="generator.html" class="generator-iframe" allow="autoplay"></iframe>
+  </div>
+</div>
+
+<!-- Airdrop Modal Popup -->
+<div id="airdropModal" class="generator-modal">
+  <div class="airdrop-modal-content">
+    <div class="airdrop-modal-header">
+      <h3>💎 Lethal Orca Airdrop</h3>
+      <button onclick="closeAirdropModal()" class="close-btn">✕</button>
+    </div>
+    <p style="color: var(--muted); font-size: 14.5px; margin-bottom: 20px;">Drop your Solana wallet address below to participate in the official $LORCA airdrop event!</p>
+    
+    <div class="ca-box" style="background: var(--abyss); padding: 12px; border-radius: 8px; font-size: 11.5px; color: var(--teal-glow); word-break: break-all; margin-bottom: 20px; border: 1px dashed var(--line);">
+      <strong>CA:</strong> 7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump
+    </div>
+
+    <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--abyss); color: #fff; font-size: 15px; margin-bottom: 15px; outline: none; font-family: var(--mono);" />
+    <button id="submitBtn" class="btn btn-airdrop" style="width: 100%; justify-content: center; padding: 16px; border-radius: 10px;">Submit Address</button>
+    
+    <p id="statusMsg" style="margin-top: 15px; font-size: 14px; text-align: center;"></p>
   </div>
 </div>
 
@@ -866,10 +914,24 @@ function closeGenerator() {
   iframe.src = iframe.src;
 }
 
+function openAirdropModal() {
+  document.getElementById('airdropModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAirdropModal() {
+  document.getElementById('airdropModal').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
 window.onclick = function(event) {
-  var modal = document.getElementById('generatorModal');
-  if (event.target == modal) {
+  var genModal = document.getElementById('generatorModal');
+  var airModal = document.getElementById('airdropModal');
+  if (event.target == genModal) {
     closeGenerator();
+  }
+  if (event.target == airModal) {
+    closeAirdropModal();
   }
 }
 
