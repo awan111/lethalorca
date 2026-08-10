@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lethal Orca | Official Airdrop & Community</title>
     <!-- Supabase JS Client CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -12,10 +12,6 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-        html {
-            scroll-behavior: smooth;
         }
         body {
             background-color: #0b0f19;
@@ -26,10 +22,6 @@
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            text-rendering: optimizeLegibility;
-            -webkit-text-size-adjust: 100%; /* Prevents iOS text auto-scaling bug */
         }
         .container {
             background: #131c2e;
@@ -68,10 +60,9 @@
             border: 1px solid #334155;
             background: #0b0f19;
             color: #fff;
-            font-size: 16px; /* 16px prevents iOS Safari from auto-zooming on focus */
+            font-size: 14px;
             margin-bottom: 15px;
             outline: none;
-            -webkit-appearance: none;
         }
         input[type="text"]:focus {
             border-color: #00d2ff;
@@ -87,7 +78,6 @@
             cursor: pointer;
             font-size: 16px;
             transition: opacity 0.2s;
-            -webkit-appearance: none;
         }
         button:hover {
             opacity: 0.9;
@@ -117,16 +107,6 @@
         }
         .socials a:hover {
             color: #00d2ff;
-        }
-
-        /* Mobile Responsive Adjustments */
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
-            h1 {
-                font-size: 22px;
-            }
         }
     </style>
 </head>
