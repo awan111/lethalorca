@@ -1,6 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airdrop & Back Buttons</title>
+    <style>
+        /* Top-Left Buttons Container */
+        .top-left-buttons {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        /* General Button Styling */
+        .btn {
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Back Button Style */
+        .back-btn {
+            background-color: #ffffff;
+            color: #333333;
+            border: 1px solid #d1d5db;
+        }
+
+        .back-btn:hover {
+            background-color: #f3f4f6;
+        }
+
+        /* Airdrop Button Style */
+        .airdrop-btn {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+
+        .airdrop-btn:hover {
+            background-color: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Left Buttons -->
+    <div class="top-left-buttons">
+        <button class="btn back-btn" onclick="history.back()">← Back</button>
+        <button class="btn airdrop-btn">Airdrop</button>
+    </div>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>LethalOrca — $LORCA</title>
