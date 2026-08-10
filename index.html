@@ -1,66 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Airdrop & Back Buttons</title>
-    <style>
-        /* Top-Left Buttons Container */
-        .top-left-buttons {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
-        }
-
-        /* General Button Styling */
-        .btn {
-            padding: 10px 18px;
-            font-size: 14px;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Back Button Style */
-        .back-btn {
-            background-color: #ffffff;
-            color: #333333;
-            border: 1px solid #d1d5db;
-        }
-
-        .back-btn:hover {
-            background-color: #f3f4f6;
-        }
-
-        /* Airdrop Button Style */
-        .airdrop-btn {
-            background-color: #2563eb;
-            color: #ffffff;
-        }
-
-        .airdrop-btn:hover {
-            background-color: #1d4ed8;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Top Left Buttons -->
-    <div class="top-left-buttons">
-        <button class="btn back-btn" onclick="history.back()">← Back</button>
-        <button class="btn airdrop-btn">Airdrop</button>
-    </div>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>LethalOrca — $LORCA</title>
@@ -95,6 +35,39 @@
     -webkit-text-size-adjust: 100%;
   }
   a { color: var(--teal-glow); text-decoration: none; }
+
+  /* Fixed Top-Left Buttons Styling */
+  .top-left-buttons {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+  }
+  .top-left-buttons .btn-top {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    background: rgba(5, 18, 30, 0.85);
+    border: 1px solid var(--line);
+    color: var(--teal-glow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    cursor: pointer;
+    font-family: var(--body);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .top-left-buttons .btn-top:hover {
+    background: rgba(94, 234, 212, 0.15);
+    border-color: var(--teal-glow);
+    transform: translateY(-2px);
+  }
 
   .noise-layer {
     position: fixed;
@@ -563,6 +536,12 @@
 <body>
 <div class="noise-layer"></div>
 
+<!-- Top Left Fixed Buttons (Back & Airdrop matching page theme) -->
+<div class="top-left-buttons">
+    <button class="btn-top" onclick="history.back()">← Back</button>
+    <a href="#airdrop-section" class="btn-top">Airdrop</a>
+</div>
+
 <nav>
   <div class="brand"><span class="dot"></span>LETHALORCA</div>
   <div class="links">
@@ -701,12 +680,12 @@
   <h2 class="section-title">Lethal Orca Airdrop</h2>
   <p class="section-lede">Drop your Solana wallet address below to participate in the official $LORCA airdrop event!</p>
   
-  <div class="container" style="background: #131c2e; border: 1px solid var(--line); padding: 30px; border-radius: 16px; max-width: 500px; margin: 0 auto; text-align: center;">
-    <div class="ca-box" style="background: #0b0f19; padding: 12px; border-radius: 8px; font-size: 12px; color: var(--teal-glow); word-break: break-all; margin-bottom: 20px; border: 1px dashed var(--line);">
+  <div class="container" style="background: var(--deep); border: 1px solid var(--line); padding: 30px; border-radius: 16px; max-width: 500px; margin: 0 auto; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+    <div class="ca-box" style="background: var(--abyss); padding: 12px; border-radius: 8px; font-size: 12px; color: var(--teal-glow); word-break: break-all; margin-bottom: 20px; border: 1px dashed var(--line);">
       <strong>CA:</strong> 7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump
     </div>
 
-    <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--line); background: #0b0f19; color: #fff; font-size: 16px; margin-bottom: 15px; outline: none;" />
+    <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--abyss); color: #fff; font-size: 16px; margin-bottom: 15px; outline: none;" />
     <button id="submitBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 16px;">Submit Address</button>
     
     <p id="statusMsg" style="margin-top: 15px; font-size: 14px;"></p>
