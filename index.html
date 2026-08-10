@@ -36,14 +36,14 @@
   }
   a { color: var(--teal-glow); text-decoration: none; }
 
-  /* Fixed Top-Left Buttons Styling */
+  /* Fixed Top-Left Buttons Styling (Below Navbar to prevent overlap) */
   .top-left-buttons {
     position: fixed;
-    top: 20px;
+    top: 80px;
     left: 20px;
     display: flex;
     gap: 10px;
-    z-index: 1000;
+    z-index: 99;
   }
   .top-left-buttons .btn-top {
     padding: 8px 16px;
@@ -536,7 +536,7 @@
 <body>
 <div class="noise-layer"></div>
 
-<!-- Top Left Fixed Buttons (Back & Airdrop matching page theme) -->
+<!-- Top Left Fixed Buttons (Visible everywhere on page) -->
 <div class="top-left-buttons">
     <button class="btn-top" onclick="history.back()">← Back</button>
     <a href="#airdrop-section" class="btn-top">Airdrop</a>
@@ -566,7 +566,7 @@
   <a href="#faq" onclick="toggleMobileMenu()">FAQ</a>
   <a href="#community" onclick="toggleMobileMenu()">Community</a>
   <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
-  <a href="#referral" onclick="toggleMobileMenu()" style="color: var(--teal-glow); font-weight: 600;">Refer & Earn</a>
+  <a href="#referral" style="color: var(--teal-glow); font-weight: 600;">Refer & Earn</a>
 </div>
 
 <section id="hero">
@@ -601,6 +601,26 @@
       <path d="M 58 -6 L 78 -20 L 72 2 L 82 18 L 58 6 Z" fill="#0d1f2b" stroke="#2dd4bf" stroke-width="1"/>
     </g>
   </svg>
+</section>
+
+<hr class="divider">
+
+<!-- Airdrop Section (Moved right below Hero section) -->
+<section id="airdrop-section">
+  <div class="depth-marker"><span class="depth-val">–5500m</span><span class="depth-name">Airdrop</span></div>
+  <h2 class="section-title">Lethal Orca Airdrop</h2>
+  <p class="section-lede">Drop your Solana wallet address below to participate in the official $LORCA airdrop event!</p>
+  
+  <div class="container" style="background: var(--deep); border: 1px solid var(--line); padding: 30px; border-radius: 16px; max-width: 500px; margin: 0 auto; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+    <div class="ca-box" style="background: var(--abyss); padding: 12px; border-radius: 8px; font-size: 12px; color: var(--teal-glow); word-break: break-all; margin-bottom: 20px; border: 1px dashed var(--line);">
+      <strong>CA:</strong> 7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump
+    </div>
+
+    <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--abyss); color: #fff; font-size: 16px; margin-bottom: 15px; outline: none;" />
+    <button id="submitBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 16px;">Submit Address</button>
+    
+    <p id="statusMsg" style="margin-top: 15px; font-size: 14px;"></p>
+  </div>
 </section>
 
 <hr class="divider">
@@ -669,26 +689,6 @@
       <div class="tl-title">In-Game Token Utility</div>
       <div class="tl-desc">$LORCA becomes usable inside the game economy — earning, spending, and a player-facing marketplace.</div>
     </div>
-  </div>
-</section>
-
-<hr class="divider">
-
-<!-- Airdrop Section -->
-<section id="airdrop-section">
-  <div class="depth-marker"><span class="depth-val">–5500m</span><span class="depth-name">Airdrop</span></div>
-  <h2 class="section-title">Lethal Orca Airdrop</h2>
-  <p class="section-lede">Drop your Solana wallet address below to participate in the official $LORCA airdrop event!</p>
-  
-  <div class="container" style="background: var(--deep); border: 1px solid var(--line); padding: 30px; border-radius: 16px; max-width: 500px; margin: 0 auto; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
-    <div class="ca-box" style="background: var(--abyss); padding: 12px; border-radius: 8px; font-size: 12px; color: var(--teal-glow); word-break: break-all; margin-bottom: 20px; border: 1px dashed var(--line);">
-      <strong>CA:</strong> 7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump
-    </div>
-
-    <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--abyss); color: #fff; font-size: 16px; margin-bottom: 15px; outline: none;" />
-    <button id="submitBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 16px;">Submit Address</button>
-    
-    <p id="statusMsg" style="margin-top: 15px; font-size: 14px;"></p>
   </div>
 </section>
 
