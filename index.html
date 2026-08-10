@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>LethalOrca — $LORCA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
     --body: 'Inter', sans-serif;
     --mono: 'IBM Plex Mono', monospace;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html { scroll-behavior: smooth; }
   body {
     background: var(--abyss);
@@ -32,6 +32,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    -webkit-text-size-adjust: 100%; /* Prevents iOS text auto-scaling */
   }
   a { color: var(--teal-glow); text-decoration: none; }
 
@@ -53,6 +54,7 @@
     padding: 16px 5%;
     z-index: 100;
     backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     background: rgba(2,9,16,0.85);
     border-bottom: 1px solid var(--line);
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -67,7 +69,7 @@
     gap: 10px;
   }
   .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-glow); box-shadow: 0 0 16px var(--teal-glow); }
-  nav .links { display: flex; gap: 24px; font-size: 14px; color: var(--muted); align-items: center; }
+  nav .links { display: flex; gap: 20px; font-size: 14px; color: var(--muted); align-items: center; }
   nav .links a:hover { color: var(--teal-glow); text-shadow: 0 0 10px rgba(94,234,212,0.5); }
 
   section { position: relative; z-index: 1; padding: 120px 5% 80px; max-width: 1240px; margin: 0 auto; }
@@ -82,7 +84,7 @@
   }
   .depth-tag {
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 13px;
     color: var(--teal);
     letter-spacing: 2px;
     margin-bottom: 20px;
@@ -91,9 +93,9 @@
   }
   h1.hero-title {
     font-family: var(--display);
-    font-size: clamp(40px, 7vw, 100px);
+    font-size: clamp(42px, 7vw, 100px);
     font-weight: 700;
-    line-height: 1.02;
+    line-height: 1.05;
     letter-spacing: -1.5px;
     background: linear-gradient(180deg, #ffffff 0%, var(--teal-glow) 120%);
     -webkit-background-clip: text;
@@ -117,8 +119,8 @@
   .btn {
     font-family: var(--body);
     font-weight: 600;
-    font-size: 14px;
-    padding: 14px 24px;
+    font-size: 15px;
+    padding: 15px 26px;
     border-radius: 100px;
     border: 1px solid var(--line);
     cursor: pointer;
@@ -207,21 +209,21 @@
     gap: 16px;
     margin-bottom: 12px;
   }
-  .depth-marker .depth-val { font-family: var(--mono); font-size: 13px; color: var(--teal); letter-spacing: 1px; }
-  .depth-marker .depth-name { font-family: var(--mono); font-size: 13px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; }
+  .depth-marker .depth-val { font-family: var(--mono); font-size: 14px; color: var(--teal); letter-spacing: 1px; }
+  .depth-marker .depth-name { font-family: var(--mono); font-size: 14px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; }
   h2.section-title {
     font-family: var(--display);
-    font-size: clamp(28px, 4vw, 48px);
+    font-size: clamp(32px, 4vw, 48px);
     font-weight: 600;
     margin-bottom: 16px;
     letter-spacing: -1px;
   }
-  .section-lede { color: var(--muted); max-width: 620px; font-size: 15.5px; margin-bottom: 40px; }
+  .section-lede { color: var(--muted); max-width: 620px; font-size: 16px; margin-bottom: 40px; }
 
   hr.divider { border: none; border-top: 1px solid var(--line); margin: 0 5%; }
 
   .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
-  .about-grid p { color: var(--muted); margin-bottom: 16px; font-size: 15px; }
+  .about-grid p { color: var(--muted); margin-bottom: 16px; font-size: 15.5px; }
   .founder-card {
     border: 1px solid var(--line);
     border-radius: 18px;
@@ -229,9 +231,9 @@
     background: linear-gradient(180deg, var(--deep2), var(--deep));
     box-shadow: 0 20px 40px rgba(0,0,0,0.4);
   }
-  .founder-card .label { font-family: var(--mono); font-size: 11px; color: var(--teal); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
-  .founder-card h3 { font-family: var(--display); font-size: 20px; margin-bottom: 12px; }
-  .founder-card p { font-size: 14px; color: var(--muted); }
+  .founder-card .label { font-family: var(--mono); font-size: 12px; color: var(--teal); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  .founder-card h3 { font-family: var(--display); font-size: 22px; margin-bottom: 12px; }
+  .founder-card p { font-size: 15px; color: var(--muted); }
 
   .ledger {
     border: 1px solid var(--line);
@@ -250,12 +252,12 @@
     gap: 10px;
   }
   .ledger-row:last-child { border-bottom: none; }
-  .ledger-key { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-family: var(--mono); }
-  .ledger-val { font-family: var(--mono); font-size: 14px; color: var(--ink); word-break: break-all; }
+  .ledger-key { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-family: var(--mono); }
+  .ledger-val { font-family: var(--mono); font-size: 14.5px; color: var(--ink); word-break: break-all; }
   .ledger-val.editable { color: var(--gold); }
   .verify-note {
     margin-top: 18px;
-    font-size: 13px;
+    font-size: 14px;
     color: var(--muted);
     display: flex;
     gap: 10px;
@@ -281,9 +283,9 @@
     border: 2px solid var(--teal-glow);
   }
   .tl-item.active::before { background: var(--teal-glow); box-shadow: 0 0 14px var(--teal-glow); }
-  .tl-phase { font-family: var(--mono); font-size: 11px; color: var(--teal); letter-spacing: 1px; margin-bottom: 4px; }
-  .tl-title { font-family: var(--display); font-size: 19px; margin-bottom: 6px; }
-  .tl-desc { color: var(--muted); font-size: 14.5px; max-width: 540px; }
+  .tl-phase { font-family: var(--mono); font-size: 12px; color: var(--teal); letter-spacing: 1px; margin-bottom: 4px; }
+  .tl-title { font-family: var(--display); font-size: 20px; margin-bottom: 6px; }
+  .tl-desc { color: var(--muted); font-size: 15px; max-width: 540px; }
 
   .community-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
   .comm-card {
@@ -294,8 +296,8 @@
     transition: all 0.3s ease;
   }
   .comm-card:hover { border-color: var(--teal-glow); transform: translateY(-3px); }
-  .comm-card .plat { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
-  .comm-card .handle { font-family: var(--display); font-size: 17px; }
+  .comm-card .plat { font-family: var(--mono); font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+  .comm-card .handle { font-family: var(--display); font-size: 18px; }
 
   footer {
     padding: 50px 5% 40px;
@@ -304,7 +306,7 @@
     z-index: 1;
   }
   .disclaimer {
-    font-size: 12.5px;
+    font-size: 13.5px;
     color: var(--muted);
     max-width: 800px;
     line-height: 1.7;
@@ -314,13 +316,13 @@
     background: rgba(255,255,255,0.02);
   }
   .disclaimer strong { color: var(--ink); }
-  .foot-bottom { margin-top: 20px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .foot-bottom { margin-top: 20px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 
   .updates-list { display: flex; flex-direction: column; gap: 0; margin-top: 28px; border-top: 1px solid var(--line); }
   .update-item { display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
-  .update-date { font-family: var(--mono); font-size: 12px; color: var(--teal); white-space: nowrap; min-width: 80px; }
-  .update-text { font-size: 14.5px; color: var(--ink); }
-  .update-text .tag { font-family: var(--mono); font-size: 10px; color: var(--gold); border: 1px solid rgba(242,201,76,0.35); padding: 2px 8px; border-radius: 20px; margin-right: 6px; text-transform: uppercase; }
+  .update-date { font-family: var(--mono); font-size: 13px; color: var(--teal); white-space: nowrap; min-width: 80px; }
+  .update-text { font-size: 15px; color: var(--ink); }
+  .update-text .tag { font-family: var(--mono); font-size: 11px; color: var(--gold); border: 1px solid rgba(242,201,76,0.35); padding: 2px 8px; border-radius: 20px; margin-right: 6px; text-transform: uppercase; }
 
   .screenshot-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 28px; }
   .screenshot-img {
@@ -333,20 +335,20 @@
   .faq-item { border-bottom: 1px solid var(--line); }
   .faq-item summary {
     padding: 20px 4px; cursor: pointer; list-style: none;
-    font-family: var(--display); font-size: 17px; color: var(--ink);
+    font-family: var(--display); font-size: 18px; color: var(--ink);
     display: flex; justify-content: space-between; align-items: center;
   }
   .faq-item summary::-webkit-details-marker { display: none; }
-  .faq-item summary::after { content: '+'; font-size: 20px; color: var(--teal-glow); margin-left: 12px; }
+  .faq-item summary::after { content: '+'; font-size: 22px; color: var(--teal-glow); margin-left: 12px; }
   .faq-item[open] summary::after { transform: rotate(45deg); }
-  .faq-item .faq-answer { padding: 0 4px 20px; color: var(--muted); font-size: 14.5px; }
+  .faq-item .faq-answer { padding: 0 4px 20px; color: var(--muted); font-size: 15px; }
 
   .newsletter-box {
     margin-top: 28px; border: 1px solid var(--line); border-radius: 16px;
     padding: 24px; background: var(--deep); display: flex; align-items: center;
     justify-content: space-between; gap: 16px; flex-wrap: wrap;
   }
-  .newsletter-box p { margin: 0; max-width: 440px; font-size: 14.5px; color: var(--muted); }
+  .newsletter-box p { margin: 0; max-width: 440px; font-size: 15px; color: var(--muted); }
 
   .generator-modal {
     display: none;
@@ -380,7 +382,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 20px;
+    padding: 16px 20px;
     background: rgba(5, 18, 30, 0.98);
     border-bottom: 1px solid rgba(94, 234, 212, 0.2);
     flex-shrink: 0;
@@ -388,7 +390,7 @@
 
   .generator-header h3 {
     font-family: var(--display);
-    font-size: 16px;
+    font-size: 17px;
     color: #00f2fe;
     letter-spacing: 0.5px;
   }
@@ -397,7 +399,7 @@
     background: transparent;
     border: none;
     color: var(--muted);
-    font-size: 22px;
+    font-size: 24px;
     cursor: pointer;
     line-height: 1;
     padding: 4px;
@@ -411,6 +413,7 @@
     flex-grow: 1;
     border: none;
     display: block;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS iFrames */
   }
 
   @keyframes modalIn {
@@ -427,33 +430,38 @@
     margin-top: 28px;
   }
   .referral-box .ref-connect-row { margin-bottom: 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .referral-box .ref-status { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+  .referral-box .ref-status { font-family: var(--mono); font-size: 13.5px; color: var(--muted); }
   .referral-box .ref-code-row {
     display: flex; gap: 10px; margin: 14px 0; flex-wrap: wrap;
   }
   .referral-box input {
-    flex: 1; min-width: 180px; padding: 12px 14px;
+    flex: 1; min-width: 180px; padding: 14px 16px;
     border-radius: 10px; border: 1px solid var(--line);
     background: rgba(255,255,255,0.03); color: var(--ink);
-    font-family: var(--mono); font-size: 13.5px;
+    font-family: var(--mono); font-size: 16px; /* 16px prevents iOS zoom-in on focus */
   }
   .referral-box .ref-stats {
     display: flex; gap: 24px; margin-top: 14px; flex-wrap: wrap;
-    font-family: var(--mono); font-size: 12.5px; color: var(--muted);
+    font-family: var(--mono); font-size: 13.5px; color: var(--muted);
   }
   .referral-box .ref-stats strong { color: var(--gold); }
-  #refMessage { font-family: var(--mono); font-size: 12.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
+  #refMessage { font-family: var(--mono); font-size: 13.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
 
+  /* Mobile & iOS Safari Optimizations */
   @media (max-width: 768px) {
     nav .links { display: none; }
-    #hero { align-items: center; text-align: center; }
-    .hero-sub { margin-left: auto; margin-right: auto; }
-    .hero-cta { flex-direction: column; width: 100%; gap: 10px; }
-    .hero-cta .btn { width: 100%; }
+    nav { padding: 14px 5%; }
+    .brand { font-size: 17px; }
+    #hero { align-items: center; text-align: center; padding-top: 110px; }
+    .hero-sub { margin-left: auto; margin-right: auto; font-size: 16px; }
+    h1.hero-title { font-size: clamp(38px, 10vw, 58px); }
+    .hero-cta { flex-direction: column; width: 100%; gap: 12px; }
+    .hero-cta .btn { width: 100%; padding: 16px 24px; font-size: 16px; }
     .about-grid { grid-template-columns: 1fr; gap: 24px; }
     #orca-trail { display: none; }
-    section { padding: 90px 5% 50px; }
-    .generator-modal-content { height: 94vh; max-height: none; }
+    section { padding: 80px 5% 50px; }
+    .generator-modal-content { height: 95vh; max-height: none; }
+    body { font-size: 16px; }
   }
 </style>
 </head>
@@ -559,7 +567,7 @@
     <div class="tl-item active">
       <div class="tl-phase">PHASE 01 — NEXT QUARTER</div>
       <div class="tl-title">Game Launch</div>
-      <div class="tl-desc">LethalOrca Fishing releases publicly on Android, with in-game point tracking and a growing player base.</div>
+      <div class="tl-desc">LethalOrca Fishing releases publicly on mobile, with in-game point tracking and a growing player base.</div>
     </div>
     <div class="tl-item">
       <div class="tl-phase">PHASE 02</div>
@@ -631,7 +639,7 @@
     </details>
     <details class="faq-item">
       <summary>When does the full game launch?</summary>
-      <div class="faq-answer">Targeted for next quarter, on Android first. Follow the Build Log above or the X account for exact dates as they're confirmed.</div>
+      <div class="faq-answer">Targeted for next quarter, on mobile first. Follow the Build Log above or the X account for exact dates as they're confirmed.</div>
     </details>
     <details class="faq-item">
       <summary>Can I withdraw tokens right now?</summary>
@@ -693,7 +701,7 @@
       <div class="plat">X / Twitter</div>
       <div class="handle">@lethalorcatdo ↗</div>
     </a>
-    <a class="comm-card" href="https://t.co/OphC6f1Fxe" target="_blank" rel="noopener">
+    <a class="comm-card" href="https://lethalorca.com/#transparency1" target="_blank" rel="noopener">
       <div class="plat">Discord</div>
       <div class="handle">Join the Crew ↗</div>
     </a>
