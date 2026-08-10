@@ -55,7 +55,7 @@
     z-index: 100;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    background: rgba(2,9,16,0.85);
+    background: rgba(2,9,16,0.9);
     border-bottom: 1px solid var(--line);
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
@@ -71,6 +71,40 @@
   .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-glow); box-shadow: 0 0 16px var(--teal-glow); }
   nav .links { display: flex; gap: 20px; font-size: 14px; color: var(--muted); align-items: center; }
   nav .links a:hover { color: var(--teal-glow); text-shadow: 0 0 10px rgba(94,234,212,0.5); }
+
+  /* Mobile Hamburger Menu */
+  .menu-toggle {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--teal-glow);
+    font-size: 22px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 65px; left: 0; right: 0;
+    background: rgba(5, 18, 30, 0.98);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--line);
+    padding: 20px 5%;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 99;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.7);
+  }
+  .mobile-menu.active { display: flex; }
+  .mobile-menu a {
+    font-size: 16px;
+    color: var(--ink);
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .mobile-menu a:hover { color: var(--teal-glow); }
 
   section { position: relative; z-index: 1; padding: 120px 5% 80px; max-width: 1240px; margin: 0 auto; }
 
@@ -447,15 +481,17 @@
   .referral-box .ref-stats strong { color: var(--gold); }
   #refMessage { font-family: var(--mono); font-size: 13.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
 
+  /* Mobile Responsive Media Query */
   @media (max-width: 768px) {
     nav .links { display: none; }
+    .menu-toggle { display: block; }
     nav { padding: 14px 5%; }
     .brand { font-size: 17px; }
     #hero { align-items: center; text-align: center; padding-top: 110px; }
     .hero-sub { margin-left: auto; margin-right: auto; font-size: 16px; }
-    h1.hero-title { font-size: clamp(38px, 10vw, 58px); }
-    .hero-cta { flex-direction: column; width: 100%; gap: 12px; }
-    .hero-cta .btn { width: 100%; padding: 16px 24px; font-size: 16px; }
+    h1.hero-title { font-size: clamp(38px, 10vw, 56px); }
+    .hero-cta { flex-direction: column; width: 100%; gap: 14px; }
+    .hero-cta .btn { width: 100%; padding: 18px 24px; font-size: 17px; font-weight: 700; border-radius: 14px; }
     .about-grid { grid-template-columns: 1fr; gap: 24px; }
     #orca-trail { display: none; }
     section { padding: 80px 5% 50px; }
@@ -476,13 +512,23 @@
     <a href="#airdrop-section" style="color: var(--teal-glow); font-weight: 600;">Airdrop</a>
     <a href="#faq">FAQ</a>
     <a href="#community">Community</a>
-    <a href="spin.html" style="display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, #2DD4C4, #0E8C82); color:#03211d; font-weight:700; font-family:'Baloo 2','Segoe UI',sans-serif; padding:10px 22px; border-radius:999px; text-decoration:none; font-size:0.9rem; box-shadow:0 4px 14px rgba(45,212,196,0.35);">
-      🎡 Spin & Win
-    </a>
     <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
     <a href="#referral" style="color: var(--teal-glow); font-weight: 600;">Refer & Earn</a>
   </div>
+  <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
 </nav>
+
+<!-- Mobile Navigation Dropdown Menu -->
+<div id="mobileMenu" class="mobile-menu">
+  <a href="#about" onclick="toggleMobileMenu()">About</a>
+  <a href="#transparency" onclick="toggleMobileMenu()">Transparency</a>
+  <a href="#roadmap" onclick="toggleMobileMenu()">Roadmap</a>
+  <a href="#airdrop-section" onclick="toggleMobileMenu()" style="color: var(--teal-glow); font-weight: 600;">Airdrop</a>
+  <a href="#faq" onclick="toggleMobileMenu()">FAQ</a>
+  <a href="#community" onclick="toggleMobileMenu()">Community</a>
+  <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
+  <a href="#referral" onclick="toggleMobileMenu()" style="color: var(--teal-glow); font-weight: 600;">Refer & Earn</a>
+</div>
 
 <section id="hero">
   <div class="depth-tag">0m — Surface</div>
@@ -490,7 +536,7 @@
   <p class="hero-sub">$LORCA is a community-first token on pump.fun, paired with LethalOrca Fishing — a play-and-earn arcade game launching next quarter. Every detail below is verifiable. Do your own research before investing.</p>
   
   <div class="hero-cta">
-    <a class="btn btn-play" href="game.html"><span class="play-icon">▶</span> Play & Earn</a>
+    <a class="btn btn-play" href="game.html"><span class="play-icon">▶</span> Daily Play & Earn</a>
     <button class="btn btn-generator" onclick="openGenerator()">
       <span class="gen-icon">⚡</span> LORCA GENERATOR
     </button>
@@ -600,8 +646,8 @@
       <strong>CA:</strong> 7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump
     </div>
 
-    <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--line); background: #0b0f19; color: #fff; font-size: 16px; margin-bottom: 15px; outline: none;" />
-    <button id="submitBtn" class="btn btn-primary" style="width: 100%; justify-content: center;">Submit Address</button>
+    <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--line); background: #0b0f19; color: #fff; font-size: 16px; margin-bottom: 15px; outline: none;" />
+    <button id="submitBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 16px;">Submit Address</button>
     
     <p id="statusMsg" style="margin-top: 15px; font-size: 14px;"></p>
   </div>
@@ -764,6 +810,11 @@
 <!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  menu.classList.toggle('active');
+}
+
 function openGenerator() {
   document.getElementById('generatorModal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
