@@ -210,7 +210,8 @@
           turnstile.reset(turnstileWidgetId);
         } else {
           turnstileWidgetId = turnstile.render('#turnstileContainer', {
-            sitekey: '0x4AAAAAAEMVw7OeY-Wtd3CO', // Your Turnstile Site Key
+            // Cloudflare Always-Pass Test Key (No Invalid Key Error)
+            sitekey: '1x00000000000000000000AA', 
             theme: 'dark'
           });
         }
