@@ -316,7 +316,7 @@
     setStatus("Connected (0 LORCA found or RPC timeout).");
   }
 
- async function stakeTokens() {
+async function stakeTokens() {
     const amount = parseFloat(els.amountInput.value);
     if (!amount || amount <= 0) {
       setStatus("Please enter a valid amount.");
@@ -342,19 +342,31 @@
 
       setStatus("Please approve transaction in Phantom...");
 
-      // 2. Base64 Transaction ko Deserialize karein
-      const txBuffer = solanaWeb3.Buffer.from(buildData.transaction, 'base64');
-      const transaction = solanaWeb3.Transaction.from(txBuffer);
+      // 2. Safe Base64 Transaction Deserialization
+      const rawTx = buildData.transaction;
+      let transaction;
+      
+      if (window.solanaWeb3 && window.solanaWeb3.Transaction) {
+        // Uint8Array conversion without relying on Buffer
+        const binaryString = atob(rawTx);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        transaction = solanaWeb3.Transaction.from(bytes);
+      } else {
+        throw new Error("Solana Web3 library not loaded.");
+      }
 
-      // 3. Phantom Wallet Pop-up Trigger Karein
+      // 3. Trigger Phantom Wallet
       const { signature } = await window.solana.signAndSendTransaction(transaction);
       
       setStatus(`Transaction Submitted! Hash: ${signature.slice(0, 8)}...`);
-      await fetchWalletBalance(); // Balance auto refresh karein
+      await fetchWalletBalance();
 
     } catch (e) {
       console.error("Stake Error:", e);
-      if (e.message.includes("User rejected")) {
+      if (e.message && e.message.includes("User rejected")) {
         setStatus("Transaction rejected in wallet.");
       } else {
         setStatus(`Error: ${e.message}`);
