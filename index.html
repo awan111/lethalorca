@@ -279,41 +279,10 @@
   }
 
   async function fetchWalletBalance() {
-    // 1. Direct Phantom RPC Provider Method (Fastest & Never blocked)
-    try {
-      if (window.solana && window.solana.isPhantom && window.solana.request) {
-        const resp = await window.solana.request({
-          method: "getTokenAccountsByOwner",
-          params: [
-            publicKey,
-            { mint: MINT_ADDRESS },
-            { encoding: "jsonParsed" }
-          ]
-        });
-
-        if (resp && resp.value && resp.value.length > 0) {
-          userLorcaBalance = resp.value[0].account.data.parsed.info.tokenAmount.uiAmount || 0;
-        } else {
-          userLorcaBalance = 0;
-        }
-
-        els.balance.textContent = `${userLorcaBalance.toLocaleString()} LORCA`;
-        if (userLorcaBalance > 0) {
-          els.amountInput.value = userLorcaBalance;
-          els.estReturn.textContent = `${(userLorcaBalance * 1.2).toLocaleString()} LORCA`;
-          els.stake.textContent = `Stake ${userLorcaBalance.toLocaleString()} LORCA`;
-        }
-        setStatus("Wallet connected & balance updated.");
-        return;
-      }
-    } catch (phantomErr) {
-      console.warn("Phantom direct RPC failed, trying fallback...", phantomErr);
-    }
-
-    // 2. Backup RPC Endpoints
     const rpcList = [
       "https://solana-rpc.publicnode.com",
-      "https://rpc.ankr.com/solana"
+      "https://rpc.ankr.com/solana",
+      "https://api.mainnet-beta.solana.com"
     ];
 
     for (const rpcUrl of rpcList) {
@@ -339,12 +308,12 @@
         setStatus("Wallet connected & balance updated.");
         return;
       } catch (err) {
-        console.warn(`RPC ${rpcUrl} failed:`, err);
+        console.warn(`RPC ${rpcUrl} failed, trying next...`);
       }
     }
 
     els.balance.textContent = "0 LORCA";
-    setStatus("Connected (0 LORCA found or token account not initialized).");
+    setStatus("Connected (0 LORCA found or RPC timeout).");
   }
 
   async function stakeTokens() {
