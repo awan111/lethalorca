@@ -280,7 +280,7 @@
 
   async function fetchWalletBalance() {
     try {
-      const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
+      const connection = new solanaWeb3.Connection("https://rpc.ankr.com/solana", "confirmed");
       const pubKey = new solanaWeb3.PublicKey(publicKey);
       const mintKey = new solanaWeb3.PublicKey(MINT_ADDRESS);
 
