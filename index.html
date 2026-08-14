@@ -76,7 +76,7 @@
     color: transparent;
   }
 
-  /* --- STAKING WIDGET UPDATED --- */
+  /* --- STAKING WIDGET --- */
   #lorca-stake-widget {
     --teal-w: #00e5c7;
     --gold-w: #f5c542;
@@ -279,31 +279,72 @@
   }
 
   async function fetchWalletBalance() {
+    // 1. Direct Phantom RPC Provider Method (Fastest & Never blocked)
     try {
-      const connection = new solanaWeb3.Connection("https://rpc.ankr.com/solana", "confirmed");
-      const pubKey = new solanaWeb3.PublicKey(publicKey);
-      const mintKey = new solanaWeb3.PublicKey(MINT_ADDRESS);
+      if (window.solana && window.solana.isPhantom && window.solana.request) {
+        const resp = await window.solana.request({
+          method: "getTokenAccountsByOwner",
+          params: [
+            publicKey,
+            { mint: MINT_ADDRESS },
+            { encoding: "jsonParsed" }
+          ]
+        });
 
-      const response = await connection.getParsedTokenAccountsByOwner(pubKey, { mint: mintKey });
-      
-      if (response.value.length > 0) {
-        userLorcaBalance = response.value[0].account.data.parsed.info.tokenAmount.uiAmount || 0;
-      } else {
-        userLorcaBalance = 0;
-      }
+        if (resp && resp.value && resp.value.length > 0) {
+          userLorcaBalance = resp.value[0].account.data.parsed.info.tokenAmount.uiAmount || 0;
+        } else {
+          userLorcaBalance = 0;
+        }
 
-      els.balance.textContent = `${userLorcaBalance.toLocaleString()} LORCA`;
-      if (userLorcaBalance > 0) {
-        els.amountInput.value = userLorcaBalance;
-        els.estReturn.textContent = `${(userLorcaBalance * 1.2).toLocaleString()} LORCA`;
-        els.stake.textContent = `Stake ${userLorcaBalance.toLocaleString()} LORCA`;
+        els.balance.textContent = `${userLorcaBalance.toLocaleString()} LORCA`;
+        if (userLorcaBalance > 0) {
+          els.amountInput.value = userLorcaBalance;
+          els.estReturn.textContent = `${(userLorcaBalance * 1.2).toLocaleString()} LORCA`;
+          els.stake.textContent = `Stake ${userLorcaBalance.toLocaleString()} LORCA`;
+        }
+        setStatus("Wallet connected & balance updated.");
+        return;
       }
-      setStatus("Wallet connected & balance updated.");
-    } catch (err) {
-      console.warn("RPC fetch error:", err);
-      els.balance.textContent = "Balance fetch error";
-      setStatus("Connected. Enter amount to Stake or Withdraw.");
+    } catch (phantomErr) {
+      console.warn("Phantom direct RPC failed, trying fallback...", phantomErr);
     }
+
+    // 2. Backup RPC Endpoints
+    const rpcList = [
+      "https://solana-rpc.publicnode.com",
+      "https://rpc.ankr.com/solana"
+    ];
+
+    for (const rpcUrl of rpcList) {
+      try {
+        const connection = new solanaWeb3.Connection(rpcUrl, "confirmed");
+        const pubKey = new solanaWeb3.PublicKey(publicKey);
+        const mintKey = new solanaWeb3.PublicKey(MINT_ADDRESS);
+
+        const response = await connection.getParsedTokenAccountsByOwner(pubKey, { mint: mintKey });
+        
+        if (response.value && response.value.length > 0) {
+          userLorcaBalance = response.value[0].account.data.parsed.info.tokenAmount.uiAmount || 0;
+        } else {
+          userLorcaBalance = 0;
+        }
+
+        els.balance.textContent = `${userLorcaBalance.toLocaleString()} LORCA`;
+        if (userLorcaBalance > 0) {
+          els.amountInput.value = userLorcaBalance;
+          els.estReturn.textContent = `${(userLorcaBalance * 1.2).toLocaleString()} LORCA`;
+          els.stake.textContent = `Stake ${userLorcaBalance.toLocaleString()} LORCA`;
+        }
+        setStatus("Wallet connected & balance updated.");
+        return;
+      } catch (err) {
+        console.warn(`RPC ${rpcUrl} failed:`, err);
+      }
+    }
+
+    els.balance.textContent = "0 LORCA";
+    setStatus("Connected (0 LORCA found or token account not initialized).");
   }
 
   async function stakeTokens() {
