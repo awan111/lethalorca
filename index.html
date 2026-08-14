@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LethalOrca — $LORCA</title>
+<title>LethalOrca — $LORCA & Airdrop</title>
+
+<!-- Supabase JS Client CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -70,6 +74,22 @@
   nav .links { display: flex; gap: 24px; font-size: 14px; color: var(--muted); align-items: center; }
   nav .links a:hover { color: var(--teal-glow); text-shadow: 0 0 10px rgba(94,234,212,0.5); }
 
+  .nav-airdrop-link {
+    color: var(--teal-glow) !important;
+    font-weight: 700;
+    border: 1px solid var(--teal);
+    padding: 6px 16px;
+    border-radius: 100px;
+    background: rgba(45,212,191,0.1);
+    box-shadow: 0 0 12px rgba(45,212,191,0.2);
+    transition: all 0.3s ease;
+  }
+  .nav-airdrop-link:hover {
+    background: var(--teal);
+    color: var(--abyss) !important;
+    box-shadow: 0 0 20px rgba(45,212,191,0.6);
+  }
+
   section { position: relative; z-index: 1; padding: 120px 5% 80px; max-width: 1240px; margin: 0 auto; }
 
   #hero {
@@ -108,7 +128,7 @@
     margin-top: 20px;
   }
   
-  /* CTA Buttons — Sleek Mobile Friendly Grid */
+  /* CTA Buttons */
   .hero-cta { 
     display: flex; 
     gap: 14px; 
@@ -131,6 +151,20 @@
     position: relative;
     text-align: center;
   }
+
+  /* AIRDROP BUTTON STYLING */
+  .btn-airdrop {
+    background: linear-gradient(135deg, #00f2fe, #2dd4bf);
+    color: var(--abyss);
+    border: none;
+    font-weight: 700;
+    box-shadow: 0 4px 25px rgba(45, 212, 191, 0.5);
+  }
+  .btn-airdrop:hover {
+    box-shadow: 0 8px 35px rgba(45, 212, 191, 0.8);
+    transform: translateY(-2px) scale(1.02);
+  }
+
   .btn-primary {
     background: linear-gradient(135deg, var(--teal-glow), var(--teal));
     color: var(--abyss);
@@ -183,7 +217,6 @@
     box-shadow: 0 8px 35px rgba(0, 242, 254, 0.75);
   }
 
-  /* Staking Button Style */
   .btn-staking {
     background: linear-gradient(135deg, #10b981, #059669);
     color: #fff;
@@ -350,7 +383,7 @@
   }
   .newsletter-box p { margin: 0; max-width: 440px; font-size: 14.5px; color: var(--muted); }
 
-  /* --- SLEEK RESPONSIVE GENERATOR MODAL --- */
+  /* GENERATOR MODAL WINDOW */
   .generator-modal {
     display: none;
     position: fixed;
@@ -416,12 +449,120 @@
     display: block;
   }
 
+  /* --- AIRDROP POPUP MODAL STYLES --- */
+  .airdrop-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(2, 9, 16, 0.88);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .airdrop-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .airdrop-modal-box {
+    background: var(--deep2);
+    border: 1px solid var(--teal);
+    padding: 32px;
+    border-radius: 20px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(45, 212, 191, 0.25);
+    position: relative;
+    transform: scale(0.92);
+    transition: transform 0.3s ease;
+  }
+  .airdrop-modal-overlay.active .airdrop-modal-box {
+    transform: scale(1);
+  }
+  .airdrop-modal-box h3 {
+    font-family: var(--display);
+    font-size: 24px;
+    color: var(--teal-glow);
+    margin-bottom: 8px;
+  }
+  .airdrop-modal-box p {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .airdrop-ca-box {
+    background: var(--abyss);
+    padding: 12px;
+    border-radius: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--gold);
+    word-break: break-all;
+    margin-bottom: 20px;
+    border: 1px dashed var(--line);
+  }
+  .airdrop-field-label {
+    display: block;
+    text-align: left;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--teal);
+    margin-bottom: 6px;
+  }
+  .airdrop-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--abyss);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 13.5px;
+    margin-bottom: 16px;
+    outline: none;
+  }
+  .airdrop-input:focus {
+    border-color: var(--teal-glow);
+    box-shadow: 0 0 10px rgba(94, 234, 212, 0.3);
+  }
+  .airdrop-submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--teal-glow), var(--teal));
+    color: var(--abyss);
+    font-weight: 700;
+    font-family: var(--body);
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+    font-size: 15px;
+    box-shadow: 0 4px 20px rgba(45, 212, 191, 0.4);
+    transition: all 0.2s;
+  }
+  .airdrop-submit-btn:hover {
+    box-shadow: 0 6px 28px rgba(45, 212, 191, 0.7);
+  }
+  .airdrop-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  #airdropStatusMsg {
+    margin-top: 15px;
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
   @keyframes modalIn {
     from { opacity: 0; transform: scale(0.96); }
     to { opacity: 1; transform: scale(1); }
   }
 
-  /* --- REFERRAL BOX --- */
+  /* REFERRAL BOX */
   .referral-box {
     border: 1px solid var(--line);
     border-radius: 18px;
@@ -448,7 +589,7 @@
   .referral-box .ref-stats strong { color: var(--gold); }
   #refMessage { font-family: var(--mono); font-size: 12.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
 
-  /* --- MOBILE SPECIFIC FIXES --- */
+  /* MOBILE FIXES */
   @media (max-width: 768px) {
     nav .links { display: none; }
     #hero { align-items: center; text-align: center; }
@@ -475,6 +616,7 @@
     <a href="#community">Community</a>
     <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
     <a href="#referral" style="color: var(--teal-glow); font-weight: 600;">Refer & Earn</a>
+    <a href="javascript:void(0)" onclick="openAirdropModal()" class="nav-airdrop-link">🪂 AIRDROP</a>
   </div>
 </nav>
 
@@ -484,6 +626,9 @@
   <p class="hero-sub">$LORCA is a community-first token on pump.fun, paired with LethalOrca Fishing — a play-and-earn arcade game launching next quarter. Every detail below is verifiable. Do your own research before investing.</p>
   
   <div class="hero-cta">
+    <button class="btn btn-airdrop" onclick="openAirdropModal()">
+      🪂 Join $LORCA Airdrop
+    </button>
     <a class="btn btn-play" href="game.html"><span class="play-icon">▶</span> Play & Earn</a>
     <button class="btn btn-generator" onclick="openGenerator()">
       <span class="gen-icon">⚡</span> LORCA GENERATOR
@@ -736,25 +881,135 @@
   </div>
 </div>
 
+<!-- AIRDROP POPUP MODAL -->
+<div id="airdropModal" class="airdrop-modal-overlay">
+  <div class="airdrop-modal-box">
+    <button onclick="closeAirdropModal()" class="close-btn" style="position: absolute; top: 18px; right: 20px;">✕</button>
+    <h3>🌊 $LORCA Airdrop</h3>
+    <p>Submit your Solana wallet address below to qualify for official $LORCA token distribution!</p>
+
+    <div class="airdrop-ca-box">
+      <strong>OFFICIAL CA:</strong> 7RqpgT532tsYakbgnTXECC4MHTE
+    </div>
+
+    <label class="airdrop-field-label" for="solAddress">SOLANA WALLET ADDRESS</label>
+    <input type="text" id="solAddress" class="airdrop-input" placeholder="Enter your Solana Wallet Address..." />
+
+    <label class="airdrop-field-label" for="xHandle">X / TWITTER PROFILE LINK</label>
+    <input type="text" id="xHandle" class="airdrop-input" placeholder="e.g. https://x.com/yourusername" />
+
+    <button id="airdropSubmitBtn" class="airdrop-submit-btn">Submit Address</button>
+    
+    <p id="airdropStatusMsg"></p>
+  </div>
+</div>
+
 <script>
+// ---- Generator Modal Functions ----
 function openGenerator() {
   document.getElementById('generatorModal').style.display = 'flex';
-  document.body.style.overflow = 'hidden'; // Prevents background page scrolling
+  document.body.style.overflow = 'hidden';
 }
 
 function closeGenerator() {
   document.getElementById('generatorModal').style.display = 'none';
   document.body.style.overflow = 'auto';
   var iframe = document.getElementById('generatorFrame');
-  iframe.src = iframe.src; // Reloads iframe to stop generator audio/timer
+  iframe.src = iframe.src;
 }
 
+// ---- Airdrop Modal Functions ----
+function openAirdropModal() {
+  document.getElementById('airdropModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  window.location.hash = 'airdrop';
+}
+
+function closeAirdropModal() {
+  document.getElementById('airdropModal').classList.remove('active');
+  document.body.style.overflow = 'auto';
+  history.pushState("", document.title, window.location.pathname + window.location.search);
+}
+
+// Check direct hash URL on load (e.g. lethalorca.com/#airdrop)
+window.addEventListener('load', () => {
+  if (window.location.hash === '#airdrop') {
+    openAirdropModal();
+  }
+});
+
 window.onclick = function(event) {
-  var modal = document.getElementById('generatorModal');
-  if (event.target == modal) {
-    closeGenerator();
+  var genModal = document.getElementById('generatorModal');
+  var airModal = document.getElementById('airdropModal');
+  if (event.target == genModal) closeGenerator();
+  if (event.target == airModal) closeAirdropModal();
+}
+
+// ---- SUPABASE & TELEGRAM AIRDROP SUBMISSION LOGIC ----
+const SUPABASE_URL = 'https://obzyiecwhfdanzjtuhiq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ienlpZWN3aGZkYW56anR1aGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MzA5MjYsImV4cCI6MjEwMTAwNjkyNn0.gYPNd5oH9hPaTLWoJkDDx-eTfkm_AXIjsj-ycHowpuc';
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const TELEGRAM_BOT_TOKEN = '8689687590:AAHSzJ_36tERZZzo4LhSMIavF30lUZI18wE';
+const TELEGRAM_CHAT_ID = '7586392121';
+
+async function sendTelegramAlert(wallet, xHandle) {
+  const message = `🚨 New Airdrop Submission!\n\nWallet: \`${wallet}\`\nX Profile: ${xHandle ? xHandle : 'Not provided'}`;
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
+
+  try {
+    await fetch(url);
+  } catch (err) {
+    console.error("Telegram fetch error:", err);
   }
 }
+
+document.getElementById('airdropSubmitBtn').addEventListener('click', async () => {
+  const address = document.getElementById('solAddress').value.trim();
+  const xHandle = document.getElementById('xHandle').value.trim();
+  const statusMsg = document.getElementById('airdropStatusMsg');
+  const submitBtn = document.getElementById('airdropSubmitBtn');
+  
+  if(address.length < 32 || address.length > 44) {
+    statusMsg.innerText = "❌ Please enter a valid Solana address!";
+    statusMsg.style.color = "#ff4d4d";
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.innerText = "Submitting...";
+  statusMsg.innerText = "";
+  
+  try {
+    const { data, error } = await supabaseClient
+      .from('airdrop_submissions')
+      .insert([{ wallet_address: address, x_profile: xHandle || null }]);
+
+    await sendTelegramAlert(address, xHandle);
+
+    if (error) {
+      if (error.code === '23505' || error.status === 409) {
+        statusMsg.innerText = "⚠️ Address already registered!";
+        statusMsg.style.color = "#ffa500";
+      } else {
+        statusMsg.innerText = "❌ Error: " + error.message;
+        statusMsg.style.color = "#ff4d4d";
+      }
+    } else {
+      statusMsg.innerText = "✅ Success! Your address has been recorded.";
+      statusMsg.style.color = "#2dd4bf";
+      document.getElementById('solAddress').value = "";
+      document.getElementById('xHandle').value = "";
+    }
+  } catch (err) {
+    statusMsg.innerText = "❌ Something went wrong!";
+    statusMsg.style.color = "#ff4d4d";
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerText = "Submit Address";
+  }
+});
 
 // ---- Referral System ----
 const REFERRAL_BACKEND_URL = "https://lethalorca-backend.vercel.app";
