@@ -6,6 +6,7 @@
 <title>LethalOrca — $LORCA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
 <style>
   :root {
     --abyss: #020910;
@@ -281,8 +282,7 @@
   async function fetchWalletBalance() {
     const rpcList = [
       "https://solana-rpc.publicnode.com",
-      "https://rpc.ankr.com/solana",
-      "https://api.mainnet-beta.solana.com"
+      "https://rpc.ankr.com/solana"
     ];
 
     for (const rpcUrl of rpcList) {
@@ -316,7 +316,7 @@
     setStatus("Connected (0 LORCA found or RPC timeout).");
   }
 
-async function stakeTokens() {
+  async function stakeTokens() {
     const amount = parseFloat(els.amountInput.value);
     if (!amount || amount <= 0) {
       setStatus("Please enter a valid amount.");
@@ -327,7 +327,6 @@ async function stakeTokens() {
     setStatus("Building transaction request...");
 
     try {
-      // 1. Backend se Transaction maangein
       const buildRes = await fetch(`${BACKEND_URL}/api/stake-fixed/build-tx`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -337,28 +336,22 @@ async function stakeTokens() {
 
       const buildData = await buildRes.json();
       if (!buildRes.ok || !buildData.transaction) {
-        throw new Error(buildData.error || `Server returned status ${buildRes.status}`);
+        throw new Error(buildData.error || `Server status ${buildRes.status}`);
       }
 
       setStatus("Please approve transaction in Phantom...");
 
-      // 2. Safe Base64 Transaction Deserialization
-      const rawTx = buildData.transaction;
-      let transaction;
-      
-      if (window.solanaWeb3 && window.solanaWeb3.Transaction) {
-        // Uint8Array conversion without relying on Buffer
-        const binaryString = atob(rawTx);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-        transaction = solanaWeb3.Transaction.from(bytes);
-      } else {
-        throw new Error("Solana Web3 library not loaded.");
+      // Safe Uint8Array conversion from Base64 (Without Buffer dependency)
+      const binaryString = atob(buildData.transaction);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
       }
 
-      // 3. Trigger Phantom Wallet
+      // Deserialize transaction
+      const transaction = solanaWeb3.Transaction.from(bytes);
+
+      // Trigger Phantom Pop-up
       const { signature } = await window.solana.signAndSendTransaction(transaction);
       
       setStatus(`Transaction Submitted! Hash: ${signature.slice(0, 8)}...`);
