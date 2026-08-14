@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lethal Orca | Official Airdrop & Community</title>
+
     <!-- Supabase JS Client CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         * {
             margin: 0;
@@ -13,6 +15,7 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         body {
             background-color: #0b0f19;
             color: #ffffff;
@@ -23,6 +26,7 @@
             min-height: 100vh;
             padding: 20px;
         }
+
         .container {
             background: #131c2e;
             border: 1px solid #1e293b;
@@ -33,16 +37,19 @@
             text-align: center;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
+
         h1 {
             color: #00d2ff;
             margin-bottom: 10px;
             font-size: 26px;
         }
+
         p {
             color: #94a3b8;
             font-size: 14px;
             margin-bottom: 20px;
         }
+
         .ca-box {
             background: #0b0f19;
             padding: 12px;
@@ -53,6 +60,7 @@
             margin-bottom: 20px;
             border: 1px dashed #334155;
         }
+
         label.field-label {
             display: block;
             text-align: left;
@@ -61,6 +69,7 @@
             margin-bottom: 6px;
             margin-top: 2px;
         }
+
         input[type="text"] {
             width: 100%;
             padding: 12px;
@@ -72,9 +81,11 @@
             margin-bottom: 15px;
             outline: none;
         }
+
         input[type="text"]:focus {
             border-color: #00d2ff;
         }
+
         button {
             width: 100%;
             padding: 12px;
@@ -87,23 +98,28 @@
             font-size: 16px;
             transition: opacity 0.2s;
         }
+
         button:hover {
             opacity: 0.9;
         }
+
         button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
+
         #statusMsg {
             margin-top: 15px;
             font-size: 14px;
         }
+
         .socials {
             margin-top: 25px;
             display: flex;
             justify-content: center;
             gap: 15px;
         }
+
         .socials a {
             color: #94a3b8;
             text-decoration: none;
@@ -113,110 +129,309 @@
             border-radius: 6px;
             transition: color 0.2s;
         }
+
         .socials a:hover {
             color: #00d2ff;
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
+
         <h1>🌊 Lethal Orca Airdrop</h1>
-        <p>Drop your Solana wallet address below to participate in the official $LCr airdrop event!</p>
-        
+
+        <p>
+            Drop your Solana wallet address below to participate in the official $LCr airdrop event!
+        </p>
+
         <div class="ca-box">
             <strong>CA:</strong> 7RqpgT532tsYakbgnTXECC4MHTE
         </div>
 
-        <label class="field-label" for="solAddress">Solana Wallet Address</label>
-        <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." />
+        <!-- Solana Wallet -->
+        <label class="field-label" for="solAddress">
+            Solana Wallet Address
+        </label>
 
-        <label class="field-label" for="xHandle">Your X (Twitter) Profile Link</label>
-        <input type="text" id="xHandle" placeholder="e.g. https://x.com/yourusername" />
+        <input
+            type="text"
+            id="solAddress"
+            placeholder="Enter your Solana Wallet Address..."
+        />
 
-        <button id="submitBtn">Submit Address</button>
-        
+        <!-- X Handle -->
+        <label class="field-label" for="xHandle">
+            Your X Handle
+        </label>
+
+        <input
+            type="text"
+            id="xHandle"
+            placeholder="@yourusername"
+        />
+
+        <button id="submitBtn">
+            Submit Address
+        </button>
+
         <p id="statusMsg"></p>
 
         <div class="socials">
-            <a href="https://t.me/Lethal_Orca" target="_blank">Telegram</a>
-            <a href="https://discord.gg/bXkMYsThv" target="_blank">Discord</a>
-            <a href="https://x.com/lethalorcatdo" target="_blank">Twitter / X</a>
+            <a href="https://t.me/Lethal_Orca" target="_blank">
+                Telegram
+            </a>
+
+            <a href="https://discord.gg/bXkMYsThv" target="_blank">
+                Discord
+            </a>
+
+            <a href="https://x.com/lethalorcatdo" target="_blank">
+                Twitter / X
+            </a>
         </div>
+
     </div>
 
     <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://obzyiecwhfdanzjtuhiq.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ienlpZWN3aGZkYW56anR1aGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MzA5MjYsImV4cCI6MjEwMTAwNjkyNn0.gYPNd5oH9hPaTLWoJkDDx-eTfkm_AXIjsj-ycHowpuc';
 
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // ==============================
+        // SUPABASE CONFIGURATION
+        // ==============================
 
-        // Telegram Configuration
-        const TELEGRAM_BOT_TOKEN = '8689687590:AAHSzJ_36tERZZzo4LhSMIavF30lUZI18wE';
-        const TELEGRAM_CHAT_ID = '7586392121';
+        const SUPABASE_URL =
+            'https://obzyiecwhfdanzjtuhiq.supabase.co';
+
+        const SUPABASE_ANON_KEY =
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzIiwicmVmIjoib2J6eWllY3doZmRhbnpqdWhpcSIsInJv b3QiOiJhbm9uIiwiaWF0IjoxNzg1NDMwOTI2LCJleHAiOjIxMDEwMDY5MjZ9.gYPNd5oH9hPaTLWoJkDDx-eTfkm_AXIjsj-ycHowpuc'
+                .replace(/\s/g, '');
+
+        const supabaseClient =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_ANON_KEY
+            );
+
+
+        // ==============================
+        // TELEGRAM CONFIGURATION
+        // ==============================
+
+        // IMPORTANT:
+        // Replace this with your NEW regenerated BotFather token.
+        const TELEGRAM_BOT_TOKEN =
+            'YOUR_NEW_BOT_TOKEN';
+
+        const TELEGRAM_CHAT_ID =
+            '7586392121';
+
+
+        // ==============================
+        // SEND TELEGRAM ALERT
+        // ==============================
 
         async function sendTelegramAlert(wallet, xHandle) {
-            const message = `🚨 New Airdrop Submission!\n\nWallet: \`${wallet}\`\nX Profile: ${xHandle ? xHandle : 'Not provided'}`;
-            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
+
+            const message =
+                `🚨 New Airdrop Submission!\n\n` +
+                `Wallet: \`${wallet}\`\n` +
+                `X Handle: ${xHandle ? xHandle : 'Not provided'}`;
+
+            const url =
+                `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}` +
+                `/sendMessage?chat_id=${TELEGRAM_CHAT_ID}` +
+                `&text=${encodeURIComponent(message)}` +
+                `&parse_mode=Markdown`;
 
             try {
+
                 const response = await fetch(url);
+
                 const result = await response.json();
-                console.log("Telegram API Response:", result);
+
+                console.log(
+                    "Telegram API Response:",
+                    result
+                );
+
             } catch (err) {
-                console.error("Telegram fetch error caught:", err);
+
+                console.error(
+                    "Telegram fetch error caught:",
+                    err
+                );
+
             }
         }
 
-        document.getElementById('submitBtn').addEventListener('click', async () => {
-            const address = document.getElementById('solAddress').value.trim();
-            const xHandle = document.getElementById('xHandle').value.trim();
-            const statusMsg = document.getElementById('statusMsg');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            // Solana address validation check (32 to 44 characters)
-            if(address.length < 32 || address.length > 44) {
-                statusMsg.innerText = "❌ Please enter a valid Solana address!";
-                statusMsg.style.color = "#ff4d4d";
-                return;
-            }
 
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Submitting...";
-            statusMsg.innerText = "";
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('airdrop_submissions')
-                    .insert([{ wallet_address: address, x_profile: xHandle || null }]);
+        // ==============================
+        // SUBMIT BUTTON
+        // ==============================
 
-                // Send Telegram notification
-                await sendTelegramAlert(address, xHandle);
+        document
+            .getElementById('submitBtn')
+            .addEventListener('click', async () => {
 
-                if (error) {
-                    if (error.code === '23505' || error.status === 409) {
-                        statusMsg.innerText = "⚠️ This wallet address is already registered!";
-                        statusMsg.style.color = "#ffa500";
-                    } else {
-                        statusMsg.innerText = "❌ Error: " + error.message;
-                        statusMsg.style.color = "#ff4d4d";
-                    }
-                } else {
-                    statusMsg.innerText = "✅ Success! Your address has been recorded.";
-                    statusMsg.style.color = "#4bb543";
-                    document.getElementById('solAddress').value = "";
-                    document.getElementById('xHandle').value = "";
+                const address =
+                    document
+                        .getElementById('solAddress')
+                        .value
+                        .trim();
+
+                const xHandle =
+                    document
+                        .getElementById('xHandle')
+                        .value
+                        .trim();
+
+                const statusMsg =
+                    document.getElementById('statusMsg');
+
+                const submitBtn =
+                    document.getElementById('submitBtn');
+
+
+                // ==============================
+                // WALLET VALIDATION
+                // ==============================
+
+                if (
+                    address.length < 32 ||
+                    address.length > 44
+                ) {
+
+                    statusMsg.innerText =
+                        "❌ Please enter a valid Solana address!";
+
+                    statusMsg.style.color =
+                        "#ff4d4d";
+
+                    return;
                 }
-            } catch (err) {
-                console.error("Main Catch Error:", err);
-                statusMsg.innerText = "❌ Something went wrong!";
-                statusMsg.style.color = "#ff4d4d";
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Address";
-            }
-        });
+
+
+                // ==============================
+                // X HANDLE VALIDATION
+                // ==============================
+
+                if (!xHandle) {
+
+                    statusMsg.innerText =
+                        "❌ Please enter your X Handle!";
+
+                    statusMsg.style.color =
+                        "#ff4d4d";
+
+                    return;
+                }
+
+
+                submitBtn.disabled = true;
+
+                submitBtn.innerText =
+                    "Submitting...";
+
+                statusMsg.innerText = "";
+
+
+                try {
+
+                    // ==============================
+                    // SAVE TO SUPABASE
+                    // ==============================
+
+                    const { data, error } =
+                        await supabaseClient
+                            .from('airdrop_submissions')
+                            .insert([
+                                {
+                                    wallet_address: address,
+                                    x_profile: xHandle
+                                }
+                            ]);
+
+
+                    // ==============================
+                    // SEND TELEGRAM NOTIFICATION
+                    // ==============================
+
+                    await sendTelegramAlert(
+                        address,
+                        xHandle
+                    );
+
+
+                    // ==============================
+                    // RESPONSE
+                    // ==============================
+
+                    if (error) {
+
+                        if (
+                            error.code === '23505' ||
+                            error.status === 409
+                        ) {
+
+                            statusMsg.innerText =
+                                "⚠️ This wallet address is already registered!";
+
+                            statusMsg.style.color =
+                                "#ffa500";
+
+                        } else {
+
+                            statusMsg.innerText =
+                                "❌ Error: " +
+                                error.message;
+
+                            statusMsg.style.color =
+                                "#ff4d4d";
+                        }
+
+                    } else {
+
+                        statusMsg.innerText =
+                            "✅ Success! Your address has been recorded.";
+
+                        statusMsg.style.color =
+                            "#4bb543";
+
+                        document
+                            .getElementById('solAddress')
+                            .value = "";
+
+                        document
+                            .getElementById('xHandle')
+                            .value = "";
+                    }
+
+
+                } catch (err) {
+
+                    console.error(
+                        "Main Catch Error:",
+                        err
+                    );
+
+                    statusMsg.innerText =
+                        "❌ Something went wrong!";
+
+                    statusMsg.style.color =
+                        "#ff4d4d";
+
+
+                } finally {
+
+                    submitBtn.disabled = false;
+
+                    submitBtn.innerText =
+                        "Submit Address";
+                }
+
+            });
+
     </script>
 
 </body>
