@@ -3,177 +3,454 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LethalOrca ($LORCA) | Deep Sea Solana Token</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase JS Client -->
+    <title>Lethal Orca | Official Airdrop & Community</title>
+    <!-- Supabase JS Client CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Turnstile Explicit Render API -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Inter:wght@300;400;600;700&display=swap');
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #030712;
-            color: #f3f4f6;
-            overflow-x: hidden;
+            background-color: #0b0f19;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
         }
-
-        .font-orbitron {
-            font-family: 'Orbitron', sans-serif;
+        .container {
+            background: #131c2e;
+            border: 1px solid #1e293b;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-
-        .glow-text {
-            text-shadow: 0 0 15px rgba(6, 182, 212, 0.6);
+        h1 {
+            color: #00d2ff;
+            margin-bottom: 10px;
+            font-size: 26px;
         }
-
-        .glow-box {
-            box-shadow: 0 0 25px rgba(6, 182, 212, 0.15);
+        p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 20px;
         }
-
-        .glow-box-hover:hover {
-            box-shadow: 0 0 35px rgba(6, 182, 212, 0.3);
+        .ca-box {
+            background: #0b0f19;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #38bdf8;
+            word-break: break-all;
+            margin-bottom: 20px;
+            border: 1px dashed #334155;
         }
-
-        .modal-blur {
-            backdrop-filter: blur(8px);
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0b0f19;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+            outline: none;
         }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+        input[type="text"]:focus {
+            border-color: #00d2ff;
         }
-        ::-webkit-scrollbar-track {
-            background: #030712;
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #00d2ff, #0072ff);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: opacity 0.2s;
         }
-        ::-webkit-scrollbar-thumb {
+        button:hover {
+            opacity: 0.9;
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        #statusMsg {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .socials {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .socials a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
             background: #1e293b;
-            border-radius: 4px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: color 0.2s;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #06b6d4;
-        }
-
-        /* Modal Visibility Animations */
-        .modal {
-            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-        }
-        .modal-active {
-            opacity: 1 !important;
-            visibility: visible !important;
-            pointer-events: auto !important;
+        .socials a:hover {
+            color: #00d2ff;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between relative selection:bg-cyan-500 selection:text-black">
+<body>
 
-    <!-- Background Ocean Grid FX -->
-    <div class="fixed inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-0"></div>
-
-    <!-- Header Navigation -->
-    <header class="w-full p-5 flex justify-between items-center border-b border-cyan-900/30 bg-slate-950/80 backdrop-blur-md fixed top-0 z-40">
-        <div class="flex items-center gap-3">
-            <span class="font-orbitron text-2xl font-black tracking-wider text-cyan-400 glow-text">LETHAL<span class="text-white">ORCA</span></span>
+    <div class="container">
+        <h1>🌊 Lethal Orca Airdrop</h1>
+        <p>Drop your Solana wallet address below to participate in the official $LCr airdrop event!</p>
+        
+        <div class="ca-box">
+            <strong>CA:</strong> 7RqpgT532tsYakbgnTXECC4MHTE
         </div>
-        <nav class="hidden md:flex gap-6 text-sm font-semibold text-slate-300">
-            <a href="#about" class="hover:text-cyan-400 transition">About</a>
-            <a href="#tokenomics" class="hover:text-cyan-400 transition">Tokenomics</a>
-            <a href="javascript:void(0)" onclick="openAirdropModal()" class="hover:text-cyan-400 transition text-cyan-400">Airdrop</a>
-        </nav>
-        <button onclick="openAirdropModal()" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-5 py-2 rounded-full shadow-lg shadow-cyan-500/20 transition transform hover:scale-105">
-            Join Airdrop
-        </button>
-    </header>
 
-    <!-- Main Content / Hero -->
-    <main class="pt-36 pb-20 px-4 text-center max-w-4xl mx-auto flex-1 flex flex-col justify-center items-center z-10">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-950/30 text-cyan-400 text-xs font-semibold mb-6">
-            <span class="flex h-2 w-2 rounded-full bg-cyan-400 animate-ping"></span>
-            SOLANA MEME & UTILITY TOKEN
-        </div>
-        <h1 class="font-orbitron text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-600 mb-6 tracking-wide">
-            DOMINATE THE OCEAN
-        </h1>
-        <p class="text-slate-400 text-base md:text-lg max-w-2xl mb-8 leading-relaxed">
-            The most lethal meme & utility ecosystem residing on Solana. Claim your early allocation and join the apex pod.
-        </p>
-        <div class="flex flex-wrap gap-4 justify-center">
-            <button onclick="openAirdropModal()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold px-8 py-4 rounded-xl shadow-cyan-500/30 shadow-lg transition transform hover:-translate-y-0.5">
-                🚀 Claim Airdrop Now
-            </button>
-        </div>
-    </main>
+        <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." />
+        <button id="submitBtn">Submit Address</button>
+        
+        <p id="statusMsg"></p>
 
-    <!-- Airdrop Modal / Pop-up -->
-    <div id="airdropModal" class="modal opacity-0 invisible pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 modal-blur">
-        <div class="bg-slate-900 border border-cyan-500/30 w-full max-w-md rounded-2xl p-6 relative shadow-2xl glow-box">
-            <!-- Close Button -->
-            <button onclick="closeAirdropModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <h2 class="font-orbitron text-2xl font-bold text-cyan-400 mb-2">LethalOrca Airdrop</h2>
-            <p class="text-slate-400 text-sm mb-6">Enter your details below to submit your wallet for the airdrop allocation.</p>
-
-            <form id="airdropForm" class="space-y-4" onsubmit="handleAirdropSubmit(event)">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1 tracking-wider">SOLANA WALLET ADDRESS</label>
-                    <input type="text" id="walletAddress" required placeholder="Enter your SOL wallet address" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-cyan-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1 tracking-wider">X (TWITTER) HANDLE</label>
-                    <input type="text" id="twitterHandle" placeholder="@username" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-cyan-500">
-                </div>
-                
-                <!-- Cloudflare Turnstile Container -->
-                <div id="turnstileContainer" class="my-3"></div>
-
-                <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-lg transition mt-4 shadow-lg shadow-cyan-500/20">
-                    Submit Airdrop Claim
-                </button>
-            </form>
+        <div class="socials">
+            <a href="https://t.me/Lethal_Orca" target="_blank">Telegram</a>
+            <a href="https://discord.gg/bXkMYsThv" target="_blank">Discord</a>
+            <a href="https://x.com/lethalorcatdo" target="_blank">Twitter / X</a>
         </div>
     </div>
 
-    <!-- Scripts Section -->
     <script>
-        // Modal functions
-        function openAirdropModal() {
-            const modal = document.getElementById('airdropModal');
-            if (modal) {
-                modal.classList.add('modal-active');
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://obzyiecwhfdanzjtuhiq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ienlpZWN3aGZkYW56anR1aGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MzA5MjYsImV4cCI6MjEwMTAwNjkyNn0.gYPNd5oH9hPaTLWoJkDDx-eTfkm_AXIjsj-ycHowpuc';
+
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Telegram Configuration
+        const TELEGRAM_BOT_TOKEN = '8689687590:AAHSzJ_36tERZZzo4LhSMIavF30lUZI18wE';
+        const TELEGRAM_CHAT_ID = '7586392121';
+
+        async function sendTelegramAlert(wallet) {
+            const message = `🚨 New Airdrop Submission!\n\nWallet: \`${wallet}\``;
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
+
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+                console.log("Telegram API Response:", result);
+            } catch (err) {
+                console.error("Telegram fetch error caught:", err);
             }
         }
 
-        function closeAirdropModal() {
-            const modal = document.getElementById('airdropModal');
-            if (modal) {
-                modal.classList.remove('modal-active');
-            }
-        }
-
-        function handleAirdropSubmit(e) {
-            e.preventDefault();
-            alert("Airdrop submission received!");
-            closeAirdropModal();
-        }
-
-        // ==========================================
-        // AUTOMATIC DIRECT LINK AUTO-OPEN LOGIC
-        // ==========================================
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
+        document.getElementById('submitBtn').addEventListener('click', async () => {
+            const address = document.getElementById('solAddress').value.trim();
+            const statusMsg = document.getElementById('statusMsg');
+            const submitBtn = document.getElementById('submitBtn');
             
-            // Checks if ?airdrop=true OR #airdrop is in the URL
-            if (urlParams.get('airdrop') === 'true' || window.location.hash === '#airdrop') {
-                setTimeout(() => {
-                    openAirdropModal();
-                }, 400); // Small delay to allow full UI render
+            // Solana address validation check (32 to 44 characters)
+            if(address.length < 32 || address.length > 44) {
+                statusMsg.innerText = "❌ Please enter a valid Solana address!";
+                statusMsg.style.color = "#ff4d4d";
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
+            statusMsg.innerText = "";
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('airdrop_submissions')
+                    .insert([{ wallet_address: address }]);
+
+                // Send Telegram notification
+                await sendTelegramAlert(address);
+
+                if (error) {
+                    if (error.code === '23505' || error.status === 409) {
+                        statusMsg.innerText = "⚠️ This wallet address is already registered!";
+                        statusMsg.style.color = "#ffa500";
+                    } else {
+                        statusMsg.innerText = "❌ Error: " + error.message;
+                        statusMsg.style.color = "#ff4d4d";
+                    }
+                } else {
+                    statusMsg.innerText = "✅ Success! Your address has been recorded.";
+                    statusMsg.style.color = "#4bb543";
+                    document.getElementById('solAddress').value = "";
+                }
+            } catch (err) {
+                console.error("Main Catch Error:", err);
+                statusMsg.innerText = "❌ Something went wrong!";
+                statusMsg.style.color = "#ff4d4d";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Address";
             }
         });
     </script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+14 aug
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lethal Orca | Official Airdrop & Community</title>
+    <!-- Supabase JS Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0b0f19;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: #131c2e;
+            border: 1px solid #1e293b;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            color: #00d2ff;
+            margin-bottom: 10px;
+            font-size: 26px;
+        }
+        p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .ca-box {
+            background: #0b0f19;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #38bdf8;
+            word-break: break-all;
+            margin-bottom: 20px;
+            border: 1px dashed #334155;
+        }
+        label.field-label {
+            display: block;
+            text-align: left;
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 6px;
+            margin-top: 2px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0b0f19;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+        input[type="text"]:focus {
+            border-color: #00d2ff;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #00d2ff, #0072ff);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: opacity 0.2s;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        #statusMsg {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .socials {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .socials a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            background: #1e293b;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: color 0.2s;
+        }
+        .socials a:hover {
+            color: #00d2ff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🌊 Lethal Orca Airdrop</h1>
+        <p>Drop your Solana wallet address below to participate in the official $LCr airdrop event!</p>
+        
+        <div class="ca-box">
+            <strong>CA:</strong> 7RqpgT532tsYakbgnTXECC4MHTE
+        </div>
+
+        <label class="field-label" for="solAddress">Solana Wallet Address</label>
+        <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." />
+
+        <label class="field-label" for="xHandle">Your X (Twitter) Profile Link</label>
+        <input type="text" id="xHandle" placeholder="e.g. https://x.com/yourusername" />
+
+        <button id="submitBtn">Submit Address</button>
+        
+        <p id="statusMsg"></p>
+
+        <div class="socials">
+            <a href="https://t.me/Lethal_Orca" target="_blank">Telegram</a>
+            <a href="https://discord.gg/bXkMYsThv" target="_blank">Discord</a>
+            <a href="https://x.com/lethalorcatdo" target="_blank">Twitter / X</a>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://obzyiecwhfdanzjtuhiq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ienlpZWN3aGZkYW56anR1aGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MzA5MjYsImV4cCI6MjEwMTAwNjkyNn0.gYPNd5oH9hPaTLWoJkDDx-eTfkm_AXIjsj-ycHowpuc';
+
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Telegram Configuration
+        const TELEGRAM_BOT_TOKEN = '8689687590:AAHSzJ_36tERZZzo4LhSMIavF30lUZI18wE';
+        const TELEGRAM_CHAT_ID = '7586392121';
+
+        async function sendTelegramAlert(wallet, xHandle) {
+            const message = `🚨 New Airdrop Submission!\n\nWallet: \`${wallet}\`\nX Profile: ${xHandle ? xHandle : 'Not provided'}`;
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
+
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+                console.log("Telegram API Response:", result);
+            } catch (err) {
+                console.error("Telegram fetch error caught:", err);
+            }
+        }
+
+        document.getElementById('submitBtn').addEventListener('click', async () => {
+            const address = document.getElementById('solAddress').value.trim();
+            const xHandle = document.getElementById('xHandle').value.trim();
+            const statusMsg = document.getElementById('statusMsg');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Solana address validation check (32 to 44 characters)
+            if(address.length < 32 || address.length > 44) {
+                statusMsg.innerText = "❌ Please enter a valid Solana address!";
+                statusMsg.style.color = "#ff4d4d";
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
+            statusMsg.innerText = "";
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('airdrop_submissions')
+                    .insert([{ wallet_address: address, x_profile: xHandle || null }]);
+
+                // Send Telegram notification
+                await sendTelegramAlert(address, xHandle);
+
+                if (error) {
+                    if (error.code === '23505' || error.status === 409) {
+                        statusMsg.innerText = "⚠️ This wallet address is already registered!";
+                        statusMsg.style.color = "#ffa500";
+                    } else {
+                        statusMsg.innerText = "❌ Error: " + error.message;
+                        statusMsg.style.color = "#ff4d4d";
+                    }
+                } else {
+                    statusMsg.innerText = "✅ Success! Your address has been recorded.";
+                    statusMsg.style.color = "#4bb543";
+                    document.getElementById('solAddress').value = "";
+                    document.getElementById('xHandle').value = "";
+                }
+            } catch (err) {
+                console.error("Main Catch Error:", err);
+                statusMsg.innerText = "❌ Something went wrong!";
+                statusMsg.style.color = "#ff4d4d";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Address";
+            }
+        });
+    </script>
+
 </body>
 </html>
