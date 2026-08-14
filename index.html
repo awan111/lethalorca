@@ -1134,6 +1134,16 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
         submitBtn.innerText = "Submit Address";
     }
 });
+
+// Auto open Airdrop Modal on Page Load if URL contains #airdrop or ?open=airdrop
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+
+    if (urlParams.get('open') === 'airdrop' || hash === '#airdrop') {
+        openAirdropModal();
+    }
+});
 </script>
 
 </body>
