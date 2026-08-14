@@ -316,7 +316,7 @@
     setStatus("Connected (0 LORCA found or RPC timeout).");
   }
 
-  async function stakeTokens() {
+ async function stakeTokens() {
     const amount = parseFloat(els.amountInput.value);
     if (!amount || amount <= 0) {
       setStatus("Please enter a valid amount.");
@@ -327,6 +327,7 @@
     setStatus("Building transaction request...");
 
     try {
+      // 1. Backend se Transaction maangein
       const buildRes = await fetch(`${BACKEND_URL}/api/stake-fixed/build-tx`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -334,12 +335,30 @@
         body: JSON.stringify({ wallet: publicKey, amount: amount }),
       });
 
-      if (!buildRes.ok) throw new Error(`Server returned status ${buildRes.status}`);
-
       const buildData = await buildRes.json();
+      if (!buildRes.ok || !buildData.transaction) {
+        throw new Error(buildData.error || `Server returned status ${buildRes.status}`);
+      }
+
       setStatus("Please approve transaction in Phantom...");
+
+      // 2. Base64 Transaction ko Deserialize karein
+      const txBuffer = solanaWeb3.Buffer.from(buildData.transaction, 'base64');
+      const transaction = solanaWeb3.Transaction.from(txBuffer);
+
+      // 3. Phantom Wallet Pop-up Trigger Karein
+      const { signature } = await window.solana.signAndSendTransaction(transaction);
+      
+      setStatus(`Transaction Submitted! Hash: ${signature.slice(0, 8)}...`);
+      await fetchWalletBalance(); // Balance auto refresh karein
+
     } catch (e) {
-      setStatus(`Error: ${e.message}`);
+      console.error("Stake Error:", e);
+      if (e.message.includes("User rejected")) {
+        setStatus("Transaction rejected in wallet.");
+      } else {
+        setStatus(`Error: ${e.message}`);
+      }
     } finally {
       els.stake.disabled = false;
     }
