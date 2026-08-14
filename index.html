@@ -1097,10 +1097,11 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     submitBtn.innerText = "Submitting...";
     statusMsg.innerText = "";
     
-    try {
+try {
+        // Saving both Wallet Address and X Handle to Supabase
         const { error } = await supabaseClient
             .from('airdrop_submissions')
-            .insert([{ wallet_address: address }]);
+            .insert([{ wallet_address: address, x_profile: xHandle }]);
 
         await sendTelegramAlert(address);
 
