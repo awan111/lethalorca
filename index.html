@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LethalOrca Runner</title>
+<title>LethalOrca: Hunting Mode</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { width:100%; height:100%; overflow:hidden; background:#020b14; font-family: 'Segoe UI', Tahoma, sans-serif; }
+  html, body { width:100%; height:100%; overflow:hidden; background:#020b14; font-family: 'Segoe UI', Tahoma, sans-serif; user-select:none; }
   #gameCanvas { display:block; width:100%; height:100%; }
 
   #hud {
@@ -16,52 +16,37 @@
     pointer-events:none; z-index:10;
   }
   .hud-box {
-    background:rgba(4,18,30,0.55); border:1px solid rgba(45,212,191,0.35);
-    backdrop-filter: blur(6px); border-radius:12px; padding:10px 16px;
-    box-shadow:0 0 18px rgba(45,212,191,0.15);
+    background:rgba(4,18,30,0.65); border:1px solid rgba(45,212,191,0.4);
+    backdrop-filter: blur(8px); border-radius:12px; padding:10px 18px;
+    box-shadow:0 0 20px rgba(45,212,191,0.2);
   }
-  #score { color:#f5c451; font-size:22px; font-weight:700; letter-spacing:0.5px; text-shadow:0 0 10px rgba(245,196,81,0.5); }
-  #scoreLabel { color:#7fe3d4; font-size:11px; letter-spacing:2px; text-transform:uppercase; }
-  #speedTag { color:#7fe3d4; font-size:12px; letter-spacing:1px; text-align:right; }
+  #score { color:#f5c451; font-size:24px; font-weight:800; letter-spacing:0.5px; text-shadow:0 0 12px rgba(245,196,81,0.6); }
+  #scoreLabel { color:#7fe3d4; font-size:10px; letter-spacing:2px; text-transform:uppercase; font-weight:600; }
+  #speedTag { color:#7fe3d4; font-size:13px; font-weight:700; letter-spacing:1px; text-align:right; }
 
   #centerMsg {
     position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-    text-align:center; z-index:20; color:#eafffb;
+    text-align:center; z-index:20; color:#eafffb; width:90%; max-width:440px;
   }
   #centerMsg h1 {
-    font-size:38px; color:#f5c451; text-shadow:0 0 22px rgba(245,196,81,0.6);
-    letter-spacing:1px; margin-bottom:6px;
+    font-size:36px; color:#f5c451; text-shadow:0 0 25px rgba(245,196,81,0.7);
+    letter-spacing:1.5px; margin-bottom:8px; font-weight:900;
   }
-  #centerMsg p { color:#9fd8cf; font-size:14px; margin-bottom:18px; letter-spacing:0.5px; }
-  #centerMsg .sub { color:#6fa89c; font-size:12px; }
+  #centerMsg p { color:#b8ece4; font-size:15px; margin-bottom:20px; letter-spacing:0.5px; line-height:1.4; }
+  #centerMsg .sub { color:#6fa89c; font-size:12px; font-weight:600; }
   button.playBtn {
     background:linear-gradient(135deg,#0f766e,#134e4a); color:#f5c451;
-    border:1px solid #f5c451; padding:12px 30px; font-size:15px; letter-spacing:1px;
-    border-radius:30px; cursor:pointer; box-shadow:0 0 20px rgba(245,196,81,0.25);
-    transition:transform .15s ease;
+    border:2px solid #f5c451; padding:14px 36px; font-size:16px; font-weight:700; letter-spacing:1px;
+    border-radius:30px; cursor:pointer; box-shadow:0 0 25px rgba(245,196,81,0.35);
+    transition:all .15s ease;
   }
+  button.playBtn:hover { transform:scale(1.05); box-shadow:0 0 35px rgba(245,196,81,0.6); }
   button.playBtn:active { transform:scale(0.95); }
-
-  /* New Game Trigger Button Style */
-  .index-game-btn {
-    display: inline-block;
-    background: linear-gradient(135deg, #f5c451, #d99b26);
-    color: #020b14;
-    font-size: 16px;
-    font-weight: 700;
-    padding: 14px 32px;
-    border-radius: 50px;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 0 15px rgba(245,196,81,0.4);
-    text-decoration: none;
-    margin-bottom: 12px;
-  }
 
   #tapHint {
     position:fixed; bottom:26px; left:50%; transform:translateX(-50%);
-    color:#7fe3d4; font-size:12px; letter-spacing:1.5px; opacity:0.75; z-index:10;
-    pointer-events:none;
+    color:#7fe3d4; font-size:12px; letter-spacing:2px; opacity:0.8; z-index:10;
+    pointer-events:none; font-weight:600; text-shadow:0 0 8px rgba(45,212,191,0.5);
   }
 </style>
 </head>
@@ -80,23 +65,129 @@
 <div id="tapHint">TAP / SPACE / ↑ TO JUMP</div>
 
 <div id="centerMsg">
-  <h1>LETHAL ORCA</h1>
-  <p>Jump the reef. Catch the coins. Swim to the right.</p>
-  
-  <!-- Index Page Main Action Button -->
-  <div>
-    <button class="index-game-btn" id="mainGameLauncherBtn">🎮 PLAY LETHAL ORCA RUNNER</button>
-  </div>
-
-  <button class="playBtn" id="startBtn">▶ START SWIM</button>
-  <div class="sub" style="margin-top:14px;">Each coin = 100 $LORCA</div>
+  <h1>LETHAL ORCA: HUNTING MODE</h1>
+  <p>Swim Right. Hunt Coins. Master the Ocean.</p>
+  <button class="playBtn" id="startBtn">▶ START HUNT</button>
+  <div class="sub" style="margin-top:16px;">Each coin = 100 $LORCA</div>
 </div>
 
 <canvas id="gameCanvas"></canvas>
 
 <script>
 // ---------------------------------------------------------------
-// SCENE SETUP — SIDE-VIEW RUNNER
+// WEB AUDIO API SYNTHESIZER (No external MP3 files needed)
+// ---------------------------------------------------------------
+let audioCtx = null;
+let bgOsc = null;
+let bgGain = null;
+let bgInterval = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function startBgMusic() {
+  initAudio();
+  if (bgInterval) clearInterval(bgInterval);
+  
+  // Underwater rhythmic pulsing bassline
+  let noteIndex = 0;
+  const notes = [65.41, 65.41, 73.42, 65.41, 87.31, 82.41]; // C2, D2, F2, E2 notes
+  
+  bgInterval = setInterval(() => {
+    if (!running || gameOver) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(notes[noteIndex % notes.length], audioCtx.currentTime);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(180, audioCtx.currentTime);
+
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.38);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.4);
+      noteIndex++;
+    } catch(e){}
+  }, 420);
+}
+
+function playCoinSound() {
+  if (!audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+    osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.12); // A6
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.13);
+  } catch(e){}
+}
+
+function playJumpSound() {
+  if (!audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(450, audioCtx.currentTime + 0.18);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(300, audioCtx.currentTime);
+
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.21);
+  } catch(e){}
+}
+
+function playHitSound() {
+  if (!audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.31);
+  } catch(e){}
+}
+
+// ---------------------------------------------------------------
+// SCENE SETUP
 // ---------------------------------------------------------------
 const canvas = document.getElementById('gameCanvas');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false });
@@ -105,7 +196,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x03121f, 0.02);
+scene.fog = new THREE.FogExp2(0x03121f, 0.022);
 scene.background = new THREE.Color(0x03121f);
 
 const camera = new THREE.PerspectiveCamera(52, window.innerWidth/window.innerHeight, 0.1, 200);
@@ -113,27 +204,29 @@ camera.position.set(0, 3.4, 13);
 camera.lookAt(0, 1.6, 0);
 
 // Lighting
-const ambient = new THREE.AmbientLight(0x2a4a55, 0.9);
+const ambient = new THREE.AmbientLight(0x2a4a55, 1.0);
 scene.add(ambient);
 
-const sun = new THREE.DirectionalLight(0xbfe9ff, 0.9);
+const sun = new THREE.DirectionalLight(0xbfe9ff, 1.1);
 sun.position.set(5, 12, 6);
 sun.castShadow = true;
 sun.shadow.mapSize.set(1024,1024);
 scene.add(sun);
 
-const goldRim = new THREE.PointLight(0xf5c451, 1.2, 30);
+const goldRim = new THREE.PointLight(0xf5c451, 1.4, 30);
 goldRim.position.set(-6, 4, 4);
 scene.add(goldRim);
 
-const tealRim = new THREE.PointLight(0x2dd4bf, 1.0, 30);
+const tealRim = new THREE.PointLight(0x2dd4bf, 1.2, 30);
 tealRim.position.set(6, 2, 4);
 scene.add(tealRim);
 
+// ---------------------------------------------------------------
 // OCEAN FLOOR
+// ---------------------------------------------------------------
 const waterGeo = new THREE.PlaneGeometry(220, 40, 140, 30);
 const waterMat = new THREE.MeshPhongMaterial({
-  color: 0x0a4a52, shininess: 90, specular: 0x2dd4bf,
+  color: 0x0a4a52, shininess: 100, specular: 0x2dd4bf,
   transparent:true, opacity:0.92, side: THREE.DoubleSide
 });
 const water = new THREE.Mesh(waterGeo, waterMat);
@@ -151,12 +244,47 @@ const abyss = new THREE.Mesh(abyssGeo, abyssMat);
 abyss.position.set(0, 5, -30);
 scene.add(abyss);
 
+// ---------------------------------------------------------------
+// PARTICLES (Bubbles & Sparkles)
+// ---------------------------------------------------------------
+const bubbleParticles = [];
+const bubbleGeo = new THREE.SphereGeometry(0.06, 8, 8);
+const bubbleMat = new THREE.MeshPhongMaterial({ color:0x7fe3d4, transparent:true, opacity:0.6, shininess:100 });
+
+function spawnBubble(x, y, z) {
+  const mesh = new THREE.Mesh(bubbleGeo, bubbleMat);
+  mesh.position.set(x + (Math.random()-0.5)*0.2, y + (Math.random()-0.5)*0.2, z + (Math.random()-0.5)*0.2);
+  scene.add(mesh);
+  bubbleParticles.push({ mesh, vy: 0.015 + Math.random()*0.02, vx: -0.05 - Math.random()*0.03, life: 1.0 });
+}
+
+const sparkParticles = [];
+const sparkGeo = new THREE.SphereGeometry(0.08, 6, 6);
+const sparkMat = new THREE.MeshBasicMaterial({ color:0xf5c451 });
+
+function spawnSparkle(x, y, z) {
+  for (let i = 0; i < 8; i++) {
+    const mesh = new THREE.Mesh(sparkGeo, sparkMat);
+    mesh.position.set(x, y, z);
+    scene.add(mesh);
+    sparkParticles.push({
+      mesh,
+      vx: (Math.random()-0.5)*0.2,
+      vy: (Math.random()-0.5)*0.2,
+      vz: (Math.random()-0.5)*0.2,
+      life: 1.0
+    });
+  }
+}
+
+// ---------------------------------------------------------------
 // ORCA BUILD
+// ---------------------------------------------------------------
 function buildOrca() {
   const group = new THREE.Group();
 
-  const blackMat = new THREE.MeshStandardMaterial({ color:0x0b0f14, roughness:0.35, metalness:0.25 });
-  const whiteMat = new THREE.MeshStandardMaterial({ color:0xeaf6f6, roughness:0.4, metalness:0.1 });
+  const blackMat = new THREE.MeshStandardMaterial({ color:0x0a0e14, roughness:0.2, metalness:0.4, shininess:90 });
+  const whiteMat = new THREE.MeshStandardMaterial({ color:0xf0fafa, roughness:0.2, metalness:0.1 });
 
   const bodyGeo = new THREE.SphereGeometry(0.62, 32, 24);
   bodyGeo.scale(1, 0.82, 1.9);
@@ -199,7 +327,7 @@ function buildOrca() {
 
   const saddleGeo = new THREE.SphereGeometry(0.32, 16, 12);
   saddleGeo.scale(1, 0.4, 0.7);
-  const saddleMat = new THREE.MeshStandardMaterial({ color:0x4a5a5f, roughness:0.5 });
+  const saddleMat = new THREE.MeshStandardMaterial({ color:0x4a5a5f, roughness:0.4 });
   const saddle = new THREE.Mesh(saddleGeo, saddleMat);
   saddle.position.set(0, 0.95, -0.55);
   group.add(saddle);
@@ -239,7 +367,6 @@ function buildOrca() {
 
   group.userData.parts = { body, dorsalFin, fluke, pecL, pecR };
   group.scale.set(0.85,0.85,0.85);
-
   group.rotation.y = Math.PI/2;
 
   return group;
@@ -256,14 +383,16 @@ const GRAVITY = -0.028;
 const JUMP_FORCE = 0.46;
 orca.position.set(ORCA_X, groundY, 0);
 
+// ---------------------------------------------------------------
 // OBSTACLES + COINS
+// ---------------------------------------------------------------
 const SPAWN_X = 15;
 const DESPAWN_X = -9;
 
 const obstacles = [];
 const coins = [];
 const obstacleMat = new THREE.MeshStandardMaterial({ color:0x2b3a3f, roughness:0.8, metalness:0.1, flatShading:true });
-const coinMat = new THREE.MeshStandardMaterial({ color:0xf5c451, roughness:0.25, metalness:0.8, emissive:0x4a2f00, emissiveIntensity:0.4 });
+const coinMat = new THREE.MeshStandardMaterial({ color:0xf5c451, roughness:0.2, metalness:0.9, emissive:0x5a3f00, emissiveIntensity:0.5 });
 
 function makeReef() {
   const g = new THREE.Group();
@@ -290,7 +419,9 @@ function makeCoin() {
   return m;
 }
 
+// ---------------------------------------------------------------
 // GAME STATE
+// ---------------------------------------------------------------
 let running = false;
 let gameOver = false;
 let score = 0;
@@ -302,13 +433,16 @@ const speedTag = document.getElementById('speedTag');
 const scoreEl = document.getElementById('score');
 const centerMsg = document.getElementById('centerMsg');
 const startBtn = document.getElementById('startBtn');
-const mainGameLauncherBtn = document.getElementById('mainGameLauncherBtn');
 
 function resetGame() {
   obstacles.forEach(o=>scene.remove(o.mesh));
   coins.forEach(c=>scene.remove(c.mesh));
+  bubbleParticles.forEach(b=>scene.remove(b.mesh));
+  sparkParticles.forEach(s=>scene.remove(s.mesh));
   obstacles.length = 0;
   coins.length = 0;
+  bubbleParticles.length = 0;
+  sparkParticles.length = 0;
   score = 0;
   speed = baseSpeed;
   spawnTimer = 0;
@@ -341,6 +475,7 @@ function jump() {
   if (!isJumping) {
     isJumping = true;
     velocityY = JUMP_FORCE;
+    playJumpSound();
   }
 }
 
@@ -348,24 +483,24 @@ function startGame() {
   resetGame();
   running = true;
   centerMsg.style.display = 'none';
+  startBgMusic();
 }
 
 function endGame() {
   running = false;
   gameOver = true;
+  playHitSound();
   centerMsg.style.display = 'block';
   centerMsg.innerHTML = `
     <h1>ORCA DOWN</h1>
-    <p>You collected <span style="color:#f5c451">${score}</span> $LORCA</p>
-    <button class="playBtn" id="startBtn2">↻ SWIM AGAIN</button>
-    <div class="sub" style="margin-top:14px;">Reef strike — try again</div>
+    <p>You hunted <span style="color:#f5c451; font-weight:800;">${score}</span> $LORCA</p>
+    <button class="playBtn" id="startBtn2">↻ HUNT AGAIN</button>
+    <div class="sub" style="margin-top:16px;">Reef strike — try again</div>
   `;
   document.getElementById('startBtn2').addEventListener('click', startGame);
 }
 
 startBtn.addEventListener('click', startGame);
-mainGameLauncherBtn.addEventListener('click', startGame);
-
 window.addEventListener('keydown', (e) => {
   if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); jump(); }
 });
@@ -377,7 +512,9 @@ function distXZ(a, b) {
   return Math.sqrt(dx*dx + dz*dz);
 }
 
+// ---------------------------------------------------------------
 // ANIMATE
+// ---------------------------------------------------------------
 const clock = new THREE.Clock();
 
 function animate() {
@@ -385,6 +522,7 @@ function animate() {
   const dt = Math.min(clock.getDelta(), 0.05);
   const t = clock.elapsedTime;
 
+  // Water ripple
   for (let i=0;i<waterPosAttr.count;i++){
     const ix = i*3;
     const x = waterBase[ix], y = waterBase[ix+1];
@@ -392,15 +530,22 @@ function animate() {
   }
   waterPosAttr.needsUpdate = true;
 
+  // Fin/tail swimming animation
   const parts = orca.userData.parts;
-  parts.fluke.rotation.y = Math.sin(t*9) * 0.35;
-  parts.pecL.rotation.y = Math.sin(t*4) * 0.15;
-  parts.pecR.rotation.y = -Math.sin(t*4) * 0.15;
-  parts.dorsalFin.rotation.z = -0.15 + Math.sin(t*9)*0.03;
+  parts.fluke.rotation.y = Math.sin(t*10) * 0.38;
+  parts.pecL.rotation.y = Math.sin(t*5) * 0.18;
+  parts.pecR.rotation.y = -Math.sin(t*5) * 0.18;
+  parts.dorsalFin.rotation.z = -0.15 + Math.sin(t*10)*0.04;
 
   if (running && !gameOver) {
     spawnTimer -= dt;
 
+    // Bubble trail generation
+    if (Math.random() < 0.6) {
+      spawnBubble(orca.position.x - 1.2, orca.position.y + 0.4, orca.position.z);
+    }
+
+    // Difficulty ramp
     if (t - lastSpeedBump > 8) {
       lastSpeedBump = t;
       speed = Math.min(speed * 1.14, baseSpeed*3.2);
@@ -413,6 +558,7 @@ function animate() {
       if (Math.random() < 0.75) spawnCoin();
     }
 
+    // Jump physics
     if (isJumping) {
       orca.position.y += velocityY;
       velocityY += GRAVITY;
@@ -425,6 +571,7 @@ function animate() {
     orca.rotation.z = isJumping ? velocityY*0.5 : Math.sin(t*3)*0.02;
     orca.position.z = Math.sin(t*1.3) * 0.05;
 
+    // Obstacles movement
     for (let i=obstacles.length-1;i>=0;i--){
       const o = obstacles[i];
       o.mesh.position.x -= speed;
@@ -441,6 +588,7 @@ function animate() {
       }
     }
 
+    // Coins movement
     for (let i=coins.length-1;i>=0;i--){
       const c = coins[i];
       c.mesh.position.x -= speed;
@@ -458,10 +606,38 @@ function animate() {
           c.taken = true;
           score += 100;
           scoreEl.textContent = score;
+          playCoinSound();
+          spawnSparkle(c.mesh.position.x, c.mesh.position.y, c.mesh.position.z);
           scene.remove(c.mesh);
           coins.splice(i,1);
         }
       }
+    }
+  }
+
+  // Animate Particles
+  for (let i = bubbleParticles.length - 1; i >= 0; i--) {
+    const b = bubbleParticles[i];
+    b.mesh.position.y += b.vy;
+    b.mesh.position.x += b.vx;
+    b.life -= 0.02;
+    b.mesh.scale.setScalar(b.life);
+    if (b.life <= 0) {
+      scene.remove(b.mesh);
+      bubbleParticles.splice(i, 1);
+    }
+  }
+
+  for (let i = sparkParticles.length - 1; i >= 0; i--) {
+    const s = sparkParticles[i];
+    s.mesh.position.x += s.vx;
+    s.mesh.position.y += s.vy;
+    s.mesh.position.z += s.vz;
+    s.life -= 0.04;
+    s.mesh.scale.setScalar(s.life);
+    if (s.life <= 0) {
+      scene.remove(s.mesh);
+      sparkParticles.splice(i, 1);
     }
   }
 
