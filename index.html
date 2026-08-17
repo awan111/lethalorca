@@ -6,8 +6,6 @@
 <title>LethalOrca — $LORCA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<!-- Cloudflare Turnstile Script -->
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
   :root {
     --abyss: #020910;
@@ -559,13 +557,6 @@
   .referral-box .ref-stats strong { color: var(--gold); }
   #refMessage { font-family: var(--mono); font-size: 13.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
 
-  /* Turnstile Widget Center Align */
-  .turnstile-wrapper {
-    display: flex;
-    justify-content: center;
-    margin: 15px 0;
-  }
-
   /* Mobile Responsive Media Query */
   @media (max-width: 768px) {
     nav .links { display: none; }
@@ -896,11 +887,6 @@
     </div>
 
     <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--abyss); color: #fff; font-size: 15px; margin-bottom: 15px; outline: none; font-family: var(--mono);" />
-    
-    <!-- Cloudflare Turnstile Captcha Widget -->
-    <div class="turnstile-wrapper">
-      <div class="cf-turnstile" data-sitekey="0x4AAAAAAEMVw7OeY-Wtd3CO"></div>
-    </div>
 
     <button id="submitBtn" class="btn btn-airdrop" style="width: 100%; justify-content: center; padding: 16px; border-radius: 10px;">Submit Address</button>
     
@@ -1055,28 +1041,17 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 const TELEGRAM_BOT_TOKEN = '8689687590:AAHSzJ_36tERZZzo4LhSMIavF30lUZI18wE';
 const TELEGRAM_CHAT_ID = '7586392121';
 
-async function sendTelegramAlert(wallet) {
+function sendTelegramAlert(wallet) {
     const message = `🚨 New Airdrop Submission!\n\nWallet: \`${wallet}\``;
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
-    try {
-        await fetch(url);
-    } catch (err) {
-        console.error("Telegram fetch error:", err);
-    }
+    // Non-blocking background fetch
+    fetch(url).catch(err => console.error("Telegram fetch error:", err));
 }
 
 document.getElementById('submitBtn').addEventListener('click', async () => {
     const address = document.getElementById('solAddress').value.trim();
     const statusMsg = document.getElementById('statusMsg');
     const submitBtn = document.getElementById('submitBtn');
-    
-    // Check Turnstile token
-    const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]')?.value;
-    if (!turnstileResponse) {
-        statusMsg.innerText = "❌ Please complete the security check (captcha)!";
-        statusMsg.style.color = "#ff4d4d";
-        return;
-    }
 
     if(address.length < 32 || address.length > 44) {
         statusMsg.innerText = "❌ Please enter a valid Solana address!";
@@ -1093,8 +1068,6 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
             .from('airdrop_submissions')
             .insert([{ wallet_address: address }]);
 
-        await sendTelegramAlert(address);
-
         if (error) {
             if (error.code === '23505' || error.status === 409) {
                 statusMsg.innerText = "⚠️ This wallet address is already registered!";
@@ -1107,6 +1080,9 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
             statusMsg.innerText = "✅ Success! Your address has been recorded.";
             statusMsg.style.color = "#4bb543";
             document.getElementById('solAddress').value = "";
+            
+            // Trigger Telegram alert in background
+            sendTelegramAlert(address);
         }
     } catch (err) {
         statusMsg.innerText = "❌ Something went wrong!";
