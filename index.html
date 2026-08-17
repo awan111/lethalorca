@@ -6,6 +6,10 @@
 <title>LethalOrca — $LORCA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Cloudflare Turnstile Script -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 <style>
   :root {
     --abyss: #020910;
@@ -434,7 +438,7 @@
   }
   .newsletter-box p { margin: 0; max-width: 440px; font-size: 15px; color: var(--muted); }
 
-  /* Modals (Generator & Airdrop Popups) */
+  /* Modals */
   .generator-modal {
     display: none;
     position: fixed;
@@ -501,7 +505,6 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Pro Airdrop Modal Box */
   .airdrop-modal-content {
     background: linear-gradient(180deg, #081a2b, #05121e);
     border: 1px solid rgba(168, 85, 247, 0.4);
@@ -557,7 +560,6 @@
   .referral-box .ref-stats strong { color: var(--gold); }
   #refMessage { font-family: var(--mono); font-size: 13.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
 
-  /* Mobile Responsive Media Query */
   @media (max-width: 768px) {
     nav .links { display: none; }
     .menu-toggle { display: block; }
@@ -579,7 +581,6 @@
 <body>
 <div class="noise-layer"></div>
 
-<!-- Pro Fixed Top-Left Back Button (Visible everywhere) -->
 <div class="top-left-buttons">
     <button class="btn-top" onclick="history.back()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -601,7 +602,6 @@
   <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
 </nav>
 
-<!-- Mobile Navigation Dropdown Menu -->
 <div id="mobileMenu" class="mobile-menu">
   <a href="#about" onclick="toggleMobileMenu()">About</a>
   <a href="#transparency" onclick="toggleMobileMenu()">Transparency</a>
@@ -882,11 +882,16 @@
     </div>
     <p style="color: var(--muted); font-size: 14.5px; margin-bottom: 20px;">Drop your Solana wallet address below to participate in the official $LORCA airdrop event!</p>
     
-    <div class="ca-box" style="background: var(--abyss); padding: 12px; border-radius: 8px; font-size: 11.5px; color: var(--teal-glow); word-break: break-all; margin-bottom: 20px; border: 1px dashed var(--line);">
+    <div class="ca-box" style="background: var(--abyss); padding: 12px; border-radius: 8px; font-size: 11.5px; color: var(--teal-glow); word-break: break-all; margin-bottom: 15px; border: 1px dashed var(--line);">
       <strong>CA:</strong> 7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump
     </div>
 
     <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--abyss); color: #fff; font-size: 15px; margin-bottom: 15px; outline: none; font-family: var(--mono);" />
+
+    <!-- Cloudflare Non-interactive Turnstile Widget (Invisible verification) -->
+    <div style="margin-bottom: 15px; display: flex; justify-content: center;">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAEMVw7OeY-Wtd3CO" data-theme="dark" data-compact="true"></div>
+    </div>
 
     <button id="submitBtn" class="btn btn-airdrop" style="width: 100%; justify-content: center; padding: 16px; border-radius: 10px;">Submit Address</button>
     
@@ -927,12 +932,8 @@ function closeAirdropModal() {
 window.onclick = function(event) {
   var genModal = document.getElementById('generatorModal');
   var airModal = document.getElementById('airdropModal');
-  if (event.target == genModal) {
-    closeGenerator();
-  }
-  if (event.target == airModal) {
-    closeAirdropModal();
-  }
+  if (event.target == genModal) closeGenerator();
+  if (event.target == airModal) closeAirdropModal();
 }
 
 const REFERRAL_BACKEND_URL = "https://lethalorca-backend.vercel.app";
@@ -1020,10 +1021,7 @@ document.getElementById('claimRefBtn').addEventListener('click', async () => {
     });
     const data = await res.json();
 
-    document.getElementById('refMessage').innerText = data.success
-      ? data.message
-      : data.error;
-
+    document.getElementById('refMessage').innerText = data.success ? data.message : data.error;
     if (data.success) loadReferralData(referralWallet);
   } catch (err) {
     document.getElementById('refMessage').innerText = "Claim failed. Try again.";
@@ -1033,7 +1031,7 @@ document.getElementById('claimRefBtn').addEventListener('click', async () => {
   }
 });
 
-// Airdrop Form Submission Logic
+// Airdrop Form Logic with Turnstile & Anti-Bot Rate Limiting
 const SUPABASE_URL = 'https://obzyiecwhfdanzjtuhiq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ienlpZWN3aGZkYW56anR1aGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MzA5MjYsImV4cCI6MjEwMTAwNjkyNn0.gYPNd5oH9hPaTLWoJkDDx-eTfkm_AXIjsj-ycHowpuc';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1044,8 +1042,7 @@ const TELEGRAM_CHAT_ID = '7586392121';
 function sendTelegramAlert(wallet) {
     const message = `🚨 New Airdrop Submission!\n\nWallet: \`${wallet}\``;
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
-    // Non-blocking background fetch
-    fetch(url).catch(err => console.error("Telegram fetch error:", err));
+    fetch(url).catch(err => console.error("Telegram error:", err));
 }
 
 document.getElementById('submitBtn').addEventListener('click', async () => {
@@ -1056,6 +1053,14 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     if(address.length < 32 || address.length > 44) {
         statusMsg.innerText = "❌ Please enter a valid Solana address!";
         statusMsg.style.color = "#ff4d4d";
+        return;
+    }
+
+    // Turnstile Captcha Check
+    const turnstileToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
+    if (!turnstileToken) {
+        statusMsg.innerText = "⚠️ Captcha verification in progress, please wait a second...";
+        statusMsg.style.color = "#ffa500";
         return;
     }
 
@@ -1081,15 +1086,27 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
             statusMsg.style.color = "#4bb543";
             document.getElementById('solAddress').value = "";
             
-            // Trigger Telegram alert in background
+            // Non-blocking Telegram Alert
             sendTelegramAlert(address);
         }
     } catch (err) {
         statusMsg.innerText = "❌ Something went wrong!";
         statusMsg.style.color = "#ff4d4d";
     } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Submit Address";
+        // Reset Captcha for security
+        if (window.turnstile) window.turnstile.reset();
+
+        // 10-second Cooldown to block spam clicks
+        let cooldown = 10;
+        const interval = setInterval(() => {
+            submitBtn.innerText = `Wait ${cooldown}s...`;
+            cooldown--;
+            if (cooldown < 0) {
+                clearInterval(interval);
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Address";
+            }
+        }, 1000);
     }
 });
 </script>
