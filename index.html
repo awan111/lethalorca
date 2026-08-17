@@ -11,17 +11,17 @@
   #gameCanvas { display:block; width:100%; height:100%; }
 
   #hud {
-    position:fixed; top:0; left:0; width:100%; padding:18px 22px;
-    display:flex; justify-content:space-between; align-items:flex-start;
-    pointer-events:none; z-index:10;
+    position:fixed; top:0; left:0; width:100%; padding:14px 18px;
+    display:flex; gap:12px; justify-content:flex-start; align-items:flex-start;
+    pointer-events:none; z-index:12;
   }
   .hud-box {
     background:rgba(4,18,30,0.55); border:1px solid rgba(45,212,191,0.35);
-    backdrop-filter: blur(6px); border-radius:12px; padding:10px 16px;
-    box-shadow:0 0 18px rgba(45,212,191,0.15);
+    backdrop-filter: blur(6px); border-radius:12px; padding:8px 12px;
+    box-shadow:0 0 18px rgba(45,212,191,0.12); pointer-events:auto;
   }
-  #score { color:#f5c451; font-size:22px; font-weight:700; letter-spacing:0.5px; text-shadow:0 0 10px rgba(245,196,81,0.5); }
-  #scoreLabel { color:#7fe3d4; font-size:11px; letter-spacing:2px; text-transform:uppercase; }
+  #score { color:#f5c451; font-size:20px; font-weight:700; letter-spacing:0.5px; text-shadow:0 0 10px rgba(245,196,81,0.5); }
+  #scoreLabel { color:#7fe3d4; font-size:10px; letter-spacing:2px; text-transform:uppercase; }
   #speedTag { color:#7fe3d4; font-size:12px; letter-spacing:1px; text-align:right; }
 
   #centerMsg {
@@ -38,7 +38,7 @@
     background:linear-gradient(135deg,#0f766e,#134e4a); color:#f5c451;
     border:1px solid #f5c451; padding:12px 30px; font-size:15px; letter-spacing:1px;
     border-radius:30px; cursor:pointer; box-shadow:0 0 20px rgba(245,196,81,0.25);
-    transition:transform .15s ease;
+    transition:transform .15s ease; pointer-events:auto;
   }
   button.playBtn:active { transform:scale(0.95); }
 
@@ -49,19 +49,39 @@
     color: #020b14;
     font-size: 16px;
     font-weight: 700;
-    padding: 14px 32px;
+    padding: 12px 24px;
     border-radius: 50px;
     border: none;
     cursor: pointer;
     box-shadow: 0 0 15px rgba(245,196,81,0.4);
     text-decoration: none;
-    margin-bottom: 12px;
+    margin-bottom: 8px; pointer-events:auto;
   }
 
   #tapHint {
     position:fixed; bottom:26px; left:50%; transform:translateX(-50%);
     color:#7fe3d4; font-size:12px; letter-spacing:1.5px; opacity:0.75; z-index:10;
     pointer-events:none;
+  }
+
+  /* HUD controls on the right */
+  #hud-right { margin-left:auto; display:flex; gap:8px; align-items:center; }
+  .small-btn { background:transparent; border:1px solid rgba(127,227,212,0.08); color:#7fe3d4; font-size:12px; padding:6px 8px; border-radius:8px; cursor:pointer; pointer-events:auto; }
+
+  /* Touch jump button */
+  #touchJumpBtn {
+    position:fixed; right:18px; bottom:18px; z-index:18; pointer-events:auto;
+    background:linear-gradient(135deg,#0f766e,#134e4a); color:#f5c451; border:none; padding:14px 18px; border-radius:50px; box-shadow:0 6px 18px rgba(0,0,0,0.4);
+    font-weight:700; font-size:16px;
+  }
+
+  /* Pause overlay smaller */
+  .overlay-note { font-size:13px; color:#9fd8cf; }
+
+  @media (max-width:520px){
+    #centerMsg h1 { font-size:28px; }
+    .hud-box { padding:8px 10px; }
+    #touchJumpBtn { padding:12px 14px; }
   }
 </style>
 </head>
@@ -72,8 +92,20 @@
     <div id="scoreLabel">LORCA COLLECTED</div>
     <div id="score">0</div>
   </div>
+
   <div class="hud-box">
     <div id="speedTag">SPEED x1.0</div>
+  </div>
+
+  <div id="hud-right">
+    <div class="hud-box">
+      <div class="overlay-note">HIGHSCORE</div>
+      <div id="highscore" style="color:#f5c451; font-weight:700">0</div>
+    </div>
+    <div class="hud-box" style="display:flex; gap:8px; align-items:center;">
+      <button id="pauseBtn" class="small-btn">Pause</button>
+      <button id="fsBtn" class="small-btn">Fullscreen</button>
+    </div>
   </div>
 </div>
 
@@ -89,14 +121,17 @@
   </div>
 
   <button class="playBtn" id="startBtn">▶ START SWIM</button>
-  <div class="sub" style="margin-top:14px;">Each coin = 100 $LORCA</div>
+  <div class="sub" style="margin-top:12px;">Each coin = 100 $LORCA</div>
 </div>
 
 <canvas id="gameCanvas"></canvas>
 
+<button id="touchJumpBtn" style="display:none">JUMP</button>
+
 <script>
 // ---------------------------------------------------------------
 // SCENE SETUP — SIDE-VIEW RUNNER
+// Improvements added: highscore (localStorage), simple sounds (WebAudio), pause/fullscreen, touch jump button
 // ---------------------------------------------------------------
 const canvas = document.getElementById('gameCanvas');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false });
@@ -298,11 +333,56 @@ let baseSpeed = 0.16;
 let speed = baseSpeed;
 let spawnTimer = 0;
 let lastSpeedBump = 0;
+let paused = false;
 const speedTag = document.getElementById('speedTag');
 const scoreEl = document.getElementById('score');
 const centerMsg = document.getElementById('centerMsg');
 const startBtn = document.getElementById('startBtn');
 const mainGameLauncherBtn = document.getElementById('mainGameLauncherBtn');
+const highscoreEl = document.getElementById('highscore');
+const pauseBtn = document.getElementById('pauseBtn');
+const fsBtn = document.getElementById('fsBtn');
+const touchJumpBtn = document.getElementById('touchJumpBtn');
+
+// Highscore via localStorage
+const HS_KEY = 'lethalOrca_highscore';
+function loadHighscore(){
+  const v = parseInt(localStorage.getItem(HS_KEY));
+  return isNaN(v)?0:v;
+}
+function saveHighscore(v){
+  localStorage.setItem(HS_KEY, String(v));
+}
+let highscore = loadHighscore();
+highscoreEl.textContent = highscore;
+
+// Simple WebAudio sounds (no external files)
+let audioCtx = null;
+function ensureAudio(){
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ audioCtx = null; }
+  }
+}
+function playTone(freq, type='sine', time=0.08, gain=0.12){
+  ensureAudio();
+  if (!audioCtx) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.value = 0;
+  o.connect(g); g.connect(audioCtx.destination);
+  const now = audioCtx.currentTime;
+  g.gain.setValueAtTime(0, now);
+  g.gain.linearRampToValueAtTime(gain, now+0.005);
+  o.start(now);
+  g.gain.exponentialRampToValueAtTime(0.0001, now+time);
+  o.stop(now+time+0.02);
+}
+function playSound(kind){
+  if (kind==='jump') playTone(520, 'sine', 0.08, 0.08);
+  else if (kind==='coin') { playTone(840, 'sawtooth', 0.12, 0.14); playTone(620,'sine',0.12,0.08); }
+  else if (kind==='crash') { playTone(120,'sine',0.25,0.25); playTone(220,'sawtooth',0.16,0.18); }
+}
 
 function resetGame() {
   obstacles.forEach(o=>scene.remove(o.mesh));
@@ -337,40 +417,96 @@ function spawnCoin() {
 }
 
 function jump() {
-  if (!running || gameOver) return;
+  if (!running || gameOver || paused) return;
   if (!isJumping) {
     isJumping = true;
     velocityY = JUMP_FORCE;
+    playSound('jump');
   }
 }
 
 function startGame() {
   resetGame();
   running = true;
+  paused = false;
   centerMsg.style.display = 'none';
+  touchJumpBtn.style.display = 'block';
 }
 
 function endGame() {
   running = false;
   gameOver = true;
+  playSound('crash');
+  // update highscore
+  if (score > highscore) { highscore = score; saveHighscore(highscore); }
+  highscoreEl.textContent = highscore;
+
   centerMsg.style.display = 'block';
   centerMsg.innerHTML = `
     <h1>ORCA DOWN</h1>
     <p>You collected <span style="color:#f5c451">${score}</span> $LORCA</p>
     <button class="playBtn" id="startBtn2">↻ SWIM AGAIN</button>
-    <div class="sub" style="margin-top:14px;">Reef strike — try again</div>
+    <div class="sub" style="margin-top:12px;">Reef strike — try again</div>
   `;
   document.getElementById('startBtn2').addEventListener('click', startGame);
+  touchJumpBtn.style.display = 'none';
 }
 
 startBtn.addEventListener('click', startGame);
 mainGameLauncherBtn.addEventListener('click', startGame);
 
+pauseBtn.addEventListener('click', togglePause);
+fsBtn.addEventListener('click', toggleFullscreen);
+
 window.addEventListener('keydown', (e) => {
   if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); jump(); }
+  if (e.code === 'KeyP') { togglePause(); }
 });
-window.addEventListener('touchstart', (e)=>{ jump(); });
+
+// touch/mouse
+window.addEventListener('touchstart', (e)=>{ 
+  // if touching a control, ignore
+  const tag = (e.target && e.target.tagName) || '';
+  if (tag === 'BUTTON' || e.target.id === 'pauseBtn' || e.target.id === 'fsBtn' ) return;
+  jump();
+});
 window.addEventListener('mousedown', (e)=>{ if(e.target.tagName!=='BUTTON') jump(); });
+
+touchJumpBtn.addEventListener('click', jump);
+
+function togglePause(){
+  if (!running || gameOver) return;
+  paused = !paused;
+  pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+  if (paused) {
+    centerMsg.style.display = 'block';
+    centerMsg.innerHTML = `<h1>PAUSED</h1><p class="overlay-note">Press P or Resume to continue</p><button class="playBtn" id="resumeBtn">▶ RESUME</button>`;
+    document.getElementById('resumeBtn').addEventListener('click', togglePause);
+  } else {
+    centerMsg.style.display = 'none';
+  }
+}
+
+function toggleFullscreen(){
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen?.();
+    fsBtn.textContent = 'Exit FS';
+  } else {
+    document.exitFullscreen?.();
+    fsBtn.textContent = 'Fullscreen';
+  }
+}
+
+window.addEventListener('fullscreenchange', ()=>{
+  if (!document.fullscreenElement) fsBtn.textContent = 'Fullscreen';
+});
+
+window.addEventListener('visibilitychange', ()=>{
+  // auto-pause when tab hidden
+  if (document.hidden && running && !gameOver && !paused) {
+    togglePause();
+  }
+});
 
 function distXZ(a, b) {
   const dx = a.x - b.x, dz = a.z - b.z;
@@ -398,7 +534,7 @@ function animate() {
   parts.pecR.rotation.y = -Math.sin(t*4) * 0.15;
   parts.dorsalFin.rotation.z = -0.15 + Math.sin(t*9)*0.03;
 
-  if (running && !gameOver) {
+  if (running && !gameOver && !paused) {
     spawnTimer -= dt;
 
     if (t - lastSpeedBump > 8) {
@@ -458,6 +594,7 @@ function animate() {
           c.taken = true;
           score += 100;
           scoreEl.textContent = score;
+          playSound('coin');
           scene.remove(c.mesh);
           coins.splice(i,1);
         }
@@ -474,6 +611,19 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
+// show touch jump on small screens
+function updateTouchVisibility(){
+  if ('ontouchstart' in window || navigator.maxTouchPoints>0) {
+    touchJumpBtn.style.display = running && !gameOver ? 'block' : (running? 'block':'none');
+  } else touchJumpBtn.style.display = 'none';
+}
+window.addEventListener('load', updateTouchVisibility);
+window.addEventListener('resize', updateTouchVisibility);
+
+// initialize audio on user gesture
+['click','touchstart','keydown'].forEach(ev=>window.addEventListener(ev, ()=>ensureAudio(), {once:true}));
+
 </script>
 </body>
 </html>
