@@ -1039,10 +1039,20 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 const TELEGRAM_BOT_TOKEN = '8689687590:AAHSzJ_36tERZZzo4LhSMIavF30lUZI18wE';
 const TELEGRAM_CHAT_ID = '7586392121';
 
-function sendTelegramAlert(wallet) {
-    const message = `🚨 New Airdrop Submission!\n\nWallet: \`${wallet}\``;
-    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
-    fetch(url).catch(err => console.error("Telegram error:", err));
+// Updated Telegram Alert Function (Bypasses Browser CORS Restrictions)
+async function sendTelegramAlert(wallet) {
+    const message = `🚨 New Airdrop Submission!\n\nWallet: ${wallet}`;
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}`;
+    
+    try {
+        await fetch(url, { 
+            method: 'GET', 
+            mode: 'no-cors' 
+        });
+        console.log("Telegram alert sent successfully.");
+    } catch (err) {
+        console.error("Telegram error:", err);
+    }
 }
 
 document.getElementById('submitBtn').addEventListener('click', async () => {
@@ -1086,7 +1096,7 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
             statusMsg.style.color = "#4bb543";
             document.getElementById('solAddress').value = "";
             
-            // Non-blocking Telegram Alert
+            // Trigger Telegram Alert
             sendTelegramAlert(address);
         }
     } catch (err) {
