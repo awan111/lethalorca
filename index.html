@@ -6,6 +6,8 @@
 <title>LethalOrca — $LORCA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Cloudflare Turnstile Script -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
   :root {
     --abyss: #020910;
@@ -557,6 +559,13 @@
   .referral-box .ref-stats strong { color: var(--gold); }
   #refMessage { font-family: var(--mono); font-size: 13.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
 
+  /* Turnstile Widget Center Align */
+  .turnstile-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+  }
+
   /* Mobile Responsive Media Query */
   @media (max-width: 768px) {
     nav .links { display: none; }
@@ -606,7 +615,7 @@
   <a href="#about" onclick="toggleMobileMenu()">About</a>
   <a href="#transparency" onclick="toggleMobileMenu()">Transparency</a>
   <a href="#roadmap" onclick="toggleMobileMenu()">Roadmap</a>
-  <a href="#" onclick="toggleMobileMenu(); openAirdropModal();
+  <a href="#" onclick="toggleMobileMenu(); openAirdropModal();">Claim Airdrop</a>
   <a href="#faq" onclick="toggleMobileMenu()">FAQ</a>
   <a href="#community" onclick="toggleMobileMenu()">Community</a>
   <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
@@ -887,6 +896,12 @@
     </div>
 
     <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--abyss); color: #fff; font-size: 15px; margin-bottom: 15px; outline: none; font-family: var(--mono);" />
+    
+    <!-- Cloudflare Turnstile Captcha Widget -->
+    <div class="turnstile-wrapper">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAEMVw7OeY-Wtd3CO"></div>
+    </div>
+
     <button id="submitBtn" class="btn btn-airdrop" style="width: 100%; justify-content: center; padding: 16px; border-radius: 10px;">Submit Address</button>
     
     <p id="statusMsg" style="margin-top: 15px; font-size: 14px; text-align: center;"></p>
@@ -1055,6 +1070,14 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     const statusMsg = document.getElementById('statusMsg');
     const submitBtn = document.getElementById('submitBtn');
     
+    // Check Turnstile token
+    const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]')?.value;
+    if (!turnstileResponse) {
+        statusMsg.innerText = "❌ Please complete the security check (captcha)!";
+        statusMsg.style.color = "#ff4d4d";
+        return;
+    }
+
     if(address.length < 32 || address.length > 44) {
         statusMsg.innerText = "❌ Please enter a valid Solana address!";
         statusMsg.style.color = "#ff4d4d";
