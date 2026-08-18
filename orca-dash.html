@@ -171,7 +171,8 @@
     <label class="field-label">Screenshot / Proof (optional)</label>
     <input id="claimShot" type="file" accept="image/*" />
 
-    <button class="menu-btn gold" style="margin-top:16px;" onclick="UI.submitClaim()">SUBMIT CLAIM</button>
+    <button class="menu-btn gold" id="submitClaimBtn" style="margin-top:16px;" onclick="UI.submitClaim()">SUBMIT CLAIM</button>
+    <div id="claimResult" class="claim-note hidden"></div>
     <div class="claim-note">Claims are verified server-side against session data (score, level, coins, wallet) before payout. Screenshots are supporting proof, not the sole basis for withdrawal — this keeps the LORCA economy resistant to tampering.</div>
   </div>
 </div>
@@ -960,6 +961,11 @@ const UI = {
     const wallet = document.getElementById('claimWallet').value.trim();
     if(!wallet){ showToast('Enter a wallet address'); return; }
 
+    const btn = document.getElementById('submitClaimBtn');
+    const resultBox = document.getElementById('claimResult');
+    btn.disabled = true;
+    btn.textContent = 'SUBMITTING...';
+
     const fileInput = document.getElementById('claimShot');
     const file = fileInput.files && fileInput.files[0];
     let screenshotBase64 = null;
@@ -978,17 +984,42 @@ const UI = {
       coins: STATE.sessionCoins,
       score: STATE.bestScore,
       wallet,
-      screenshot: screenshotBase64   // null if no file was attached
+      screenshot: screenshotBase64,   // null if no file was attached
+      submittedAt: new Date().toISOString()
     };
+
+    let serverConfirmed = false;
     try{
-      await fetch(CONFIG.api.claim, {
+      const res = await fetch(CONFIG.api.claim, {
         method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
       });
-      showToast('Claim submitted for verification');
+      // fetch() only rejects on a network failure — a missing/404 endpoint
+      // still "succeeds" as far as fetch is concerned, so we must check
+      // res.ok ourselves or a dead endpoint would silently look fine.
+      if(res.ok){
+        serverConfirmed = true;
+      } else {
+        throw new Error('Endpoint returned ' + res.status);
+      }
     }catch(err){
-      showToast('Claim saved locally — backend endpoint not wired yet');
-      console.log('[orca-runner] claim stub:', payload);
+      console.log('[orca-runner] claim backend not reachable yet — saved locally instead:', payload);
     }
+
+    // Always keep a local copy so nothing is lost while the backend isn't wired up.
+    try{
+      const key = 'lorca_orca_claims';
+      const existing = JSON.parse(localStorage.getItem(key) || '[]');
+      existing.push(payload);
+      localStorage.setItem(key, JSON.stringify(existing));
+    }catch(err){ /* storage unavailable — ignore, payload is still in console */ }
+
+    btn.disabled = false;
+    btn.textContent = 'SUBMIT CLAIM';
+    resultBox.classList.remove('hidden');
+    resultBox.textContent = serverConfirmed
+      ? '✅ Claim received by the server — awaiting admin verification.'
+      : '📝 Claim saved on this device (backend not connected yet). It will show up in your browser console for now — ask the dev team to wire up ' + CONFIG.api.claim + ' to actually store this in the database.';
+    showToast(serverConfirmed ? 'Claim submitted for verification' : 'Claim recorded locally');
   }
 };
 
