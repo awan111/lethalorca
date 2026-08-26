@@ -1,1123 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-<title>LethalOrca — $LORCA</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-<!-- Cloudflare Turnstile Script -->
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-
-<style>
-  :root {
-    --abyss: #020910;
-    --deep: #05121e;
-    --deep2: #081a2b;
-    --teal: #2dd4bf;
-    --teal-glow: #5eead4;
-    --gold: #f2c94c;
-    --ink: #f4fcfc;
-    --muted: #8ab4b4;
-    --line: rgba(94, 234, 212, 0.2);
-    --display: 'Space Grotesk', sans-serif;
-    --body: 'Inter', sans-serif;
-    --mono: 'IBM Plex Mono', monospace;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--abyss);
-    color: var(--ink);
-    font-family: var(--body);
-    line-height: 1.6;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-    -webkit-text-size-adjust: 100%;
-  }
-  a { color: var(--teal-glow); text-decoration: none; }
-
-  /* Pro Fixed Top-Left Back Button */
-  .top-left-buttons {
-    position: fixed;
-    top: 85px;
-    left: 20px;
-    z-index: 99;
-  }
-  .top-left-buttons .btn-top {
-    padding: 10px 18px;
-    font-size: 13.5px;
-    font-weight: 600;
-    border-radius: 12px;
-    background: rgba(5, 18, 30, 0.9);
-    border: 1px solid rgba(94, 234, 212, 0.35);
-    color: var(--teal-glow);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    cursor: pointer;
-    font-family: var(--body);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.6), 0 0 15px rgba(45,212,191,0.15);
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .top-left-buttons .btn-top:hover {
-    background: rgba(94, 234, 212, 0.2);
-    border-color: var(--teal-glow);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 25px rgba(94,234,212,0.35);
-    transform: translateY(-2px);
-  }
-
-  .noise-layer {
-    position: fixed;
-    inset: 0;
-    background-image: radial-gradient(circle at 20% 20%, rgba(45,212,191,0.08), transparent 40%),
-                       radial-gradient(circle at 80% 60%, rgba(242,201,76,0.05), transparent 45%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 5%;
-    z-index: 100;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    background: rgba(2,9,16,0.9);
-    border-bottom: 1px solid var(--line);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
-  .brand {
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 18px;
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-glow); box-shadow: 0 0 16px var(--teal-glow); }
-  nav .links { display: flex; gap: 20px; font-size: 14px; color: var(--muted); align-items: center; }
-  nav .links a:hover { color: var(--teal-glow); text-shadow: 0 0 10px rgba(94,234,212,0.5); }
-
-  /* Mobile Hamburger Menu */
-  .menu-toggle {
-    display: none;
-    background: transparent;
-    border: 1px solid var(--line);
-    color: var(--teal-glow);
-    font-size: 22px;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-
-  .mobile-menu {
-    display: none;
-    position: fixed;
-    top: 65px; left: 0; right: 0;
-    background: rgba(5, 18, 30, 0.98);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--line);
-    padding: 20px 5%;
-    flex-direction: column;
-    gap: 14px;
-    z-index: 99;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.7);
-  }
-  .mobile-menu.active { display: flex; }
-  .mobile-menu a {
-    font-size: 16px;
-    color: var(--ink);
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-  }
-  .mobile-menu a:hover { color: var(--teal-glow); }
-
-  section { position: relative; z-index: 1; padding: 120px 5% 80px; max-width: 1240px; margin: 0 auto; }
-
-  #hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-top: 90px;
-    position: relative;
-  }
-  .depth-tag {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--teal);
-    letter-spacing: 2px;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    text-shadow: 0 0 10px rgba(45,212,191,0.3);
-  }
-  h1.hero-title {
-    font-family: var(--display);
-    font-size: clamp(42px, 7vw, 100px);
-    font-weight: 700;
-    line-height: 1.05;
-    letter-spacing: -1.5px;
-    background: linear-gradient(180deg, #ffffff 0%, var(--teal-glow) 120%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    filter: drop-shadow(0 4px 25px rgba(94,234,212,0.2));
-  }
-  .hero-sub {
-    font-size: 17px;
-    color: var(--muted);
-    max-width: 580px;
-    margin-top: 20px;
-  }
-  
-  .hero-cta { 
-    display: flex; 
-    gap: 14px; 
-    margin-top: 32px; 
-    flex-wrap: wrap; 
-  }
-  .btn {
-    font-family: var(--body);
-    font-weight: 600;
-    font-size: 15px;
-    padding: 15px 26px;
-    border-radius: 100px;
-    border: 1px solid var(--line);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    position: relative;
-    text-align: center;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--teal-glow), var(--teal));
-    color: var(--abyss);
-    border: none;
-    font-weight: 700;
-    box-shadow: 0 4px 25px rgba(45, 212, 191, 0.4);
-  }
-  .btn-primary:hover {
-    box-shadow: 0 8px 35px rgba(45, 212, 191, 0.65);
-    transform: translateY(-2px);
-  }
-  .btn-ghost { color: var(--ink); background: rgba(255,255,255,0.03); }
-  .btn-ghost:hover {
-    border-color: var(--teal-glow);
-    color: var(--teal-glow);
-    background: rgba(94,234,212,0.08);
-    transform: translateY(-2px);
-  }
-
-  .btn-play {
-    background: linear-gradient(135deg, var(--gold), #ffb347);
-    color: #2a1f00;
-    border: none;
-    font-weight: 700;
-    box-shadow: 0 4px 25px rgba(242, 201, 76, 0.45);
-    animation: play-pulse 2.6s ease-in-out infinite;
-  }
-  .btn-play:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 10px 35px rgba(242, 201, 76, 0.7);
-  }
-  .btn-play .play-icon {
-    display: inline-flex;
-    width: 18px; height: 18px;
-    align-items: center; justify-content: center;
-    background: rgba(0,0,0,0.15);
-    border-radius: 50%;
-    font-size: 10px;
-  }
-
-  .btn-generator {
-    background: linear-gradient(135deg, #00f2fe, #3b82f6);
-    color: #000;
-    border: none;
-    font-weight: 700;
-    box-shadow: 0 4px 25px rgba(0, 242, 254, 0.45);
-  }
-  .btn-generator:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 35px rgba(0, 242, 254, 0.75);
-  }
-
-  .btn-staking {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: #fff;
-    border: none;
-    font-weight: 700;
-    box-shadow: 0 4px 25px rgba(16, 185, 129, 0.45);
-  }
-  .btn-staking:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 35px rgba(16, 185, 129, 0.75);
-  }
-
-  .btn-airdrop {
-    background: linear-gradient(135deg, #a855f7, #ec4899);
-    color: #fff;
-    border: none;
-    font-weight: 700;
-    box-shadow: 0 4px 25px rgba(168, 85, 247, 0.45);
-    animation: airdrop-pulse 2.8s ease-in-out infinite;
-  }
-  .btn-airdrop:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 10px 35px rgba(236, 72, 153, 0.75);
-  }
-
-  @keyframes play-pulse {
-    0%, 100% { box-shadow: 0 4px 25px rgba(242, 201, 76, 0.45); }
-    50% { box-shadow: 0 4px 35px rgba(242, 201, 76, 0.75); }
-  }
-
-  @keyframes airdrop-pulse {
-    0%, 100% { box-shadow: 0 4px 25px rgba(168, 85, 247, 0.45); }
-    50% { box-shadow: 0 4px 35px rgba(236, 72, 153, 0.75); }
-  }
-
-  #orca-trail { position: absolute; right: -5%; top: 20%; width: 55%; max-width: 640px; opacity: 0.9; }
-
-  .depth-marker {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    margin-bottom: 12px;
-  }
-  .depth-marker .depth-val { font-family: var(--mono); font-size: 14px; color: var(--teal); letter-spacing: 1px; }
-  .depth-marker .depth-name { font-family: var(--mono); font-size: 14px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; }
-  h2.section-title {
-    font-family: var(--display);
-    font-size: clamp(32px, 4vw, 48px);
-    font-weight: 600;
-    margin-bottom: 16px;
-    letter-spacing: -1px;
-  }
-  .section-lede { color: var(--muted); max-width: 620px; font-size: 16px; margin-bottom: 40px; }
-
-  hr.divider { border: none; border-top: 1px solid var(--line); margin: 0 5%; }
-
-  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
-  .about-grid p { color: var(--muted); margin-bottom: 16px; font-size: 15.5px; }
-  .founder-card {
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 28px;
-    background: linear-gradient(180deg, var(--deep2), var(--deep));
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-  }
-  .founder-card .label { font-family: var(--mono); font-size: 12px; color: var(--teal); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
-  .founder-card h3 { font-family: var(--display); font-size: 22px; margin-bottom: 12px; }
-  .founder-card p { font-size: 15px; color: var(--muted); }
-
-  .ledger {
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    overflow: hidden;
-    background: var(--deep);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-  }
-  .ledger-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--line);
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .ledger-row:last-child { border-bottom: none; }
-  .ledger-key { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-family: var(--mono); }
-  .ledger-val { font-family: var(--mono); font-size: 14.5px; color: var(--ink); word-break: break-all; }
-  .ledger-val.editable { color: var(--gold); }
-  .verify-note {
-    margin-top: 18px;
-    font-size: 14px;
-    color: var(--muted);
-    display: flex;
-    gap: 10px;
-  }
-
-  .timeline { position: relative; padding-left: 28px; }
-  .timeline::before {
-    content: '';
-    position: absolute;
-    left: 6px; top: 8px; bottom: 8px;
-    width: 1px;
-    background: linear-gradient(180deg, var(--teal-glow), transparent);
-  }
-  .tl-item { position: relative; padding-bottom: 36px; }
-  .tl-item:last-child { padding-bottom: 0; }
-  .tl-item::before {
-    content: '';
-    position: absolute;
-    left: -28px; top: 4px;
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--abyss);
-    border: 2px solid var(--teal-glow);
-  }
-  .tl-item.active::before { background: var(--teal-glow); box-shadow: 0 0 14px var(--teal-glow); }
-  .tl-phase { font-family: var(--mono); font-size: 12px; color: var(--teal); letter-spacing: 1px; margin-bottom: 4px; }
-  .tl-title { font-family: var(--display); font-size: 20px; margin-bottom: 6px; }
-  .tl-desc { color: var(--muted); font-size: 15px; max-width: 540px; }
-
-  .community-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-  .comm-card {
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 22px;
-    background: var(--deep);
-    transition: all 0.3s ease;
-  }
-  .comm-card:hover { border-color: var(--teal-glow); transform: translateY(-3px); }
-  .comm-card .plat { font-family: var(--mono); font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
-  .comm-card .handle { font-family: var(--display); font-size: 18px; }
-
-  footer {
-    padding: 50px 5% 40px;
-    border-top: 1px solid var(--line);
-    position: relative;
-    z-index: 1;
-  }
-  .disclaimer {
-    font-size: 13.5px;
-    color: var(--muted);
-    max-width: 800px;
-    line-height: 1.7;
-    padding: 20px;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: rgba(255,255,255,0.02);
-  }
-  .disclaimer strong { color: var(--ink); }
-  .foot-bottom { margin-top: 20px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-
-  .updates-list { display: flex; flex-direction: column; gap: 0; margin-top: 28px; border-top: 1px solid var(--line); }
-  .update-item { display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
-  .update-date { font-family: var(--mono); font-size: 13px; color: var(--teal); white-space: nowrap; min-width: 80px; }
-  .update-text { font-size: 15px; color: var(--ink); }
-  .update-text .tag { font-family: var(--mono); font-size: 11px; color: var(--gold); border: 1px solid rgba(242,201,76,0.35); padding: 2px 8px; border-radius: 20px; margin-right: 6px; text-transform: uppercase; }
-
-  .screenshot-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 28px; }
-  .screenshot-img {
-    aspect-ratio: 16/9; border-radius: 14px; border: 1px solid var(--line);
-    overflow: hidden; background: var(--deep);
-  }
-  .screenshot-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
-
-  .faq-list { margin-top: 28px; border-top: 1px solid var(--line); }
-  .faq-item { border-bottom: 1px solid var(--line); }
-  .faq-item summary {
-    padding: 20px 4px; cursor: pointer; list-style: none;
-    font-family: var(--display); font-size: 18px; color: var(--ink);
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .faq-item summary::-webkit-details-marker { display: none; }
-  .faq-item summary::after { content: '+'; font-size: 22px; color: var(--teal-glow); margin-left: 12px; }
-  .faq-item[open] summary::after { transform: rotate(45deg); }
-  .faq-item .faq-answer { padding: 0 4px 20px; color: var(--muted); font-size: 15px; }
-
-  .newsletter-box {
-    margin-top: 28px; border: 1px solid var(--line); border-radius: 16px;
-    padding: 24px; background: var(--deep); display: flex; align-items: center;
-    justify-content: space-between; gap: 16px; flex-wrap: wrap;
-  }
-  .newsletter-box p { margin: 0; max-width: 440px; font-size: 15px; color: var(--muted); }
-
-  /* Modals */
-  .generator-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: rgba(2, 9, 16, 0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-  }
-
-  .generator-modal-content {
-    background: #081a2b;
-    border: 1px solid rgba(0, 242, 254, 0.35);
-    border-radius: 18px;
-    width: 100%;
-    max-width: 720px;
-    height: 90vh;
-    max-height: 720px;
-    box-shadow: 0 0 50px rgba(0, 242, 254, 0.25);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    animation: modalIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  .generator-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    background: rgba(5, 18, 30, 0.98);
-    border-bottom: 1px solid rgba(94, 234, 212, 0.2);
-    flex-shrink: 0;
-  }
-
-  .generator-header h3 {
-    font-family: var(--display);
-    font-size: 17px;
-    color: #00f2fe;
-    letter-spacing: 0.5px;
-  }
-
-  .close-btn {
-    background: transparent;
-    border: none;
-    color: var(--muted);
-    font-size: 24px;
-    cursor: pointer;
-    line-height: 1;
-    padding: 4px;
-  }
-
-  .close-btn:hover { color: #ff5555; }
-
-  .generator-iframe {
-    width: 100%;
-    height: 100%;
-    flex-grow: 1;
-    border: none;
-    display: block;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .airdrop-modal-content {
-    background: linear-gradient(180deg, #081a2b, #05121e);
-    border: 1px solid rgba(168, 85, 247, 0.4);
-    border-radius: 20px;
-    width: 100%;
-    max-width: 520px;
-    padding: 30px;
-    box-shadow: 0 0 60px rgba(168, 85, 247, 0.3);
-    position: relative;
-    animation: modalIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  .airdrop-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  .airdrop-modal-header h3 {
-    font-family: var(--display);
-    font-size: 20px;
-    color: #ec4899;
-  }
-
-  @keyframes modalIn {
-    from { opacity: 0; transform: scale(0.96); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  .referral-box {
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 28px;
-    background: linear-gradient(180deg, var(--deep2), var(--deep));
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    margin-top: 28px;
-  }
-  .referral-box .ref-connect-row { margin-bottom: 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .referral-box .ref-status { font-family: var(--mono); font-size: 13.5px; color: var(--muted); }
-  .referral-box .ref-code-row {
-    display: flex; gap: 10px; margin: 14px 0; flex-wrap: wrap;
-  }
-  .referral-box input {
-    flex: 1; min-width: 180px; padding: 14px 16px;
-    border-radius: 10px; border: 1px solid var(--line);
-    background: rgba(255,255,255,0.03); color: var(--ink);
-    font-family: var(--mono); font-size: 16px;
-  }
-  .referral-box .ref-stats {
-    display: flex; gap: 24px; margin-top: 14px; flex-wrap: wrap;
-    font-family: var(--mono); font-size: 13.5px; color: var(--muted);
-  }
-  .referral-box .ref-stats strong { color: var(--gold); }
-  #refMessage { font-family: var(--mono); font-size: 13.5px; color: var(--teal-glow); margin-top: 10px; min-height: 16px; }
-
-  @media (max-width: 768px) {
-    nav .links { display: none; }
-    .menu-toggle { display: block; }
-    nav { padding: 14px 5%; }
-    .brand { font-size: 17px; }
-    #hero { align-items: center; text-align: center; padding-top: 110px; }
-    .hero-sub { margin-left: auto; margin-right: auto; font-size: 16px; }
-    h1.hero-title { font-size: clamp(38px, 10vw, 56px); }
-    .hero-cta { flex-direction: column; width: 100%; gap: 14px; }
-    .hero-cta .btn { width: 100%; padding: 18px 24px; font-size: 17px; font-weight: 700; border-radius: 14px; }
-    .about-grid { grid-template-columns: 1fr; gap: 24px; }
-    #orca-trail { display: none; }
-    section { padding: 80px 5% 50px; }
-    .generator-modal-content { height: 95vh; max-height: none; }
-    body { font-size: 16px; }
-  }
-</style>
-</head>
-<body>
-<div class="noise-layer"></div>
-
-<div class="top-left-buttons">
-    <button class="btn-top" onclick="history.back()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Back
-    </button>
-</div>
-
-<nav>
-  <div class="brand"><span class="dot"></span>LETHALORCA</div>
-  <div class="links">
-    <a href="#about">About</a>
-    <a href="#transparency">Transparency</a>
-    <a href="#roadmap">Roadmap</a>
-    <a href="#faq">FAQ</a>
-    <a href="#community">Community</a>
-    <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
-    <a href="#referral" style="color: var(--teal-glow); font-weight: 600;">Refer & Earn</a>
-  </div>
-  <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
-</nav>
-
-<div id="mobileMenu" class="mobile-menu">
-  <a href="#about" onclick="toggleMobileMenu()">About</a>
-  <a href="#transparency" onclick="toggleMobileMenu()">Transparency</a>
-  <a href="#roadmap" onclick="toggleMobileMenu()">Roadmap</a>
-  <a href="#" onclick="toggleMobileMenu(); openAirdropModal();">Claim Airdrop</a>
-  <a href="#faq" onclick="toggleMobileMenu()">FAQ</a>
-  <a href="#community" onclick="toggleMobileMenu()">Community</a>
-  <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
-  <a href="#referral" style="color: var(--teal-glow); font-weight: 600;">Refer & Earn</a>
-</div>
-
-<section id="hero">
-  <div class="depth-tag">0m — Surface</div>
-  <h1 class="hero-title">Built in<br>open water.</h1>
-  <p class="hero-sub">$LORCA is a community-first token on pump.fun, paired with LethalOrca Fishing — a play-and-earn arcade game launching next quarter. Every detail below is verifiable. Do your own research before investing.</p>
-  
-  <div class="hero-cta">
-    <button class="btn btn-airdrop" onclick="openAirdropModal()">
-      <span>💎 CLAIM FREE AIRDROP</span>
-    </button>
-    <a class="btn btn-play" href="game.html"><span class="play-icon">▶</span> Daily Play & Earn</a>
-    <button class="btn btn-generator" onclick="openGenerator()">
-      <span class="gen-icon">⚡</span> LORCA GENERATOR
-    </button>
-    <a class="btn btn-staking" href="stake.html">
-      <span class="stake-icon">⚓</span> STAKING POOL
-    </a>
-    <a class="btn btn-ghost" href="https://t.me/Lethal_Orca" target="_blank" rel="noopener">Join Telegram ↗</a>
-  </div>
-
-  <svg id="orca-trail" viewBox="0 0 500 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path id="trail-path" d="M -20 220 Q 100 180 180 200 Q 260 220 320 140 Q 380 70 480 60" stroke="url(#trailGrad)" stroke-width="2" stroke-dasharray="4 8" opacity="0.5"/>
-    <defs>
-      <linearGradient id="trailGrad" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0"/>
-        <stop offset="100%" stop-color="#5eead4" stop-opacity="0.8"/>
-      </linearGradient>
-    </defs>
-    <g id="orca-icon" transform="translate(420,60) scale(1.1)">
-      <path d="M -60 10 Q -40 -30 0 -32 Q 45 -34 62 -5 Q 55 12 25 20 Q -10 26 -40 20 Q -55 17 -60 10 Z" fill="#0d1f2b" stroke="#2dd4bf" stroke-width="1"/>
-      <path d="M -38 10 Q -15 20 15 18 Q 35 16 45 4 Q 28 17 0 16 Q -25 15 -38 10 Z" fill="#f4fcfc"/>
-      <circle cx="-42" cy="-3" r="2.6" fill="#f4fcfc"/>
-      <path d="M 58 -6 L 78 -20 L 72 2 L 82 18 L 58 6 Z" fill="#0d1f2b" stroke="#2dd4bf" stroke-width="1"/>
-    </g>
-  </svg>
-</section>
-
-<hr class="divider">
-
-<section id="about">
-  <div class="depth-marker"><span class="depth-val">–200m</span><span class="depth-name">Mesopelagic / About</span></div>
-  <h2 class="section-title">Who's building this</h2>
-  <p class="section-lede">A real person, building in public, with a plan longer than one launch.</p>
-  <div class="about-grid">
-    <div>
-      <p>LethalOrca started as a simple idea: pair a genuinely fun, free-to-play arcade game with a community token — instead of a token with nothing behind it.</p>
-      <p>The first product is a lightweight fishing-arcade game, already playable in prototype form, with wallet and reward features planned as the community grows. Progress is shared openly on X rather than promised all at once.</p>
-      <p>This is an early-stage, high-risk project. There are no guarantees of value or returns — see the disclaimer at the bottom of this page before making any decisions.</p>
-    </div>
-    <div class="founder-card">
-      <div class="label">Founder</div>
-      <h3>Independent Developer</h3>
-      <p>25+ years of professional background in sales, customer service, and front-office operations, now building LethalOrca as an independent, self-funded project. Actively posting build updates and roadmap progress on X.</p>
-    </div>
-  </div>
-</section>
-
-<hr class="divider">
-
-<section id="transparency">
-  <div class="depth-marker"><span class="depth-val">–1000m</span><span class="depth-name">Bathypelagic / Transparency</span></div>
-  <h2 class="section-title">Verify it yourself</h2>
-  <p class="section-lede">Don't take our word for it — every figure below can be checked on-chain or on pump.fun directly.</p>
-  <div class="ledger">
-    <div class="ledger-row"><span class="ledger-key">Token</span><span class="ledger-val">LethalOrca ($LORCA)</span></div>
-    <div class="ledger-row"><span class="ledger-key">Chain</span><span class="ledger-val">Solana</span></div>
-    <div class="ledger-row"><span class="ledger-key">Launch platform</span><span class="ledger-val">pump.fun</span></div>
-    <div class="ledger-row"><span class="ledger-key">Contract address</span><span class="ledger-val editable">7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump</span></div>
-    <div class="ledger-row"><span class="ledger-key">Total supply</span><span class="ledger-val editable">1,000,000,000 (standard pump.fun supply)</span></div>
-    <div class="ledger-row"><span class="ledger-key">Planned dev holding</span><span class="ledger-val editable">~3-5%, purchased at launch like any buyer</span></div>
-  </div>
-  <div class="verify-note">
-    ⚓ The $LORCA token is now live on pump.fun. The contract address above is the official token — never trust an address from anywhere else. Always verify here first.
-  </div>
-</section>
-
-<hr class="divider">
-
-<section id="roadmap">
-  <div class="depth-marker"><span class="depth-val">–4000m</span><span class="depth-name">Abyssal / Roadmap</span></div>
-  <h2 class="section-title">Where this goes next</h2>
-  <p class="section-lede">A phased plan — each stage ships before the next one is promised.</p>
-  <div class="timeline">
-    <div class="tl-item active">
-      <div class="tl-phase">PHASE 01 — NEXT QUARTER</div>
-      <div class="tl-title">Game Launch</div>
-      <div class="tl-desc">LethalOrca Fishing releases publicly on mobile, with in-game point tracking and a growing player base.</div>
-    </div>
-    <div class="tl-item">
-      <div class="tl-phase">PHASE 02</div>
-      <div class="tl-title">Wallet Integration</div>
-      <div class="tl-desc">Secure wallet connection added, letting players link accounts in preparation for on-chain rewards.</div>
-    </div>
-    <div class="tl-item">
-      <div class="tl-phase">PHASE 03</div>
-      <div class="tl-title">Marketplace & Community</div>
-      <div class="tl-desc">Player-driven marketplace and community features enabling peer-to-peer trading and engagement.</div>
-    </div>
-    <div class="tl-item">
-      <div class="tl-phase">PHASE 04</div>
-      <div class="tl-title">In-Game Token Utility</div>
-      <div class="tl-desc">$LORCA becomes usable inside the game economy — earning, spending, and a player-facing marketplace.</div>
-    </div>
-  </div>
-</section>
-
-<hr class="divider">
-
-<section id="screenshots">
-  <div class="depth-marker"><span class="depth-val">–2500m</span><span class="depth-name">Gameplay</span></div>
-  <h2 class="section-title">See it in action</h2>
-  <p class="section-lede">Game screenshots showing the fishing arcade in action.</p>
-  <div class="screenshot-row">
-    <div class="screenshot-img"><img src="./screenshot-1.png" alt="LethalOrca Fishing hero screen" onerror="this.alt='Game screenshot 1'"></div>
-    <div class="screenshot-img"><img src="./screenshot-2.png" alt="LethalOrca Fishing start screen" onerror="this.alt='Game screenshot 2'"></div>
-    <div class="screenshot-img"><img src="./screenshot-3.png" alt="LethalOrca Fishing gameplay" onerror="this.alt='Game screenshot 3'"></div>
-  </div>
-</section>
-
-<hr class="divider">
-
-<section id="updates">
-  <div class="depth-marker"><span class="depth-val">–3200m</span><span class="depth-name">Build Log</span></div>
-  <h2 class="section-title">Latest updates</h2>
-  <p class="section-lede">Progress, shared as it happens — not saved up for a big reveal.</p>
-  <div class="updates-list">
-    <div class="update-item">
-      <div class="update-date">JUL 2026</div>
-      <div class="update-text"><span class="tag">Launch</span>$LORCA token live on pump.fun with contract address published above.</div>
-    </div>
-    <div class="update-item">
-      <div class="update-date">JUL 2026</div>
-      <div class="update-text"><span class="tag">Backend</span>Withdrawal system deployed and ready for Phase 2 wallet integration.</div>
-    </div>
-    <div class="update-item">
-      <div class="update-date">JUL 2026</div>
-      <div class="update-text"><span class="tag">Update</span>Wallet-connect preview added to the game — UI functional, backend live.</div>
-    </div>
-  </div>
-</section>
-
-<hr class="divider">
-
-<section id="faq">
-  <div class="depth-marker"><span class="depth-val">–5000m</span><span class="depth-name">FAQ</span></div>
-  <h2 class="section-title">Common questions</h2>
-  <p class="section-lede">Answered here directly, instead of scattered across replies.</p>
-  <div class="faq-list">
-    <details class="faq-item">
-      <summary>Is $LORCA a scam?</summary>
-      <div class="faq-answer">No one can prove a negative on the internet — that's exactly why every claim on this page is verifiable rather than just asserted. The contract address is published above and can be verified on pump.fun directly.</div>
-    </details>
-    <details class="faq-item">
-      <summary>How do I get $LORCA tokens?</summary>
-      <div class="faq-answer">Tokens are live now on pump.fun. Play LethalOrca Fishing to earn in-game points, which can be withdrawn to your wallet during Phase 2.</div>
-    </details>
-    <details class="faq-item">
-      <summary>When does the full game launch?</summary>
-      <div class="faq-answer">Targeted for next quarter, on mobile first. Follow the Build Log above or the X account for exact dates as they're confirmed.</div>
-    </details>
-    <details class="faq-item">
-      <summary>Can I withdraw tokens right now?</summary>
-      <div class="faq-answer">The current game build includes a wallet-connect preview for demonstration. Real token withdrawals are live during Phase 2, once the backend is fully operational with all security measures in place.</div>
-    </details>
-    <details class="faq-item">
-      <summary>Who's behind this project?</summary>
-      <div class="faq-answer">An independent, self-funded developer building in public. See the About section above for background, and follow along on X for regular build updates.</div>
-    </details>
-  </div>
-</section>
-
-<hr class="divider">
-
-<section id="referral">
-  <div class="depth-marker"><span class="depth-val">–3800m</span><span class="depth-name">Refer & Earn</span></div>
-  <h2 class="section-title">Bring a friend, earn LORCA</h2>
-  <p class="section-lede">Connect your wallet to get your unique referral code. Every friend who joins using it earns you both bonus $LORCA.</p>
-
-  <div class="referral-box">
-    <div class="ref-connect-row">
-      <button class="btn btn-staking" id="refConnectBtn">Connect Wallet</button>
-      <div class="ref-status" id="refStatus">Not connected</div>
-    </div>
-
-    <div class="ref-code-row">
-      <input type="text" id="myReferralCode" readonly placeholder="Connect wallet to see your code" />
-      <button class="btn btn-ghost" id="copyRefBtn">Copy</button>
-    </div>
-
-    <div class="ref-stats">
-      <span>Referrals: <strong id="refCount">0</strong></span>
-      <span>Earned: <strong id="refEarnings">0</strong> LORCA</span>
-    </div>
-
-    <div class="ref-code-row" style="margin-top: 16px;">
-      <button class="btn btn-play" id="claimRefBtn" style="width: 100%;">Claim Referral Bonus</button>
-    </div>
-
-    <hr class="divider" style="margin: 20px 0;">
-
-    <div class="ref-code-row">
-      <input type="text" id="applyCodeInput" placeholder="Have a friend's code? Enter it here" />
-      <button class="btn btn-generator" id="applyRefBtn">Apply</button>
-    </div>
-
-    <p id="refMessage"></p>
-  </div>
-</section>
-
-<hr class="divider">
-
-<section id="community">
-  <div class="depth-marker"><span class="depth-val">–6000m</span><span class="depth-name">Hadal / Community</span></div>
-  <h2 class="section-title">Join the crew</h2>
-  <p class="section-lede">Follow along, ask questions, and watch the build happen in real time.</p>
-  <div class="community-grid">
-    <a class="comm-card" href="https://x.com/lethalorcatdo" target="_blank" rel="noopener">
-      <div class="plat">X / Twitter</div>
-      <div class="handle">@lethalorcatdo ↗</div>
-    </a>
-    <a class="comm-card" href="https://lethalorca.com/#transparency1" target="_blank" rel="noopener">
-      <div class="plat">Discord</div>
-      <div class="handle">Join the Crew ↗</div>
-    </a>
-    <a class="comm-card" href="https://t.me/Lethal_Orca" target="_blank" rel="noopener">
-      <div class="plat">Telegram</div>
-      <div class="handle">Join the Chat ↗</div>
-    </a>
-    <a class="comm-card" href="https://pump.fun/coin/7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump" target="_blank" rel="noopener">
-      <div class="plat">pump.fun</div>
-      <div class="handle">View on pump.fun ↗</div>
-    </a>
-  </div>
-
-  <div class="newsletter-box">
-    <p>Don't use Telegram or Discord? Get major updates by email instead — no spam, just real progress.</p>
-    <a class="btn btn-ghost" href="mailto:lethalorca@gmail.com?subject=Add me to LethalOrca updates">Get Email Updates</a>
-  </div>
-</section>
-
-<footer>
-  <div class="disclaimer">
-    <strong>Risk disclosure:</strong> $LORCA is an experimental, early-stage cryptocurrency token. It carries high risk, including the possible loss of your full investment. Nothing on this page is financial advice, and no one associated with this project can guarantee its price, liquidity, or future value. Cryptocurrency markets are volatile and largely unregulated — always do your own research, verify all contract addresses independently, and only invest what you can afford to lose.
-  </div>
-  <div class="foot-bottom">
-    <span>© 2026 LethalOrca. Built independently.</span>
-    <span>Not affiliated with pump.fun.</span>
-  </div>
-</footer>
-
-<!-- Generator Modal Popup -->
-<div id="generatorModal" class="generator-modal">
-  <div class="generator-modal-content">
-    <div class="generator-header">
-      <h3>⚡ LORCA MINT GENERATOR</h3>
-      <button onclick="closeGenerator()" class="close-btn">✕</button>
-    </div>
-    <iframe id="generatorFrame" src="generator.html" class="generator-iframe" allow="autoplay"></iframe>
-  </div>
-</div>
-
-<!-- Airdrop Modal Popup -->
-<div id="airdropModal" class="generator-modal">
-  <div class="airdrop-modal-content">
-    <div class="airdrop-modal-header">
-      <h3>💎 Lethal Orca Airdrop</h3>
-      <button onclick="closeAirdropModal()" class="close-btn">✕</button>
-    </div>
-    <p style="color: var(--muted); font-size: 14.5px; margin-bottom: 20px;">Drop your Solana wallet address below to participate in the official $LORCA airdrop event!</p>
-    
-    <div class="ca-box" style="background: var(--abyss); padding: 12px; border-radius: 8px; font-size: 11.5px; color: var(--teal-glow); word-break: break-all; margin-bottom: 15px; border: 1px dashed var(--line);">
-      <strong>CA:</strong> 7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump
-    </div>
-
-    <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--abyss); color: #fff; font-size: 15px; margin-bottom: 15px; outline: none; font-family: var(--mono);" />
-
-    <!-- Cloudflare Non-interactive Turnstile Widget (Invisible verification) -->
-    <div style="margin-bottom: 15px; display: flex; justify-content: center;">
-      <div class="cf-turnstile" data-sitekey="0x4AAAAAAEMVw7OeY-Wtd3CO" data-theme="dark" data-compact="true"></div>
-    </div>
-
-    <button id="submitBtn" class="btn btn-airdrop" style="width: 100%; justify-content: center; padding: 16px; border-radius: 10px;">Submit Address</button>
-    
-    <p id="statusMsg" style="margin-top: 15px; font-size: 14px; text-align: center;"></p>
-  </div>
-</div>
-
-<!-- Supabase CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-function toggleMobileMenu() {
-  const menu = document.getElementById('mobileMenu');
-  menu.classList.toggle('active');
-}
-
-function openGenerator() {
-  document.getElementById('generatorModal').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-
-function closeGenerator() {
-  document.getElementById('generatorModal').style.display = 'none';
-  document.body.style.overflow = 'auto';
-  var iframe = document.getElementById('generatorFrame');
-  iframe.src = iframe.src;
-}
-
-function openAirdropModal() {
-  document.getElementById('airdropModal').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-
-function closeAirdropModal() {
-  document.getElementById('airdropModal').style.display = 'none';
-  document.body.style.overflow = 'auto';
-}
-
-window.onclick = function(event) {
-  var genModal = document.getElementById('generatorModal');
-  var airModal = document.getElementById('airdropModal');
-  if (event.target == genModal) closeGenerator();
-  if (event.target == airModal) closeAirdropModal();
-}
-
-const REFERRAL_BACKEND_URL = "https://lethalorca-backend.vercel.app";
-let referralWallet = null;
-
-async function connectReferralWallet() {
-  try {
-    if (!window.solana || !window.solana.isPhantom) {
-      document.getElementById('refStatus').innerText = "Phantom wallet not found — install it first.";
-      return;
-    }
-    const resp = await window.solana.connect();
-    referralWallet = resp.publicKey.toString();
-    document.getElementById('refStatus').innerText =
-      "Connected: " + referralWallet.slice(0, 4) + "..." + referralWallet.slice(-4);
-    document.getElementById('refConnectBtn').innerText = "Connected";
-    loadReferralData(referralWallet);
-  } catch (err) {
-    console.error('Wallet connect error:', err);
-    document.getElementById('refStatus').innerText = "Connection failed. Try again.";
-  }
-}
-
-async function loadReferralData(wallet) {
-  try {
-    const res = await fetch(`${REFERRAL_BACKEND_URL}/api/referral?action=get-code&wallet=${wallet}`);
-    const data = await res.json();
-    if (data.success) {
-      document.getElementById('myReferralCode').value = data.referralCode;
-      document.getElementById('refCount').innerText = data.referralCount;
-      document.getElementById('refEarnings').innerText = data.referralEarnings;
-    }
-  } catch (err) {
-    console.error('Referral load error:', err);
-  }
-}
-
-document.getElementById('refConnectBtn').addEventListener('click', connectReferralWallet);
-
-document.getElementById('copyRefBtn').addEventListener('click', () => {
-  const code = document.getElementById('myReferralCode').value;
-  if (!code) return;
-  navigator.clipboard.writeText(code);
-  document.getElementById('refMessage').innerText = "Code copied to clipboard.";
-});
-
-document.getElementById('applyRefBtn').addEventListener('click', async () => {
-  const code = document.getElementById('applyCodeInput').value.trim();
-  if (!referralWallet) {
-    document.getElementById('refMessage').innerText = "Connect your wallet first.";
-    return;
-  }
-  if (!code) {
-    document.getElementById('refMessage').innerText = "Enter a referral code first.";
-    return;
-  }
-  try {
-    const res = await fetch(`${REFERRAL_BACKEND_URL}/api/referral?action=apply-code`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wallet: referralWallet, code })
-    });
-    const data = await res.json();
-    document.getElementById('refMessage').innerText = data.success ? data.message : data.error;
-    if (data.success) loadReferralData(referralWallet);
-  } catch (err) {
-    document.getElementById('refMessage').innerText = "Something went wrong.";
-  }
-});
-
-document.getElementById('claimRefBtn').addEventListener('click', async () => {
-  if (!referralWallet) {
-    document.getElementById('refMessage').innerText = "Connect your wallet first.";
-    return;
-  }
-
-  document.getElementById('claimRefBtn').innerText = "Claiming...";
-  document.getElementById('claimRefBtn').disabled = true;
-
-  try {
-    const res = await fetch(`${REFERRAL_BACKEND_URL}/api/claim-referral`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wallet: referralWallet })
-    });
-    const data = await res.json();
-
-    document.getElementById('refMessage').innerText = data.success ? data.message : data.error;
-    if (data.success) loadReferralData(referralWallet);
-  } catch (err) {
-    document.getElementById('refMessage').innerText = "Claim failed. Try again.";
-  } finally {
-    document.getElementById('claimRefBtn').innerText = "Claim Referral Bonus";
-    document.getElementById('claimRefBtn').disabled = false;
-  }
-});
-
-// Airdrop Form Logic with Turnstile & Anti-Bot Rate Limiting
-const SUPABASE_URL = 'https://obzyiecwhfdanzjtuhiq.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ienlpZWN3aGZkYW56anR1aGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MzA5MjYsImV4cCI6MjEwMTAwNjkyNn0.gYPNd5oH9hPaTLWoJkDDx-eTfkm_AXIjsj-ycHowpuc';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-const TELEGRAM_BOT_TOKEN = '8689687590:AAHSzJ_36tERZZzo4LhSMIavF30lUZI18wE';
-const TELEGRAM_CHAT_ID = '7586392121';
-
-// Updated Telegram Alert Function
-async function sendTelegramAlert(wallet) {
-    const message = `🚨 New Airdrop Submission!\n\nWallet: ${wallet}`;
-    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}`;
-    
-    try {
-        await fetch(url, { 
-            method: 'GET', 
-            mode: 'no-cors' 
-        });
-        console.log("Telegram alert sent successfully.");
-    } catch (err) {
-        console.error("Telegram error:", err);
-    }
-}
-
-document.getElementById('submitBtn').addEventListener('click', async () => {
-    const address = document.getElementById('solAddress').value.trim();
-    const statusMsg = document.getElementById('statusMsg');
-    const submitBtn = document.getElementById('submitBtn');
-
-    if(address.length < 32 || address.length > 44) {
-        statusMsg.innerText = "❌ Please enter a valid Solana address!";
-        statusMsg.style.color = "#ff4d4d";
-        return;
-    }
-
-    // Turnstile Captcha Check
-    const turnstileToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
-    if (!turnstileToken) {
-        statusMsg.innerText = "⚠️ Captcha verification in progress, please wait a second...";
-        statusMsg.style.color = "#ffa500";
-        return;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.innerText = "Submitting...";
-    statusMsg.innerText = "";
-    
-    try {
-        const { error } = await supabaseClient
-            .from('airdrop_submissions')
-            .insert([{ wallet_address: address }]);
-
-        if (error) {
-            if (error.code === '23505' || error.status === 409) {
-                statusMsg.innerText = "⚠️ This wallet address is already registered!";
-                statusMsg.style.color = "#ffa500";
-            } else {
-                statusMsg.innerText = "❌ Error: " + error.message;
-                statusMsg.style.color = "#ff4d4d";
-            }
-        } else {
-            statusMsg.innerText = "✅ Success! Your address has been recorded.";
-            statusMsg.style.color = "#4bb543";
-            document.getElementById('solAddress').value = "";
-            
-            // Trigger Telegram Alert
-            sendTelegramAlert(address);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LethalOrca ($LORCA) | Deep Sea Solana Token</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Turnstile Explicit Render API -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030712;
+            color: #f3f4f6;
+            overflow-x: hidden;
         }
-    } catch (err) {
-        statusMsg.innerText = "❌ Something went wrong!";
-        statusMsg.style.color = "#ff4d4d";
-    } finally {
-        if (window.turnstile) window.turnstile.reset();
 
-        let cooldown = 10;
-        const interval = setInterval(() => {
-            submitBtn.innerText = `Wait ${cooldown}s...`;
-            cooldown--;
-            if (cooldown < 0) {
-                clearInterval(interval);
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Address";
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 15px rgba(6, 182, 212, 0.6);
+        }
+
+        .glow-box {
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.15);
+        }
+
+        .modal-blur {
+            backdrop-filter: blur(8px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030712;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #06b6d4;
+        }
+
+        /* Modal Visibility Animations */
+        .modal {
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .modal-active {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between relative selection:bg-cyan-500 selection:text-black">
+
+    <!-- Background Ocean Grid FX -->
+    <div class="fixed inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-0"></div>
+
+    <!-- Header Navigation -->
+    <header class="w-full p-5 flex justify-between items-center border-b border-cyan-900/30 bg-slate-950/80 backdrop-blur-md fixed top-0 z-40">
+        <div class="flex items-center gap-3">
+            <span class="font-orbitron text-2xl font-black tracking-wider text-cyan-400 glow-text">LETHAL<span class="text-white">ORCA</span></span>
+        </div>
+        <nav class="hidden md:flex gap-6 text-sm font-semibold text-slate-300">
+            <a href="#about" class="hover:text-cyan-400 transition">About</a>
+            <a href="#tokenomics" class="hover:text-cyan-400 transition">Tokenomics</a>
+            <a href="javascript:void(0)" onclick="openAirdropModal()" class="hover:text-cyan-400 transition text-cyan-400">Airdrop</a>
+        </nav>
+        <button onclick="openAirdropModal()" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-5 py-2 rounded-full shadow-lg shadow-cyan-500/20 transition transform hover:scale-105">
+            Join Airdrop
+        </button>
+    </header>
+
+    <!-- Main Content / Hero -->
+    <main class="pt-36 pb-20 px-4 text-center max-w-4xl mx-auto flex-1 flex flex-col justify-center items-center z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-950/30 text-cyan-400 text-xs font-semibold mb-6">
+            <span class="flex h-2 w-2 rounded-full bg-cyan-400 animate-ping"></span>
+            SOLANA MEME & UTILITY TOKEN
+        </div>
+        <h1 class="font-orbitron text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-600 mb-6 tracking-wide">
+            DOMINATE THE OCEAN
+        </h1>
+        <p class="text-slate-400 text-base md:text-lg max-w-2xl mb-8 leading-relaxed">
+            The most lethal meme & utility ecosystem residing on Solana. Claim your early allocation and join the apex pod.
+        </p>
+        <div class="flex flex-wrap gap-4 justify-center">
+            <button onclick="openAirdropModal()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold px-8 py-4 rounded-xl shadow-cyan-500/30 shadow-lg transition transform hover:-translate-y-0.5">
+                🚀 Claim Airdrop Now
+            </button>
+        </div>
+    </main>
+
+    <!-- Airdrop Modal / Pop-up -->
+    <div id="airdropModal" class="modal opacity-0 invisible pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 modal-blur">
+        <div class="bg-slate-900 border border-cyan-500/30 w-full max-w-md rounded-2xl p-6 relative shadow-2xl glow-box">
+            <!-- Close Button -->
+            <button onclick="closeAirdropModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h2 class="font-orbitron text-2xl font-bold text-cyan-400 mb-2">LethalOrca Airdrop</h2>
+            <p class="text-slate-400 text-sm mb-5">Enter your wallet and verify your X details below to claim your allocation.</p>
+
+            <form id="airdropForm" class="space-y-4" onsubmit="handleAirdropSubmit(event)">
+                <!-- Solana Wallet Input -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1 tracking-wider">SOLANA WALLET ADDRESS</label>
+                    <input type="text" id="walletAddress" required placeholder="Enter your SOL wallet address" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <!-- Dedicated X (Twitter) Details Box -->
+                <div class="bg-slate-950/70 border border-cyan-900/40 rounded-xl p-4 space-y-2">
+                    <label class="block text-xs font-bold text-cyan-400 tracking-wider flex items-center gap-2">
+                        <i class="fa-brands fa-x-twitter text-white text-base"></i> X (TWITTER) VERIFICATION
+                    </label>
+                    <p class="text-xs text-slate-400">Enter your X username to verify community participation.</p>
+                    <input type="text" id="twitterHandle" required placeholder="@username" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-cyan-500">
+                </div>
+                
+                <!-- Cloudflare Turnstile Container -->
+                <div id="turnstileContainer" class="my-3 flex justify-center"></div>
+
+                <button type="submit" id="submitBtn" class="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-lg transition mt-4 shadow-lg shadow-cyan-500/20">
+                    Submit Airdrop Claim
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts Section -->
+    <script>
+        // ==========================================
+        // CONFIGURATION (Replace with your keys)
+        // ==========================================
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
+        const TURNSTILE_SITE_KEY = 'YOUR_TURNSTILE_SITE_KEY_HERE';
+
+        // Initialize Supabase Client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let turnstileWidgetId = null;
+
+        // Render Turnstile explicitly when API is ready
+        window.onload = function() {
+            if (window.turnstile) {
+                turnstileWidgetId = window.turnstile.render('#turnstileContainer', {
+                    sitekey: TURNSTILE_SITE_KEY,
+                    theme: 'dark'
+                });
             }
-        }, 1000);
-    }
-});
-</script>
+        };
 
+        // Modal functions
+        function openAirdropModal() {
+            const modal = document.getElementById('airdropModal');
+            if (modal) {
+                modal.classList.add('modal-active');
+            }
+        }
+
+        function closeAirdropModal() {
+            const modal = document.getElementById('airdropModal');
+            if (modal) {
+                modal.classList.remove('modal-active');
+            }
+        }
+
+        // Handle Form Submission & Database Insertion
+        async function handleAirdropSubmit(e) {
+            e.preventDefault();
+
+            const walletAddress = document.getElementById('walletAddress').value.trim();
+            const twitterHandle = document.getElementById('twitterHandle').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Grab Turnstile response token from hidden input generated by Cloudflare
+            const turnstileInput = document.querySelector('[name="cf-turnstile-response"]');
+            const token = turnstileInput ? turnstileInput.value : '';
+
+            if (!token) {
+                alert("Please complete the Turnstile verification challenge.");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting Claim...";
+
+            try {
+                // Insert record into Supabase table ('airdrop_claims')
+                const { data, error } = await supabase
+                    .from('airdrop_claims')
+                    .insert([
+                        { 
+                            wallet_address: walletAddress, 
+                            twitter_handle: twitterHandle,
+                            created_at: new Date().toISOString()
+                        }
+                    ]);
+
+                if (error) {
+                    console.error("Supabase Error:", error.message);
+                    alert("Submission failed: " + error.message);
+                } else {
+                    alert("🎉 Airdrop claim submitted successfully!");
+                    closeAirdropModal();
+                    document.getElementById('airdropForm').reset();
+                    
+                    // Reset Turnstile widget if available
+                    if (window.turnstile && turnstileWidgetId !== null) {
+                        window.turnstile.reset(turnstileWidgetId);
+                    }
+                }
+            } catch (err) {
+                console.error("Unexpected error:", err);
+                alert("An unexpected error occurred. Please try again.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Airdrop Claim";
+            }
+        }
+
+        // Automatic Direct Link Auto-Open Logic
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('airdrop') === 'true' || window.location.hash === '#airdrop') {
+                setTimeout(() => {
+                    openAirdropModal();
+                }, 400);
+            }
+        });
+    </script>
 </body>
 </html>
