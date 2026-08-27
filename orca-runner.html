@@ -600,7 +600,38 @@ function doJump(){
   }
 }
 
-/* FIXED DIRECTION CONSTANTS */
+// Keyboard Controls (Left / Right Arrow Keys Matching)
+window.addEventListener('keydown', (e) => {
+  if (!STATE.running || STATE.paused) return;
+
+  // Left Arrow ya 'A' key press karne par Left Lane shift
+  if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+    e.preventDefault(); // Page scroll hone se rokne ke liye
+    if (STATE.lane > 0) {
+      STATE.lane--;
+      STATE.targetX = CONFIG.lanes[STATE.lane];
+    }
+  }
+
+  // Right Arrow ya 'D' key press karne par Right Lane shift
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+    e.preventDefault(); // Page scroll hone se rokne ke liye
+    if (STATE.lane < CONFIG.lanes.length - 1) {
+      STATE.lane++;
+      STATE.targetX = CONFIG.lanes[STATE.lane];
+    }
+  }
+
+  // Up Arrow, Space ya 'W' key press karne par Jump/Breach
+  if (e.code === 'ArrowUp' || e.code === 'Space' || e.code === 'KeyW') {
+    e.preventDefault();
+    if (STATE.grounded) {
+      STATE.vy = CONFIG.jumpForce;
+      STATE.grounded = false;
+      AudioEngine.jump();
+    }
+  }
+});/* FIXED DIRECTION CONSTANTS */
 const SCREEN_LEFT = -1, SCREEN_RIGHT = 1;
 
 window.addEventListener('keydown', (e)=>{
