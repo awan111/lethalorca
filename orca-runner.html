@@ -143,7 +143,7 @@
     <button class="menu-btn primary" onclick="UI.startGame()">▶ PLAY <small>Run · Collect · Earn</small></button>
     <button class="menu-btn" onclick="UI.show('levelsOverlay')">🏁 LEVELS <small>Progression</small></button>
     <button class="menu-btn gold" onclick="UI.show('rewardsOverlay')">🏆 REWARDS <small>Claim earnings</small></button>
-    <button class="menu-btn" onclick="UI.show('howtoOverlay')">泛 HOW TO PLAY</button>
+    <button class="menu-btn" onclick="UI.show('howtoOverlay')">❓ HOW TO PLAY</button>
   </div>
 </div>
 
@@ -233,7 +233,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-// Safe global declaration for Supabase to avoid SyntaxError redeclaration bugs
 window.SUPABASE_URL = window.SUPABASE_URL || 'https://obzyiecwhfdanzjtuhiq.supabase.co';
 window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_gUT3ac6tLxZWn5w7_CPxqw_MVUQQMd-';
 
@@ -584,6 +583,7 @@ function spawnBurst(pos, color){
   }
 }
 
+// Fixed lane switcher
 function changeLane(dir){
   STATE.lane = Math.min(2, Math.max(0, STATE.lane + dir));
 }
@@ -596,12 +596,11 @@ function doJump(){
   }
 }
 
-const SCREEN_LEFT = -1, SCREEN_RIGHT = 1;
-
+// Controls logic updated
 window.addEventListener('keydown', (e)=>{
   if(!STATE.running || STATE.paused) return;
-  if(e.code==='ArrowLeft'||e.code==='KeyA') changeLane(SCREEN_LEFT);
-  if(e.code==='ArrowRight'||e.code==='KeyD') changeLane(SCREEN_RIGHT);
+  if(e.code==='ArrowLeft'||e.code==='KeyA') changeLane(-1);
+  if(e.code==='ArrowRight'||e.code==='KeyD') changeLane(1);
   if(e.code==='ArrowUp'||e.code==='Space'||e.code==='KeyW'){ e.preventDefault(); doJump(); }
   if(e.code==='Escape') UI.togglePause();
 });
@@ -625,7 +624,7 @@ touchZone.addEventListener('touchend', (e)=>{
   const elapsed = performance.now() - touchStartT;
 
   if(Math.abs(dx) > 32 && Math.abs(dx) > Math.abs(dy)){
-    changeLane(dx > 0 ? SCREEN_RIGHT : SCREEN_LEFT);
+    changeLane(dx > 0 ? 1 : -1);
   } else if(elapsed < 250 && Math.abs(dx) < 20 && Math.abs(dy) < 20){
     doJump();
   }
@@ -939,6 +938,8 @@ const UI = {
     const muted = AudioEngine.toggleMute();
     document.getElementById('muteBtn').textContent = muted ? '🔇' : '🔊';
   },
+
+  // Robust Claim logic with Supabase + Local Storage
   async submitClaim(){
     const wallet = document.getElementById('claimWallet').value.trim();
     if(!wallet){ showToast('Enter a wallet address'); return; }
@@ -966,17 +967,23 @@ const UI = {
       coins: STATE.sessionCoins,
       score: STATE.bestScore,
       wallet: wallet,
-      screenshot: screenshotBase64,
       created_at: new Date().toISOString()
     };
+
+    if(screenshotBase64) {
+      payload.screenshot = screenshotBase64;
+    }
 
     let serverConfirmed = false;
 
     if (supabaseClient) {
       try {
         const { data, error } = await supabaseClient.from('claims').insert([payload]);
-        if(!error) serverConfirmed = true;
-        else console.error('[Supabase Claim Error]:', error);
+        if(!error) {
+          serverConfirmed = true;
+        } else {
+          console.error('[Supabase Claim Error]:', error.message);
+        }
       } catch(e) {
         console.error('[Supabase Claim Exception]:', e);
       }
@@ -987,14 +994,16 @@ const UI = {
       const existing = JSON.parse(localStorage.getItem(key) || '[]');
       existing.push(payload);
       localStorage.setItem(key, JSON.stringify(existing));
-    }catch(err){}
+    }catch(err){
+      console.error(err);
+    }
 
     btn.disabled = false;
     btn.textContent = 'SUBMIT CLAIM';
     resultBox.classList.remove('hidden');
     resultBox.textContent = serverConfirmed
       ? '✅ Claim received by the database — awaiting verification.'
-      : '📝 Claim saved on this device (local fallback). It will sync once connection is established.';
+      : '📝 Claim saved on this device (local fallback).';
     showToast(serverConfirmed ? 'Claim submitted successfully' : 'Claim recorded locally');
   }
 };
