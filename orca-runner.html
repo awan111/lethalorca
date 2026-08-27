@@ -47,13 +47,13 @@
   /* Overlays */
   .overlay{position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; background:radial-gradient(ellipse at 50% 20%, rgba(15,25,45,0.55), rgba(3,5,10,0.92)); backdrop-filter:blur(3px);}
   .hidden{display:none !important;}
-  .panel{width:min(420px, 92vw); background:linear-gradient(180deg, var(--panel), var(--panel2)); border:1px solid var(--line); border-radius:20px; padding:26px 24px; box-shadow:0 20px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.03); max-height:88vh; overflow-y:auto;}
+  .panel{width:min(420px, 92vw); background:linear-gradient(180deg, var(--panel), var(--panel2)); border:1px solid var(--line); border-radius:20px; padding:26px 24px; box-shadow:0 20px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.03); max-height:88vh; overflow-y:auto; position:relative; z-index:60;}
   .brand{text-align:center; margin-bottom:6px;}
   .brand .title{font-size:26px; font-weight:900; letter-spacing:1px; background:linear-gradient(90deg, var(--teal), var(--gold)); -webkit-background-clip:text; background-clip:text; color:transparent;}
   .brand .sub{font-size:11px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-top:2px;}
   .orca-emblem{width:72px; height:72px; margin:6px auto 10px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:radial-gradient(circle at 35% 30%, #1c3a2f, #06120d); border:1px solid var(--teal-dim); font-size:38px;}
 
-  .menu-btn{display:flex; align-items:center; justify-content:space-between; width:100%; padding:14px 18px; margin-top:10px; border-radius:14px; border:1px solid var(--line); background:linear-gradient(180deg, rgba(24,224,196,0.08), rgba(24,224,196,0.02)); color:var(--text); font-size:15px; font-weight:700; cursor:pointer; transition:.15s; letter-spacing:0.3px;}
+  .menu-btn{display:flex; align-items:center; justify-content:space-between; width:100%; padding:14px 18px; margin-top:10px; border-radius:14px; border:1px solid var(--line); background:linear-gradient(180deg, rgba(24,224,196,0.08), rgba(24,224,196,0.02)); color:var(--text); font-size:15px; font-weight:700; cursor:pointer; transition:.15s; letter-spacing:0.3px; position:relative; z-index:70;}
   .menu-btn:hover{border-color:var(--teal); background:linear-gradient(180deg, rgba(24,224,196,0.18), rgba(24,224,196,0.04)); transform:translateY(-1px);}
   .menu-btn.primary{background:linear-gradient(180deg, var(--teal), #0e9a86); color:#032621; border:none; box-shadow:0 6px 20px rgba(24,224,196,0.25);}
   .menu-btn.primary:hover{filter:brightness(1.08);}
@@ -87,7 +87,7 @@
   .claim-note{font-size:11px; color:var(--muted); line-height:1.5; background:rgba(244,193,92,0.05); border:1px solid rgba(244,193,92,0.25); padding:10px 12px; border-radius:10px; margin-top:14px;}
 
   /* touch controls */
-  #touchZone{position:fixed; inset:0; z-index:15; touch-action:none;}
+  #touchZone{position:fixed; inset:0; z-index:10; touch-action:none;}
   #mobileHint{position:fixed; bottom:18px; left:0; right:0; text-align:center; font-size:11px; color:var(--muted); z-index:20; letter-spacing:0.5px; pointer-events:none;}
 
   #pauseBtn{position:fixed; top:16px; right:16px; z-index:22; width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:rgba(13,21,38,0.85); color:var(--teal); font-size:14px; display:flex; align-items:center; justify-content:center; cursor:pointer;}
@@ -598,7 +598,8 @@ function doJump(){
   }
 }
 
-const SCREEN_LEFT = 1, SCREEN_RIGHT = -1;
+/* FIXED DIRECTION CONSTANTS */
+const SCREEN_LEFT = -1, SCREEN_RIGHT = 1;
 
 window.addEventListener('keydown', (e)=>{
   if(!STATE.running || STATE.paused) return;
