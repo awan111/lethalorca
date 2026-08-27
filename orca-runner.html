@@ -235,7 +235,9 @@
 <script>
 const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const supabase = (SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL' && window.supabase) 
+
+// FIXED SYNTAX ERROR: Changed variable name from 'supabase' to 'supabaseClient'
+const supabaseClient = (SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL' && window.supabase) 
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
   : null;
 
@@ -841,9 +843,10 @@ async function saveSessionToServer(){
     created_at: new Date().toISOString()
   };
 
-  if (supabase) {
+  // UPDATED: Using supabaseClient instead of duplicate supabase variable
+  if (supabaseClient) {
     try {
-      const { data, error } = await supabase.from('game_sessions').insert([payload]);
+      const { data, error } = await supabaseClient.from('game_sessions').insert([payload]);
       if(error) console.error('[Supabase Error]:', error);
       else console.log('[Supabase Session Saved]:', data);
     } catch(err) {
@@ -982,9 +985,10 @@ const UI = {
 
     let serverConfirmed = false;
 
-    if (supabase) {
+    // UPDATED: Using supabaseClient instead of duplicate supabase variable
+    if (supabaseClient) {
       try {
-        const { data, error } = await supabase.from('claims').insert([payload]);
+        const { data, error } = await supabaseClient.from('claims').insert([payload]);
         if(!error) serverConfirmed = true;
         else console.error('[Supabase Claim Error]:', error);
       } catch(e) {
