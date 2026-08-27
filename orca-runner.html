@@ -236,7 +236,6 @@
 const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
-// FIXED SYNTAX ERROR: Changed variable name from 'supabase' to 'supabaseClient'
 const supabaseClient = (SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL' && window.supabase) 
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
   : null;
@@ -592,6 +591,7 @@ function spawnBurst(pos, color){
 function changeLane(dir){
   STATE.lane = Math.min(2, Math.max(0, STATE.lane + dir));
 }
+
 function doJump(){
   if(STATE.grounded){
     STATE.vy = CONFIG.jumpForce;
@@ -600,38 +600,6 @@ function doJump(){
   }
 }
 
-// Keyboard Controls (Left / Right Arrow Keys Matching)
-window.addEventListener('keydown', (e) => {
-  if (!STATE.running || STATE.paused) return;
-
-  // Left Arrow ya 'A' key press karne par Left Lane shift
-  if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
-    e.preventDefault(); // Page scroll hone se rokne ke liye
-    if (STATE.lane > 0) {
-      STATE.lane--;
-      STATE.targetX = CONFIG.lanes[STATE.lane];
-    }
-  }
-
-  // Right Arrow ya 'D' key press karne par Right Lane shift
-  if (e.code === 'ArrowRight' || e.code === 'KeyD') {
-    e.preventDefault(); // Page scroll hone se rokne ke liye
-    if (STATE.lane < CONFIG.lanes.length - 1) {
-      STATE.lane++;
-      STATE.targetX = CONFIG.lanes[STATE.lane];
-    }
-  }
-
-  // Up Arrow, Space ya 'W' key press karne par Jump/Breach
-  if (e.code === 'ArrowUp' || e.code === 'Space' || e.code === 'KeyW') {
-    e.preventDefault();
-    if (STATE.grounded) {
-      STATE.vy = CONFIG.jumpForce;
-      STATE.grounded = false;
-      AudioEngine.jump();
-    }
-  }
-});/* FIXED DIRECTION CONSTANTS */
 const SCREEN_LEFT = -1, SCREEN_RIGHT = 1;
 
 window.addEventListener('keydown', (e)=>{
@@ -650,6 +618,7 @@ touchZone.addEventListener('touchstart', (e)=>{
   touchStartY = e.touches[0].clientY;
   touchStartT = performance.now();
 }, {passive:true});
+
 touchZone.addEventListener('touchend', (e)=>{
   if(!touchActive || !STATE.running || STATE.paused) return;
   touchActive = false;
@@ -874,7 +843,6 @@ async function saveSessionToServer(){
     created_at: new Date().toISOString()
   };
 
-  // UPDATED: Using supabaseClient instead of duplicate supabase variable
   if (supabaseClient) {
     try {
       const { data, error } = await supabaseClient.from('game_sessions').insert([payload]);
@@ -1016,7 +984,6 @@ const UI = {
 
     let serverConfirmed = false;
 
-    // UPDATED: Using supabaseClient instead of duplicate supabase variable
     if (supabaseClient) {
       try {
         const { data, error } = await supabaseClient.from('claims').insert([payload]);
