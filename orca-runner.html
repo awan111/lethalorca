@@ -320,7 +320,7 @@ const AudioEngine = (function(){
     startMusic(){ ensureCtx(); if(running) return; running=true; scheduleLoop(); },
     stopMusic(){ running=false; if(stepTimer) clearTimeout(stepTimer); },
     suspend(){ if(ctx) ctx.suspend(); },
-    resume(){ if(ctx) ctx.resume(); },
+    resume(){ ensureCtx(); if(ctx && ctx.state === 'suspended') ctx.resume(); },
     toggleMute(){
       muted = !muted;
       ensureCtx();
@@ -677,7 +677,7 @@ function showToast(msg){
   setTimeout(()=> t.classList.remove('show'), 1600);
 }
 
-clock = new THREE.Clock();
+clock = new THREE.Clock(false);
 
 function animate(){
   requestAnimationFrame(animate);
@@ -889,12 +889,22 @@ const UI = {
   startGame(){
     this.hideAll();
     resetRun();
-    STATE.running = true; STATE.paused = false;
-    AudioEngine.startMusic();
+    
+    if (typeof AudioEngine !== 'undefined') {
+      AudioEngine.resume();
+      AudioEngine.startMusic();
+    }
+
+    if (clock) clock.start();
+    
+    STATE.running = true; 
+    STATE.paused = false;
+
     document.getElementById('hud').classList.remove('hidden');
     document.getElementById('timerPill').classList.remove('hidden');
     document.getElementById('pauseBtn').classList.remove('hidden');
     document.getElementById('muteBtn').classList.remove('hidden');
+
     const isTouch = 'ontouchstart' in window;
     if(isTouch){
       document.getElementById('touchZone').classList.remove('hidden');
@@ -907,12 +917,24 @@ const UI = {
     if(!STATE.running) return;
     STATE.paused = !STATE.paused;
     document.getElementById('pauseOverlay').classList.toggle('hidden', !STATE.paused);
-    if(STATE.paused) AudioEngine.suspend(); else AudioEngine.resume();
+    if(STATE.paused) {
+      AudioEngine.suspend();
+      if(clock) clock.stop();
+    } else {
+      AudioEngine.resume();
+      if(clock) clock.start();
+    }
   },
-  resumeGame(){ STATE.paused = false; document.getElementById('pauseOverlay').classList.add('hidden'); AudioEngine.resume(); },
+  resumeGame(){ 
+    STATE.paused = false; 
+    document.getElementById('pauseOverlay').classList.add('hidden'); 
+    AudioEngine.resume(); 
+    if(clock) clock.start();
+  },
   quitToMenu(){
     STATE.running = false; STATE.paused = false;
     AudioEngine.stopMusic();
+    if(clock) clock.stop();
     document.getElementById('hud').classList.add('hidden');
     document.getElementById('timerPill').classList.add('hidden');
     document.getElementById('pauseBtn').classList.add('hidden');
