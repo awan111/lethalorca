@@ -25,7 +25,7 @@
   #canvasWrap{position:fixed; inset:0;}
   canvas{display:block; width:100%; height:100%;}
 
-  /* ---------- HUD ---------- */
+  /* HUD */
   #hud{position:fixed; top:0; left:0; right:0; padding:14px 16px; display:flex; justify-content:space-between; align-items:flex-start; pointer-events:none; z-index:20; font-family:'Consolas','SFMono-Regular',monospace;}
   .hud-pill{background:linear-gradient(180deg, rgba(13,21,38,0.92), rgba(10,15,28,0.88)); border:1px solid var(--line); border-radius:12px; padding:8px 14px; backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,0.4);}
   .hud-left{display:flex; flex-direction:column; gap:6px;}
@@ -44,7 +44,7 @@
   .float-reward{position:absolute; font-weight:800; font-size:22px; color:var(--gold); text-shadow:0 0 12px rgba(244,193,92,0.7); pointer-events:none; z-index:30; animation:floatUp 0.9s ease-out forwards;}
   @keyframes floatUp{0%{opacity:0; transform:translateY(0) scale(0.6);} 15%{opacity:1; transform:translateY(-10px) scale(1.15);} 100%{opacity:0; transform:translateY(-70px) scale(1);}}
 
-  /* ---------- Overlays ---------- */
+  /* Overlays */
   .overlay{position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; background:radial-gradient(ellipse at 50% 20%, rgba(15,25,45,0.55), rgba(3,5,10,0.92)); backdrop-filter:blur(3px);}
   .hidden{display:none !important;}
   .panel{width:min(420px, 92vw); background:linear-gradient(180deg, var(--panel), var(--panel2)); border:1px solid var(--line); border-radius:20px; padding:26px 24px; box-shadow:0 20px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.03); max-height:88vh; overflow-y:auto;}
@@ -132,7 +132,7 @@
 <div id="touchZone" class="hidden"></div>
 <div id="mobileHint" class="hidden">TAP TO JUMP · SWIPE LEFT/RIGHT TO CHANGE LANES</div>
 
-<!-- ===================== MAIN MENU ===================== -->
+<!-- MAIN MENU -->
 <div id="menuOverlay" class="overlay">
   <div class="panel">
     <div class="brand">
@@ -147,7 +147,7 @@
   </div>
 </div>
 
-<!-- ===================== LEVELS ===================== -->
+<!-- LEVELS -->
 <div id="levelsOverlay" class="overlay hidden">
   <div class="panel">
     <div class="back-link" onclick="UI.show('menuOverlay')">← Back</div>
@@ -157,7 +157,7 @@
   </div>
 </div>
 
-<!-- ===================== REWARDS / CLAIM ===================== -->
+<!-- REWARDS / CLAIM -->
 <div id="rewardsOverlay" class="overlay hidden">
   <div class="panel">
     <div class="back-link" onclick="UI.show('menuOverlay')">← Back</div>
@@ -179,7 +179,7 @@
   </div>
 </div>
 
-<!-- ===================== HOW TO PLAY ===================== -->
+<!-- HOW TO PLAY -->
 <div id="howtoOverlay" class="overlay hidden">
   <div class="panel">
     <div class="back-link" onclick="UI.show('menuOverlay')">← Back</div>
@@ -195,7 +195,7 @@
   </div>
 </div>
 
-<!-- ===================== LEVEL UP TOAST OVERLAY ===================== -->
+<!-- LEVEL UP TOAST OVERLAY -->
 <div id="levelupOverlay" class="overlay hidden">
   <div class="panel" style="text-align:center;">
     <div class="brand"><div class="title" style="font-size:22px;">LEVEL <span id="luLevel">2</span> CLEARED</div></div>
@@ -207,7 +207,7 @@
   </div>
 </div>
 
-<!-- ===================== GAME OVER ===================== -->
+<!-- GAME OVER -->
 <div id="gameoverOverlay" class="overlay hidden">
   <div class="panel" style="text-align:center;">
     <div class="brand"><div class="title" style="font-size:22px;">RUN ENDED</div></div>
@@ -222,7 +222,7 @@
   </div>
 </div>
 
-<!-- ===================== PAUSE ===================== -->
+<!-- PAUSE -->
 <div id="pauseOverlay" class="overlay hidden">
   <div class="panel" style="text-align:center;">
     <h3 class="panel-title">Paused</h3>
@@ -233,10 +233,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-/* =====================================================================
-   SUPABASE INTEGRATION INITIALIZATION
-   Apni Supabase URL aur Anon Key se niche replace karein.
-   ===================================================================== */
 const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 const supabase = (SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL' && window.supabase) 
@@ -273,9 +269,6 @@ const STATE = {
 STATE.playerId = 'ORCA-' + Math.random().toString(36).slice(2,8).toUpperCase();
 document.getElementById('claimPid').textContent = STATE.playerId;
 
-/* =====================================================================
-   PROCEDURAL AUDIO ENGINE
-   ===================================================================== */
 const AudioEngine = (function(){
   let ctx=null, master=null, musicGain=null, sfxGain=null;
   let running=false, stepTimer=null, muted=false;
@@ -350,7 +343,6 @@ const AudioEngine = (function(){
   };
 })();
 
-/* ===================== THREE.JS SETUP ===================== */
 let scene, camera, renderer, clock;
 let orca, orcaParts = {};
 
@@ -505,7 +497,6 @@ function buildOrca(){
   scene.add(orca);
 }
 
-/* ===================== OBSTACLES & COINS ===================== */
 const obstacleGeo = {
   barrier: new THREE.BoxGeometry(1.6, 1.1, 0.5),
   rock: new THREE.DodecahedronGeometry(0.65, 0),
@@ -570,7 +561,6 @@ function spawnWave(){
   }
 }
 
-/* ===================== PARTICLES / FLOAT TEXT ===================== */
 function spawnFloatText(text, worldPos){
   const vec = worldPos.clone().project(camera);
   const x = (vec.x * 0.5 + 0.5) * window.innerWidth;
@@ -597,7 +587,6 @@ function spawnBurst(pos, color){
   }
 }
 
-/* ===================== INPUT ===================== */
 function changeLane(dir){
   STATE.lane = Math.min(2, Math.max(0, STATE.lane + dir));
 }
@@ -643,17 +632,28 @@ touchZone.addEventListener('touchend', (e)=>{
   }
 }, {passive:true});
 
-/* ===================== GAME LOOP ===================== */
 function resetRun(){
-  STATE.obstacles.forEach(o=>scene.remove(o));
-  STATE.coins.forEach(c=>scene.remove(c));
-  STATE.particles.forEach(p=>scene.remove(p));
+  STATE.obstacles.forEach(o => scene.remove(o));
+  STATE.coins.forEach(c => scene.remove(c));
+  STATE.particles.forEach(p => scene.remove(p));
   STATE.obstacles = []; STATE.coins = []; STATE.particles = [];
-  STATE.lane = 1; STATE.x = 0; STATE.y = 0; STATE.vy = 0; STATE.grounded = true;
-  STATE.distance = 0; STATE.level = 1; STATE.sessionCoins = 0;
-  STATE.speed = CONFIG.baseSpeed; STATE.spawnTimer = 0; STATE.spawnInterval = CONFIG.spawnBase;
+  
+  STATE.lane = 1; 
+  STATE.x = 0; 
+  STATE.y = 0; 
+  STATE.vy = 0; 
+  STATE.grounded = true;
+  STATE.distance = 0; 
+  STATE.level = 1; 
+  STATE.sessionCoins = 0; 
+  STATE.balance = 0; 
+
+  STATE.speed = CONFIG.baseSpeed; 
+  STATE.spawnTimer = 0; 
+  STATE.spawnInterval = CONFIG.spawnBase;
   STATE.timeLeft = CONFIG.runDuration;
   spawnCount = 0;
+  
   orca.position.set(0, 0, 0);
   document.getElementById('timerPill').classList.remove('urgent');
   updateHud();
@@ -749,21 +749,22 @@ function updateGame(dt){
     }
   }
 
-  for(let i = STATE.coins.length-1; i>=0; i--){
+  for(let i = STATE.coins.length - 1; i >= 0; i--){
     const c = STATE.coins[i];
-    c.rotation.z += dt*6;
+    c.rotation.z += dt * 6;
     if(c.position.z < STATE.distance - 4){
-      scene.remove(c); STATE.coins.splice(i,1); continue;
+      scene.remove(c); STATE.coins.splice(i, 1); continue;
     }
     const dz = Math.abs(c.position.z - orca.position.z);
     const dx = Math.abs(c.position.x - orca.position.x);
     if(dz < 1.0 && dx < 0.9 && STATE.y < 1.9){
       STATE.sessionCoins += c.userData.value;
-      STATE.balance += c.userData.value;
+      STATE.balance = STATE.sessionCoins; 
+
       spawnFloatText('+' + c.userData.value, c.position);
       spawnBurst(c.position, 0xf4c15c);
       AudioEngine.coin(c.userData.value);
-      scene.remove(c); STATE.coins.splice(i,1);
+      scene.remove(c); STATE.coins.splice(i, 1);
       updateHud();
     }
   }
@@ -801,58 +802,6 @@ function levelUp(newLevel){
   AudioEngine.levelUp();
 }
 
-/* ===================== RUN LIFECYCLE & RESET ===================== */
-function resetRun(){
-  STATE.obstacles.forEach(o => scene.remove(o));
-  STATE.coins.forEach(c => scene.remove(c));
-  STATE.particles.forEach(p => scene.remove(p));
-  STATE.obstacles = []; STATE.coins = []; STATE.particles = [];
-  
-  STATE.lane = 1; 
-  STATE.x = 0; 
-  STATE.y = 0; 
-  STATE.vy = 0; 
-  STATE.grounded = true;
-  STATE.distance = 0; 
-  STATE.level = 1; 
-  
-  // 1 minute run finish/reset hote hi coin counter ZERO ho jae
-  STATE.sessionCoins = 0; 
-  STATE.balance = 0; 
-
-  STATE.speed = CONFIG.baseSpeed; 
-  STATE.spawnTimer = 0; 
-  STATE.spawnInterval = CONFIG.spawnBase;
-  STATE.timeLeft = CONFIG.runDuration;
-  spawnCount = 0;
-  
-  orca.position.set(0, 0, 0);
-  document.getElementById('timerPill').classList.remove('urgent');
-  updateHud();
-}
-
-/* ===================== COIN COLLECTION UPDATE ===================== */
-// updateGame() function ke andar coin collect hone wale section ko check karein:
-for(let i = STATE.coins.length - 1; i >= 0; i--){
-  const c = STATE.coins[i];
-  c.rotation.z += dt * 6;
-  if(c.position.z < STATE.distance - 4){
-    scene.remove(c); STATE.coins.splice(i, 1); continue;
-  }
-  const dz = Math.abs(c.position.z - orca.position.z);
-  const dx = Math.abs(c.position.x - orca.position.x);
-  if(dz < 1.0 && dx < 0.9 && STATE.y < 1.9){
-    // Pure session aur balance ko same coins se sync rakhein
-    STATE.sessionCoins += c.userData.value;
-    STATE.balance = STATE.sessionCoins; 
-
-    spawnFloatText('+' + c.userData.value, c.position);
-    spawnBurst(c.position, 0xf4c15c);
-    AudioEngine.coin(c.userData.value);
-    scene.remove(c); STATE.coins.splice(i, 1);
-    updateHud();
-  }
-}/* ===================== RUN LIFECYCLE ===================== */
 function endRun(timeUp){
   STATE.running = false;
   if(timeUp){
@@ -881,7 +830,6 @@ function endRun(timeUp){
   document.getElementById('mobileHint').classList.add('hidden');
 }
 
-/* ===================== SERVER / SUPABASE STUBS ===================== */
 async function saveSessionToServer(){
   const payload = {
     player_id: STATE.playerId,
@@ -911,7 +859,6 @@ async function saveSessionToServer(){
   }
 }
 
-/* ===================== UI CONTROLLER ===================== */
 const UI = {
   overlays:['menuOverlay','levelsOverlay','rewardsOverlay','howtoOverlay','levelupOverlay','gameoverOverlay','pauseOverlay'],
   hideAll(){ this.overlays.forEach(id=> document.getElementById(id).classList.add('hidden')); },
