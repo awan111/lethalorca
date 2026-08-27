@@ -801,7 +801,58 @@ function levelUp(newLevel){
   AudioEngine.levelUp();
 }
 
-/* ===================== RUN LIFECYCLE ===================== */
+/* ===================== RUN LIFECYCLE & RESET ===================== */
+function resetRun(){
+  STATE.obstacles.forEach(o => scene.remove(o));
+  STATE.coins.forEach(c => scene.remove(c));
+  STATE.particles.forEach(p => scene.remove(p));
+  STATE.obstacles = []; STATE.coins = []; STATE.particles = [];
+  
+  STATE.lane = 1; 
+  STATE.x = 0; 
+  STATE.y = 0; 
+  STATE.vy = 0; 
+  STATE.grounded = true;
+  STATE.distance = 0; 
+  STATE.level = 1; 
+  
+  // 1 minute run finish/reset hote hi coin counter ZERO ho jae
+  STATE.sessionCoins = 0; 
+  STATE.balance = 0; 
+
+  STATE.speed = CONFIG.baseSpeed; 
+  STATE.spawnTimer = 0; 
+  STATE.spawnInterval = CONFIG.spawnBase;
+  STATE.timeLeft = CONFIG.runDuration;
+  spawnCount = 0;
+  
+  orca.position.set(0, 0, 0);
+  document.getElementById('timerPill').classList.remove('urgent');
+  updateHud();
+}
+
+/* ===================== COIN COLLECTION UPDATE ===================== */
+// updateGame() function ke andar coin collect hone wale section ko check karein:
+for(let i = STATE.coins.length - 1; i >= 0; i--){
+  const c = STATE.coins[i];
+  c.rotation.z += dt * 6;
+  if(c.position.z < STATE.distance - 4){
+    scene.remove(c); STATE.coins.splice(i, 1); continue;
+  }
+  const dz = Math.abs(c.position.z - orca.position.z);
+  const dx = Math.abs(c.position.x - orca.position.x);
+  if(dz < 1.0 && dx < 0.9 && STATE.y < 1.9){
+    // Pure session aur balance ko same coins se sync rakhein
+    STATE.sessionCoins += c.userData.value;
+    STATE.balance = STATE.sessionCoins; 
+
+    spawnFloatText('+' + c.userData.value, c.position);
+    spawnBurst(c.position, 0xf4c15c);
+    AudioEngine.coin(c.userData.value);
+    scene.remove(c); STATE.coins.splice(i, 1);
+    updateHud();
+  }
+}/* ===================== RUN LIFECYCLE ===================== */
 function endRun(timeUp){
   STATE.running = false;
   if(timeUp){
