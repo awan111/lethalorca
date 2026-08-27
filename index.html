@@ -242,6 +242,18 @@
     font-size: 10px;
   }
 
+  .btn-runner {
+    background: linear-gradient(135deg, #ff5e62, #ff9966);
+    color: #fff;
+    border: none;
+    font-weight: 700;
+    box-shadow: 0 4px 25px rgba(255, 94, 98, 0.45);
+  }
+  .btn-runner:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 35px rgba(255, 94, 98, 0.75);
+  }
+
   .btn-generator {
     background: linear-gradient(135deg, #00f2fe, #3b82f6);
     color: #000;
@@ -610,7 +622,7 @@
   <a href="#faq" onclick="toggleMobileMenu()">FAQ</a>
   <a href="#community" onclick="toggleMobileMenu()">Community</a>
   <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
-  <a href="#referral" style="color: var(--teal-glow); font-weight: 600;">Refer & Earn</a>
+  <a href="#referral" style="color: var(--toggleMobileMenu()">Refer & Earn</a>
 </div>
 
 <section id="hero">
@@ -623,6 +635,12 @@
       <span>💎 CLAIM FREE AIRDROP</span>
     </button>
     <a class="btn btn-play" href="game.html"><span class="play-icon">▶</span> Daily Play & Earn</a>
+    
+    <!-- Orca Runner Button Added Below -->
+    <a class="btn btn-runner" href="orca-runner.html">
+      <span class="play-icon">🏃</span> ORCA RUNNER
+    </a>
+
     <button class="btn btn-generator" onclick="openGenerator()">
       <span class="gen-icon">⚡</span> LORCA GENERATOR
     </button>
@@ -888,7 +906,7 @@
 
     <input type="text" id="solAddress" placeholder="Enter your Solana Wallet Address..." style="width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--abyss); color: #fff; font-size: 15px; margin-bottom: 15px; outline: none; font-family: var(--mono);" />
 
-    <!-- Cloudflare Non-interactive Turnstile Widget (Invisible verification) -->
+    <!-- Cloudflare Non-interactive Turnstile Widget -->
     <div style="margin-bottom: 15px; display: flex; justify-content: center;">
       <div class="cf-turnstile" data-sitekey="0x4AAAAAAEMVw7OeY-Wtd3CO" data-theme="dark" data-compact="true"></div>
     </div>
@@ -1031,7 +1049,7 @@ document.getElementById('claimRefBtn').addEventListener('click', async () => {
   }
 });
 
-// Airdrop Form Logic with Turnstile & Anti-Bot Rate Limiting
+// Airdrop Form Logic
 const SUPABASE_URL = 'https://obzyiecwhfdanzjtuhiq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ienlpZWN3aGZkYW56anR1aGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MzA5MjYsImV4cCI6MjEwMTAwNjkyNn0.gYPNd5oH9hPaTLWoJkDDx-eTfkm_AXIjsj-ycHowpuc';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1039,7 +1057,6 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 const TELEGRAM_BOT_TOKEN = '8689687590:AAHSzJ_36tERZZzo4LhSMIavF30lUZI18wE';
 const TELEGRAM_CHAT_ID = '7586392121';
 
-// Updated Telegram Alert Function
 async function sendTelegramAlert(wallet) {
     const message = `🚨 New Airdrop Submission!\n\nWallet: ${wallet}`;
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}`;
@@ -1066,7 +1083,6 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
         return;
     }
 
-    // Turnstile Captcha Check
     const turnstileToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
     if (!turnstileToken) {
         statusMsg.innerText = "⚠️ Captcha verification in progress, please wait a second...";
@@ -1096,7 +1112,6 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
             statusMsg.style.color = "#4bb543";
             document.getElementById('solAddress').value = "";
             
-            // Trigger Telegram Alert
             sendTelegramAlert(address);
         }
     } catch (err) {
