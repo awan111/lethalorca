@@ -583,26 +583,41 @@ function spawnBurst(pos, color){
   }
 }
 
-// Fixed lane switcher
-function changeLane(dir){
-  STATE.lane = Math.min(2, Math.max(0, STATE.lane + dir));
-}
+// Keyboard Controls (Left / Right Arrow Keys Matching)
+window.addEventListener('keydown', (e) => {
+  if (!STATE.running || STATE.paused) return;
 
-function doJump(){
-  if(STATE.grounded){
-    STATE.vy = CONFIG.jumpForce;
-    STATE.grounded = false;
-    AudioEngine.jump();
+  // Left Arrow ya 'A' key press karne par Left Lane shift
+  if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+    e.preventDefault(); // Page scroll hone se rokne ke liye
+    if (STATE.lane > 0) {
+      STATE.lane--;
+      STATE.targetX = CONFIG.lanes[STATE.lane];
+    }
   }
-}
 
-// Controls logic updated
-window.addEventListener('keydown', (e)=>{
-  if(!STATE.running || STATE.paused) return;
-  if(e.code==='ArrowLeft'||e.code==='KeyA') changeLane(-1);
-  if(e.code==='ArrowRight'||e.code==='KeyD') changeLane(1);
-  if(e.code==='ArrowUp'||e.code==='Space'||e.code==='KeyW'){ e.preventDefault(); doJump(); }
-  if(e.code==='Escape') UI.togglePause();
+  // Right Arrow ya 'D' key press karne par Right Lane shift
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+    e.preventDefault(); // Page scroll hone se rokne ke liye
+    if (STATE.lane < CONFIG.lanes.length - 1) {
+      STATE.lane++;
+      STATE.targetX = CONFIG.lanes[STATE.lane];
+    }
+  }
+
+  // Up Arrow, Space ya 'W' key press karne par Jump/Breach
+  if (e.code === 'ArrowUp' || e.code === 'Space' || e.code === 'KeyW') {
+    e.preventDefault();
+    if (STATE.grounded) {
+      STATE.vy = CONFIG.jumpForce;
+      STATE.grounded = false;
+      AudioEngine.jump();
+    }
+  }
+
+  if (e.code === 'Escape') {
+    UI.togglePause();
+  }
 });
 
 let touchStartX=0, touchStartY=0, touchStartT=0, touchActive=false;
@@ -624,9 +639,15 @@ touchZone.addEventListener('touchend', (e)=>{
   const elapsed = performance.now() - touchStartT;
 
   if(Math.abs(dx) > 32 && Math.abs(dx) > Math.abs(dy)){
-    changeLane(dx > 0 ? 1 : -1);
+    const dir = dx > 0 ? 1 : -1;
+    STATE.lane = Math.min(2, Math.max(0, STATE.lane + dir));
+    STATE.targetX = CONFIG.lanes[STATE.lane];
   } else if(elapsed < 250 && Math.abs(dx) < 20 && Math.abs(dy) < 20){
-    doJump();
+    if(STATE.grounded){
+      STATE.vy = CONFIG.jumpForce;
+      STATE.grounded = false;
+      AudioEngine.jump();
+    }
   }
 }, {passive:true});
 
@@ -637,6 +658,7 @@ function resetRun(){
   STATE.obstacles = []; STATE.coins = []; STATE.particles = [];
   
   STATE.lane = 1; 
+  STATE.targetX = CONFIG.lanes[1];
   STATE.x = 0; 
   STATE.y = 0; 
   STATE.vy = 0; 
@@ -699,8 +721,8 @@ function updateGame(dt){
   }
 
   STATE.distance += STATE.speed * dt;
-  const targetX = CONFIG.lanes[STATE.lane];
-  STATE.x += (targetX - STATE.x) * Math.min(1, dt*10);
+  STATE.targetX = CONFIG.lanes[STATE.lane];
+  STATE.x += (STATE.targetX - STATE.x) * Math.min(1, dt*10);
 
   if(!STATE.grounded){
     STATE.vy += CONFIG.gravity * dt;
@@ -711,7 +733,7 @@ function updateGame(dt){
   orca.position.x = STATE.x;
   orca.position.y = STATE.y;
   orca.position.z = STATE.distance;
-  orca.rotation.z = (targetX - STATE.x) * -0.25;
+  orca.rotation.z = (STATE.targetX - STATE.x) * -0.25;
   orca.rotation.x = STATE.grounded ? 0 : -0.18;
   const t = performance.now()/1000;
   orcaParts.fluke.rotation.y = Math.sin(t*10) * 0.35;
@@ -1015,36 +1037,4 @@ initThree();
 animate();
 </script>
 </body>
-  // Keyboard Controls (Left / Right Arrow Keys Matching)
-window.addEventListener('keydown', (e) => {
-  if (!STATE.running || STATE.paused) return;
-
-  // Left Arrow ya 'A' key press karne par Left Lane shift
-  if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
-    e.preventDefault(); // Page scroll hone se rokne ke liye
-    if (STATE.lane > 0) {
-      STATE.lane--;
-      STATE.targetX = CONFIG.lanes[STATE.lane];
-    }
-  }
-
-  // Right Arrow ya 'D' key press karne par Right Lane shift
-  if (e.code === 'ArrowRight' || e.code === 'KeyD') {
-    e.preventDefault(); // Page scroll hone se rokne ke liye
-    if (STATE.lane < CONFIG.lanes.length - 1) {
-      STATE.lane++;
-      STATE.targetX = CONFIG.lanes[STATE.lane];
-    }
-  }
-
-  // Up Arrow, Space ya 'W' key press karne par Jump/Breach
-  if (e.code === 'ArrowUp' || e.code === 'Space' || e.code === 'KeyW') {
-    e.preventDefault();
-    if (STATE.grounded) {
-      STATE.vy = CONFIG.jumpForce;
-      STATE.grounded = false;
-      AudioEngine.jump();
-    }
-  }
-});
 </html>
