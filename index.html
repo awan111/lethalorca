@@ -606,6 +606,7 @@
     <a href="#about">About</a>
     <a href="#transparency">Transparency</a>
     <a href="#roadmap">Roadmap</a>
+    <a href="#gameplay">Play Arcade</a>
     <a href="#faq">FAQ</a>
     <a href="#community">Community</a>
     <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
@@ -618,11 +619,12 @@
   <a href="#about" onclick="toggleMobileMenu()">About</a>
   <a href="#transparency" onclick="toggleMobileMenu()">Transparency</a>
   <a href="#roadmap" onclick="toggleMobileMenu()">Roadmap</a>
+  <a href="#gameplay" onclick="toggleMobileMenu()">Play Arcade</a>
   <a href="#" onclick="toggleMobileMenu(); openAirdropModal();">Claim Airdrop</a>
   <a href="#faq" onclick="toggleMobileMenu()">FAQ</a>
   <a href="#community" onclick="toggleMobileMenu()">Community</a>
   <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
-  <a href="#referral" style="color: var(--toggleMobileMenu()">Refer & Earn</a>
+  <a href="#referral" onclick="toggleMobileMenu()">Refer & Earn</a>
 </div>
 
 <section id="hero">
@@ -634,7 +636,7 @@
     <button class="btn btn-airdrop" onclick="openAirdropModal()">
       <span>💎 CLAIM FREE AIRDROP</span>
     </button>
-    <a class="btn btn-play" href="game.html"><span class="play-icon">▶</span> Daily Play & Earn</a>
+    <a class="btn btn-play" href="#gameplay"><span class="play-icon">▶</span> Daily Play & Earn</a>
     
     <!-- Orca Runner Button Added Below -->
     <a class="btn btn-runner" href="orca-runner.html">
@@ -738,14 +740,20 @@
 
 <hr class="divider">
 
-<section id="screenshots">
-  <div class="depth-marker"><span class="depth-val">–2500m</span><span class="depth-name">Gameplay</span></div>
-  <h2 class="section-title">See it in action</h2>
-  <p class="section-lede">Game screenshots showing the fishing arcade in action.</p>
-  <div class="screenshot-row">
-    <div class="screenshot-img"><img src="./screenshot-1.png" alt="LethalOrca Fishing hero screen" onerror="this.alt='Game screenshot 1'"></div>
-    <div class="screenshot-img"><img src="./screenshot-2.png" alt="LethalOrca Fishing start screen" onerror="this.alt='Game screenshot 2'"></div>
-    <div class="screenshot-img"><img src="./screenshot-3.png" alt="LethalOrca Fishing gameplay" onerror="this.alt='Game screenshot 3'"></div>
+<!-- LIVE PLAYABLE ARCADE SECTION EMBEDDED -->
+<section id="gameplay">
+  <div class="depth-marker"><span class="depth-val">–2500m</span><span class="depth-name">Live Arcade Gameplay</span></div>
+  <h2 class="section-title">Play LethalOrca Fishing</h2>
+  <p class="section-lede">Hunt deep-sea prey, avoid abyssal hazards, and secure your $LORCA tokens directly in your browser.</p>
+  
+  <div style="width: 100%; max-width: 1050px; margin: 0 auto; border-radius: 18px; overflow: hidden; border: 1px solid rgba(94, 234, 212, 0.4); box-shadow: 0 0 40px rgba(45, 212, 191, 0.25); background: #000;">
+    <iframe 
+      src="https://lethalorca-arcade.ai.studio" 
+      width="100%" 
+      height="750px" 
+      style="border:none; display: block;" 
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope">
+    </iframe>
   </div>
 </section>
 
