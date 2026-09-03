@@ -242,6 +242,20 @@
     font-size: 10px;
   }
 
+  /* Stunning New Cyber-Neon Arcade Button */
+  .btn-arcade {
+    background: linear-gradient(135deg, #ff007f, #7928ca);
+    color: #fff;
+    border: none;
+    font-weight: 700;
+    box-shadow: 0 4px 25px rgba(255, 0, 127, 0.45);
+    animation: arcade-pulse 2.5s ease-in-out infinite;
+  }
+  .btn-arcade:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 35px rgba(255, 0, 127, 0.75);
+  }
+
   .btn-runner {
     background: linear-gradient(135deg, #ff5e62, #ff9966);
     color: #fff;
@@ -294,6 +308,11 @@
   @keyframes play-pulse {
     0%, 100% { box-shadow: 0 4px 25px rgba(242, 201, 76, 0.45); }
     50% { box-shadow: 0 4px 35px rgba(242, 201, 76, 0.75); }
+  }
+
+  @keyframes arcade-pulse {
+    0%, 100% { box-shadow: 0 4px 25px rgba(255, 0, 127, 0.45); }
+    50% { box-shadow: 0 4px 35px rgba(255, 0, 127, 0.75); }
   }
 
   @keyframes airdrop-pulse {
@@ -423,13 +442,6 @@
   .update-date { font-family: var(--mono); font-size: 13px; color: var(--teal); white-space: nowrap; min-width: 80px; }
   .update-text { font-size: 15px; color: var(--ink); }
   .update-text .tag { font-family: var(--mono); font-size: 11px; color: var(--gold); border: 1px solid rgba(242,201,76,0.35); padding: 2px 8px; border-radius: 20px; margin-right: 6px; text-transform: uppercase; }
-
-  .screenshot-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 28px; }
-  .screenshot-img {
-    aspect-ratio: 16/9; border-radius: 14px; border: 1px solid var(--line);
-    overflow: hidden; background: var(--deep);
-  }
-  .screenshot-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
 
   .faq-list { margin-top: 28px; border-top: 1px solid var(--line); }
   .faq-item { border-bottom: 1px solid var(--line); }
@@ -606,7 +618,6 @@
     <a href="#about">About</a>
     <a href="#transparency">Transparency</a>
     <a href="#roadmap">Roadmap</a>
-    <a href="#gameplay">Play Arcade</a>
     <a href="#faq">FAQ</a>
     <a href="#community">Community</a>
     <a href="stake.html" style="color: var(--teal-glow); font-weight: 600;">Staking Pool</a>
@@ -619,7 +630,6 @@
   <a href="#about" onclick="toggleMobileMenu()">About</a>
   <a href="#transparency" onclick="toggleMobileMenu()">Transparency</a>
   <a href="#roadmap" onclick="toggleMobileMenu()">Roadmap</a>
-  <a href="#gameplay" onclick="toggleMobileMenu()">Play Arcade</a>
   <a href="#" onclick="toggleMobileMenu(); openAirdropModal();">Claim Airdrop</a>
   <a href="#faq" onclick="toggleMobileMenu()">FAQ</a>
   <a href="#community" onclick="toggleMobileMenu()">Community</a>
@@ -636,9 +646,14 @@
     <button class="btn btn-airdrop" onclick="openAirdropModal()">
       <span>💎 CLAIM FREE AIRDROP</span>
     </button>
+    
+    <!-- New Cyber-Neon Play Arcade Button -->
+    <a class="btn btn-arcade" href="#gameplay">
+      <span class="play-icon">🎮</span> PLAY ARCADE
+    </a>
+
     <a class="btn btn-play" href="#gameplay"><span class="play-icon">▶</span> Daily Play & Earn</a>
     
-    <!-- Orca Runner Button Added Below -->
     <a class="btn btn-runner" href="orca-runner.html">
       <span class="play-icon">🏃</span> ORCA RUNNER
     </a>
@@ -649,7 +664,7 @@
     <a class="btn btn-staking" href="stake.html">
       <span class="stake-icon">⚓</span> STAKING POOL
     </a>
-    <a class="btn btn-ghost" href="https://t.me/Lethal_Orca" target="_blank" rel="noopener">Join Telegram ↗</a>
+    <a class="btn btn-ghost" href="https://t.me/" target="_blank" rel="noopener">Join Telegram ↗</a>
   </div>
 
   <svg id="orca-trail" viewBox="0 0 500 300" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -740,7 +755,7 @@
 
 <hr class="divider">
 
-<!-- LIVE PLAYABLE ARCADE SECTION EMBEDDED -->
+<!-- LIVE PLAYABLE ARCADE SECTION EMBEDDED WITH CORRECT URL -->
 <section id="gameplay">
   <div class="depth-marker"><span class="depth-val">–2500m</span><span class="depth-name">Live Arcade Gameplay</span></div>
   <h2 class="section-title">Play LethalOrca Fishing</h2>
@@ -748,7 +763,7 @@
   
   <div style="width: 100%; max-width: 1050px; margin: 0 auto; border-radius: 18px; overflow: hidden; border: 1px solid rgba(94, 234, 212, 0.4); box-shadow: 0 0 40px rgba(45, 212, 191, 0.25); background: #000;">
     <iframe 
-      src="https://lethalorca-arcade.ai.studio" 
+      src="https://lethal-orca-arcade.ai.studio/" 
       width="100%" 
       height="750px" 
       style="border:none; display: block;" 
@@ -854,19 +869,19 @@
   <h2 class="section-title">Join the crew</h2>
   <p class="section-lede">Follow along, ask questions, and watch the build happen in real time.</p>
   <div class="community-grid">
-    <a class="comm-card" href="https://x.com/lethalorcatdo" target="_blank" rel="noopener">
+    <a class="comm-card" href="https://x.com" target="_blank" rel="noopener">
       <div class="plat">X / Twitter</div>
       <div class="handle">@lethalorcatdo ↗</div>
     </a>
-    <a class="comm-card" href="https://lethalorca.com/#transparency1" target="_blank" rel="noopener">
+    <a class="comm-card" href="https://discord.com" target="_blank" rel="noopener">
       <div class="plat">Discord</div>
       <div class="handle">Join the Crew ↗</div>
     </a>
-    <a class="comm-card" href="https://t.me/Lethal_Orca" target="_blank" rel="noopener">
+    <a class="comm-card" href="https://t.me" target="_blank" rel="noopener">
       <div class="plat">Telegram</div>
       <div class="handle">Join the Chat ↗</div>
     </a>
-    <a class="comm-card" href="https://pump.fun/coin/7RqpgT532tsYakbgnTXECC4MHTEGu5HzBxVAkAAHpump" target="_blank" rel="noopener">
+    <a class="comm-card" href="https://pump.fun" target="_blank" rel="noopener">
       <div class="plat">pump.fun</div>
       <div class="handle">View on pump.fun ↗</div>
     </a>
